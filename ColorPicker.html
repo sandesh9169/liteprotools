@@ -1,0 +1,1380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Photo Color Picker</title>
+
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary-purple: #7c3aed;
+            --light-purple-bg: #f3f0ff;
+            --border-purple: #d8b4fe;
+            --text-dark: #1f2937;
+            --text-light: #6b7280;
+            --success-green: #6ee7b7;
+            --success-hover: #34d399;
+            --btn-shadow: 0 4px 6px -1px rgba(124, 58, 237, 0.4);
+            --lock-orange: #f59e0b;
+            --lock-orange-dark: #d97706;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            background-color: #f3f4f6;
+            background-image: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+            color: var(--text-dark);
+            display: flex;
+            flex-direction: column;
+            padding: 15px;
+            gap: 12px;
+        }
+
+        /* ---------- Header ---------- */
+        header {
+            flex-shrink: 0;
+            background: white;
+            border-radius: 20px;
+            padding: 18px 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08), 0 0 0 1px rgba(124, 58, 237, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        header h1 {
+            font-size: 1.3rem;
+            color: var(--text-dark);
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            white-space: nowrap;
+        }
+
+        header h1 i { color: var(--primary-purple); }
+
+        .header-controls {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        #imageInput { display: none; }
+
+        .tool-btn {
+            padding: 10px 18px;
+            background: white;
+            color: var(--primary-purple);
+            border: 1px solid var(--border-purple);
+            font-weight: 700;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.82rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+
+        .tool-btn:hover {
+            background: var(--light-purple-bg);
+            transform: translateY(-2px);
+        }
+
+        .tool-btn.active {
+            background: var(--primary-purple);
+            border-color: var(--primary-purple);
+            color: white;
+            box-shadow: var(--btn-shadow);
+        }
+
+        .upload-label {
+            padding: 10px 20px;
+            background: var(--primary-purple);
+            color: white;
+            font-weight: 700;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.82rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: var(--btn-shadow);
+            white-space: nowrap;
+        }
+
+        .upload-label:hover {
+            background: #6d28d9;
+            transform: translateY(-2px);
+        }
+
+        .reset-btn {
+            padding: 10px 18px;
+            background: var(--success-green);
+            color: #166534;
+            font-weight: 700;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.82rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 4px 6px -1px rgba(52, 211, 153, 0.4);
+            white-space: nowrap;
+        }
+
+        .reset-btn:hover {
+            background: var(--success-hover);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* Unlock button */
+        .unlock-btn {
+            padding: 10px 18px;
+            background: var(--lock-orange);
+            color: white;
+            font-weight: 700;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.82rem;
+            display: none;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 4px 6px -1px rgba(245, 158, 11, 0.4);
+            white-space: nowrap;
+            animation: pulse-unlock 1.5s infinite;
+        }
+
+        .unlock-btn.show {
+            display: flex;
+        }
+
+        .unlock-btn:hover {
+            background: var(--lock-orange-dark);
+            transform: translateY(-2px);
+            animation: none;
+        }
+
+        @keyframes pulse-unlock {
+            0%, 100% { box-shadow: 0 4px 6px -1px rgba(245, 158, 11, 0.4); }
+            50% { box-shadow: 0 4px 18px 2px rgba(245, 158, 11, 0.6); }
+        }
+
+        /* ---------- Main Split Layout ---------- */
+        .main-area {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1.3fr 1fr;
+            gap: 12px;
+            overflow: hidden;
+            min-height: 0;
+        }
+
+        /* ---------- LEFT: Image Canvas ---------- */
+        .canvas-wrap {
+            background: #f8fafc;
+            border-radius: 20px;
+            position: relative;
+            overflow: hidden;
+            border: 2px dashed var(--border-purple);
+            touch-action: none;
+            user-select: none;
+            cursor: crosshair;
+            min-height: 0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        }
+
+        .canvas-wrap.grabbing { cursor: grabbing !important; }
+
+        .canvas-wrap.empty::before {
+            content: "\f03e  Click 'Select Photo' to begin";
+            font-family: 'Font Awesome 6 Free', 'Segoe UI', sans-serif;
+            font-weight: 900;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.05rem;
+            color: var(--text-light);
+            text-align: center;
+            padding: 20px;
+            line-height: 1.8;
+        }
+
+        #canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            transform-origin: 0 0;
+            image-rendering: pixelated;
+            pointer-events: none;
+        }
+
+        /* Floating Badge — follows cursor on hover, locks on click */
+        .color-badge {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            color: var(--text-dark);
+            padding: 10px 14px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-family: 'Courier New', monospace;
+            pointer-events: none;
+            z-index: 20;
+            display: none;
+            border: 2px solid var(--primary-purple);
+            box-shadow: 0 6px 20px rgba(124, 58, 237, 0.3);
+            white-space: nowrap;
+            transform: translate(18px, 18px);
+            transition: border-color 0.1s;
+        }
+
+        .color-badge.locked {
+            border-color: var(--lock-orange);
+            box-shadow: 0 6px 20px rgba(245, 158, 11, 0.5);
+        }
+
+        .color-badge .badge-hex {
+            font-weight: 700;
+            font-size: 0.95rem;
+            margin-bottom: 2px;
+            color: var(--primary-purple);
+        }
+
+        .color-badge.locked .badge-hex {
+            color: var(--lock-orange-dark);
+        }
+
+        .color-badge .badge-rgb {
+            color: var(--text-light);
+            font-size: 0.75rem;
+        }
+
+        .color-badge .lock-hint {
+            font-size: 0.65rem;
+            color: var(--lock-orange);
+            font-weight: 700;
+            margin-top: 2px;
+            display: none;
+        }
+
+        .color-badge.locked .lock-hint {
+            display: block;
+        }
+
+        /* Magnifier */
+        #magnifier {
+            position: absolute;
+            width: 140px;
+            height: 140px;
+            border: 3px solid var(--primary-purple);
+            border-radius: 50%;
+            box-shadow: 0 0 25px rgba(124, 58, 237, 0.4), inset 0 0 0 2px white;
+            pointer-events: none;
+            display: none;
+            background-repeat: no-repeat;
+            z-index: 15;
+            overflow: hidden;
+            image-rendering: pixelated;
+        }
+
+        #magnifier.locked {
+            border-color: var(--lock-orange);
+            box-shadow: 0 0 25px rgba(245, 158, 11, 0.5), inset 0 0 0 2px white;
+        }
+
+        #magnifier::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 8px;
+            height: 8px;
+            background: white;
+            border: 2px solid var(--primary-purple);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.5);
+        }
+
+        #magnifier.locked::after {
+            border-color: var(--lock-orange);
+        }
+
+        .zoom-indicator {
+            position: absolute;
+            bottom: 12px;
+            right: 12px;
+            background: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--primary-purple);
+            z-index: 5;
+            font-family: 'Courier New', monospace;
+            border: 1px solid var(--border-purple);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+        }
+
+        /* Lock indicator on canvas */
+        .lock-indicator {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            background: var(--lock-orange);
+            color: white;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            z-index: 10;
+            display: none;
+            align-items: center;
+            gap: 5px;
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+            animation: pulse-lock 1.5s infinite;
+        }
+
+        .lock-indicator.show {
+            display: flex;
+        }
+
+        @keyframes pulse-lock {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        /* ---------- RIGHT: Info Panel ---------- */
+        .info-panel {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            overflow-y: auto;
+            border: 1px solid rgba(124, 58, 237, 0.1);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            min-height: 0;
+        }
+
+        .info-panel::-webkit-scrollbar { width: 8px; }
+        .info-panel::-webkit-scrollbar-track { background: var(--light-purple-bg); border-radius: 4px; }
+        .info-panel::-webkit-scrollbar-thumb { background: var(--border-purple); border-radius: 4px; }
+        .info-panel::-webkit-scrollbar-thumb:hover { background: var(--primary-purple); }
+
+        .placeholder {
+            text-align: center;
+            color: var(--text-light);
+            padding: 80px 20px;
+            font-size: 0.95rem;
+            line-height: 1.9;
+        }
+
+        .placeholder .icon {
+            font-size: 3rem;
+            display: block;
+            margin-bottom: 15px;
+            color: var(--border-purple);
+        }
+
+        .color-preview {
+            width: 100%;
+            height: 110px;
+            border-radius: 16px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            border: 3px solid white;
+            transition: background 0.08s;
+        }
+
+        .color-name {
+            font-size: 1.3rem;
+            font-weight: 800;
+            margin-bottom: 3px;
+            text-align: center;
+            color: var(--text-dark);
+        }
+
+        .color-sub {
+            text-align: center;
+            color: var(--primary-purple);
+            margin-bottom: 15px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            background: var(--light-purple-bg);
+            padding: 6px 12px;
+            border-radius: 20px;
+            display: inline-block;
+            width: 100%;
+            border: 1px solid var(--border-purple);
+        }
+
+        .section {
+            background: #f8fafc;
+            padding: 15px;
+            border-radius: 14px;
+            margin-bottom: 12px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .section h3 {
+            font-size: 0.85rem;
+            margin-bottom: 12px;
+            color: var(--primary-purple);
+            border-bottom: 1px dashed var(--border-purple);
+            padding-bottom: 8px;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .code-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 0;
+            font-size: 0.82rem;
+            border-bottom: 1px dashed #e2e8f0;
+            gap: 8px;
+        }
+
+        .code-row:last-child { border-bottom: none; }
+
+        .code-label {
+            font-weight: 700;
+            color: var(--text-light);
+            min-width: 65px;
+            font-size: 0.72rem;
+            flex-shrink: 0;
+            text-transform: uppercase;
+        }
+
+        .code-value {
+            font-family: 'Courier New', monospace;
+            background: white;
+            padding: 5px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex: 1;
+            text-align: right;
+            margin-right: 6px;
+            word-break: break-all;
+            font-size: 0.76rem;
+            color: var(--primary-purple);
+            font-weight: 700;
+            border: 1px solid var(--border-purple);
+        }
+
+        .code-value:hover {
+            background: var(--light-purple-bg);
+            border-color: var(--primary-purple);
+        }
+
+        .copy-btn {
+            background: var(--primary-purple);
+            border: none;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.7rem;
+            transition: all 0.2s;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .copy-btn:hover {
+            background: #6d28d9;
+            transform: scale(1.05);
+        }
+
+        .copy-btn.copied {
+            background: var(--success-green);
+            color: #166534;
+        }
+
+        .shades-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 5px;
+        }
+
+        .shade {
+            height: 36px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .shade:hover {
+            transform: scale(1.15);
+            box-shadow: 0 0 12px rgba(124, 58, 237, 0.5);
+            z-index: 2;
+        }
+
+        .history-list {
+            list-style: none;
+            font-size: 0.82rem;
+            line-height: 1.7;
+        }
+
+        .history-list li {
+            padding: 5px 0 5px 20px;
+            position: relative;
+            color: var(--text-dark);
+        }
+
+        .history-list li::before {
+            content: "▸";
+            position: absolute;
+            left: 0;
+            color: var(--primary-purple);
+            font-weight: 700;
+        }
+
+        .history-list li b { color: var(--primary-purple); }
+
+        /* Toast */
+        #toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--success-green);
+            color: #166534;
+            padding: 14px 26px;
+            border-radius: 30px;
+            font-weight: 700;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s;
+            pointer-events: none;
+            z-index: 999;
+            box-shadow: 0 6px 25px rgba(52, 211, 153, 0.5);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        #toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ---------- Responsive ---------- */
+        @media (max-width: 900px) {
+            .main-area { grid-template-columns: 1fr; }
+            header h1 { font-size: 1rem; }
+            .header-controls { justify-content: center; }
+            .canvas-wrap { min-height: 350px; }
+        }
+
+        @media (max-width: 550px) {
+            body { padding: 10px; gap: 10px; }
+            header { padding: 14px 16px; }
+            header h1 { font-size: 0.95rem; }
+            .tool-btn, .upload-label, .reset-btn, .unlock-btn { padding: 8px 14px; font-size: 0.75rem; }
+            .canvas-wrap { min-height: 280px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <h1>
+            <i class="fas fa-palette"></i>
+            Photo Color Picker
+        </h1>
+        <div class="header-controls">
+            <input type="file" id="imageInput" accept="image/*">
+            <label for="imageInput" class="upload-label">
+                <i class="fas fa-camera"></i> Select Photo
+            </label>
+            <button class="tool-btn active" id="pickMode">
+                <i class="fas fa-crosshairs"></i> Pick
+            </button>
+            <button class="tool-btn" id="panMode">
+                <i class="fas fa-hand-paper"></i> Pan
+            </button>
+            <button class="tool-btn" id="zoomIn">
+                <i class="fas fa-plus"></i>
+            </button>
+            <button class="tool-btn" id="zoomOut">
+                <i class="fas fa-minus"></i>
+            </button>
+            <button class="tool-btn" id="fitBtn">
+                <i class="fas fa-expand"></i> Fit
+            </button>
+            <button class="reset-btn" id="resetBtn">
+                <i class="fas fa-redo"></i> Reset
+            </button>
+            <button class="unlock-btn" id="unlockBtn">
+                <i class="fas fa-lock-open"></i> Unlock
+            </button>
+        </div>
+    </header>
+
+    <div class="main-area">
+        <!-- LEFT: Image Canvas -->
+        <div class="canvas-wrap empty" id="canvasWrap">
+            <canvas id="canvas"></canvas>
+            <div id="magnifier"></div>
+            <div class="color-badge" id="colorBadge">
+                <div class="badge-hex" id="badgeHex">#000000</div>
+                <div class="badge-rgb" id="badgeRgb">rgb(0, 0, 0)</div>
+                <div class="lock-hint"><i class="fas fa-lock"></i> Locked — click Unlock to release</div>
+            </div>
+            <div class="lock-indicator" id="lockIndicator">
+                <i class="fas fa-lock"></i> Locked
+            </div>
+            <div class="zoom-indicator" id="zoomIndicator">100%</div>
+        </div>
+
+        <!-- RIGHT: Info Panel -->
+        <div class="info-panel" id="infoPanel">
+            <p class="placeholder">
+                <span class="icon"><i class="fas fa-palette"></i></span>
+                Upload a photo, then <strong>hover</strong> to preview.<br>
+                <strong>Click</strong> to lock a color and copy its codes.
+            </p>
+        </div>
+    </div>
+
+    <div id="toast">
+        <i class="fas fa-check-circle"></i> Copied to clipboard!
+    </div>
+
+    <script>
+        const imageInput = document.getElementById('imageInput');
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+        const infoPanel = document.getElementById('infoPanel');
+        const magnifier = document.getElementById('magnifier');
+        const toast = document.getElementById('toast');
+        const canvasWrap = document.getElementById('canvasWrap');
+        const zoomIndicator = document.getElementById('zoomIndicator');
+        const resetBtn = document.getElementById('resetBtn');
+        const panModeBtn = document.getElementById('panMode');
+        const pickModeBtn = document.getElementById('pickMode');
+        const colorBadge = document.getElementById('colorBadge');
+        const badgeHex = document.getElementById('badgeHex');
+        const badgeRgb = document.getElementById('badgeRgb');
+        const lockIndicator = document.getElementById('lockIndicator');
+        const unlockBtn = document.getElementById('unlockBtn');
+
+        let img = new Image();
+        let currentMode = 'pick';
+        let scale = 1, offsetX = 0, offsetY = 0;
+
+        let isDragging = false;
+        let dragStart = { x: 0, y: 0 };
+        let offsetStart = { x: 0, y: 0 };
+
+        // Hover throttle
+        let lastHoverTime = 0;
+        const HOVER_THROTTLE = 30;
+
+        // Locked state
+        let isLocked = false;
+        let lockedImgX = 0, lockedImgY = 0;
+        let lockedR = 0, lockedG = 0, lockedB = 0;
+
+        // ---------- Color Names ----------
+        const colorNames = [
+            { name: "Black", hex: "#000000" }, { name: "White", hex: "#FFFFFF" },
+            { name: "Red", hex: "#FF0000" }, { name: "Green", hex: "#008000" },
+            { name: "Blue", hex: "#0000FF" }, { name: "Yellow", hex: "#FFFF00" },
+            { name: "Cyan", hex: "#00FFFF" }, { name: "Magenta", hex: "#FF00FF" },
+            { name: "Orange", hex: "#FFA500" }, { name: "Purple", hex: "#800080" },
+            { name: "Pink", hex: "#FFC0CB" }, { name: "Brown", hex: "#A52A2A" },
+            { name: "Gray", hex: "#808080" }, { name: "Navy", hex: "#000080" },
+            { name: "Teal", hex: "#008080" }, { name: "Olive", hex: "#808000" },
+            { name: "Maroon", hex: "#800000" }, { name: "Lime", hex: "#00FF00" },
+            { name: "Aqua", hex: "#00FFFF" }, { name: "Silver", hex: "#C0C0C0" },
+            { name: "Gold", hex: "#FFD700" }, { name: "Coral", hex: "#FF7F50" },
+            { name: "Crimson", hex: "#DC143C" }, { name: "Indigo", hex: "#4B0082" },
+            { name: "Violet", hex: "#EE82EE" }, { name: "Turquoise", hex: "#40E0D0" },
+            { name: "Salmon", hex: "#FA8072" }, { name: "Khaki", hex: "#F0E68C" },
+            { name: "Lavender", hex: "#E6E6FA" }, { name: "Beige", hex: "#F5F5DC" },
+            { name: "Ivory", hex: "#FFFFF0" }, { name: "Sky Blue", hex: "#87CEEB" },
+            { name: "Royal Blue", hex: "#4169E1" }, { name: "Steel Blue", hex: "#4682B4" },
+            { name: "Forest Green", hex: "#228B22" }, { name: "Sea Green", hex: "#2E8B57" },
+            { name: "Hot Pink", hex: "#FF69B4" }, { name: "Deep Pink", hex: "#FF1493" },
+            { name: "Chocolate", hex: "#D2691E" }, { name: "Tomato", hex: "#FF6347" },
+            { name: "Plum", hex: "#DDA0DD" }, { name: "Orchid", hex: "#DA70D6" },
+            { name: "Tan", hex: "#D2B48C" }, { name: "Wheat", hex: "#F5DEB3" },
+            { name: "Peach", hex: "#FFDAB9" }, { name: "Mint", hex: "#98FF98" },
+            { name: "Lemon", hex: "#FFF700" }, { name: "Cherry", hex: "#DE3163" }
+        ];
+
+        // ============================================================
+        //   RELIABLE COPY FUNCTION (with fallback)
+        // ============================================================
+        function copyToClipboard(text) {
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(text)
+                    .then(() => showToast('Copied: ' + text))
+                    .catch(() => fallbackCopy(text));
+            } else {
+                fallbackCopy(text);
+            }
+        }
+
+        function fallbackCopy(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            textarea.style.top = '-1000px';
+            textarea.style.left = '-1000px';
+            textarea.setAttribute('readonly', '');
+            document.body.appendChild(textarea);
+            textarea.select();
+            textarea.setSelectionRange(0, textarea.value.length);
+            try {
+                const success = document.execCommand('copy');
+                if (success) {
+                    showToast('Copied: ' + text);
+                } else {
+                    showToast('Copy failed. Please copy manually.');
+                }
+            } catch (err) {
+                showToast('Copy failed. Please copy manually.');
+            }
+            document.body.removeChild(textarea);
+        }
+
+        function showToast(msg) {
+            toast.innerHTML = '<i class="fas fa-check-circle"></i> ' + msg;
+            toast.classList.add('show');
+            clearTimeout(showToast._timer);
+            showToast._timer = setTimeout(() => toast.classList.remove('show'), 1600);
+        }
+
+        // ============================================================
+        //   EVENT DELEGATION for copy buttons, code values, shades
+        // ============================================================
+        infoPanel.addEventListener('click', (e) => {
+            const btn = e.target.closest('.copy-btn');
+            if (btn) {
+                const text = btn.getAttribute('data-copy');
+                if (text !== null) {
+                    copyToClipboard(text);
+                    btn.classList.add('copied');
+                    const original = btn.innerHTML;
+                    btn.innerHTML = '<i class="fas fa-check"></i>';
+                    setTimeout(() => {
+                        btn.classList.remove('copied');
+                        btn.innerHTML = original;
+                    }, 900);
+                }
+                return;
+            }
+
+            const codeVal = e.target.closest('.code-value');
+            if (codeVal) {
+                const text = codeVal.getAttribute('data-copy');
+                if (text !== null) {
+                    copyToClipboard(text);
+                    codeVal.style.background = 'var(--light-purple-bg)';
+                    setTimeout(() => {
+                        codeVal.style.background = '';
+                    }, 400);
+                }
+                return;
+            }
+
+            const shade = e.target.closest('.shade');
+            if (shade) {
+                const text = shade.getAttribute('data-copy');
+                if (text !== null) {
+                    copyToClipboard(text);
+                }
+                return;
+            }
+        });
+
+        // ============================================================
+        //   Apply Transform
+        // ============================================================
+        function applyTransform() {
+            canvas.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(${scale})`;
+            zoomIndicator.textContent = Math.round(scale * 100) + '%';
+        }
+
+        // ---------- Photo Loading ----------
+        imageInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                img.onload = () => {
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    ctx.drawImage(img, 0, 0);
+                    canvasWrap.classList.remove('empty');
+                    requestAnimationFrame(() => fitToScreen());
+                    infoPanel.innerHTML = '<p class="placeholder"><span class="icon"><i class="fas fa-hand-pointer"></i></span>Hover to preview, click to lock a color.<br>Then copy any format you need.</p>';
+                    resetLockState();
+                    lastRenderedKey = '';
+                };
+                img.src = ev.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
+
+        function resetLockState() {
+            isLocked = false;
+            colorBadge.style.display = 'none';
+            magnifier.style.display = 'none';
+            lockIndicator.classList.remove('show');
+            colorBadge.classList.remove('locked');
+            magnifier.classList.remove('locked');
+            unlockBtn.classList.remove('show');
+        }
+
+        function fitToScreen() {
+            if (!canvas.width) return;
+            const wrapRect = canvasWrap.getBoundingClientRect();
+            const scaleX = wrapRect.width / canvas.width;
+            const scaleY = wrapRect.height / canvas.height;
+            scale = Math.min(scaleX, scaleY) * 0.95;
+            offsetX = (wrapRect.width - canvas.width * scale) / 2;
+            offsetY = (wrapRect.height - canvas.height * scale) / 2;
+            applyTransform();
+        }
+
+        resetBtn.addEventListener('click', () => {
+            fitToScreen();
+            resetLockState();
+        });
+
+        document.getElementById('fitBtn').addEventListener('click', fitToScreen);
+
+        let resizeTimer;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(() => { if (canvas.width) fitToScreen(); }, 150);
+        });
+
+        // ---------- Unlock Button ----------
+        unlockBtn.addEventListener('click', () => {
+            unlockColor();
+        });
+
+        function unlockColor() {
+            isLocked = false;
+            colorBadge.classList.remove('locked');
+            magnifier.classList.remove('locked');
+            lockIndicator.classList.remove('show');
+            unlockBtn.classList.remove('show');
+            // Hide hover elements until next hover
+            colorBadge.style.display = 'none';
+            magnifier.style.display = 'none';
+            showToast('Color unlocked — hover again to preview');
+        }
+
+        // ---------- Mode ----------
+        panModeBtn.addEventListener('click', () => setMode('pan'));
+        pickModeBtn.addEventListener('click', () => setMode('pick'));
+
+        function setMode(mode) {
+            currentMode = mode;
+            panModeBtn.classList.toggle('active', mode === 'pan');
+            pickModeBtn.classList.toggle('active', mode === 'pick');
+            canvasWrap.style.cursor = mode === 'pan' ? 'grab' : 'crosshair';
+
+            if (mode === 'pan') {
+                magnifier.style.display = 'none';
+                if (!isLocked) {
+                    colorBadge.style.display = 'none';
+                }
+            } else {
+                if (isLocked) {
+                    colorBadge.style.display = 'block';
+                    magnifier.style.display = 'block';
+                } else {
+                    colorBadge.style.display = 'none';
+                    magnifier.style.display = 'none';
+                }
+            }
+        }
+
+        // ---------- Zoom ----------
+        document.getElementById('zoomIn').addEventListener('click', () => zoomAt(1.25, canvasWrap.clientWidth / 2, canvasWrap.clientHeight / 2));
+        document.getElementById('zoomOut').addEventListener('click', () => zoomAt(0.8, canvasWrap.clientWidth / 2, canvasWrap.clientHeight / 2));
+
+        canvasWrap.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            if (!canvas.width) return;
+            const rect = canvasWrap.getBoundingClientRect();
+            zoomAt(e.deltaY < 0 ? 1.15 : 0.87, e.clientX - rect.left, e.clientY - rect.top);
+        }, { passive: false });
+
+        function zoomAt(factor, mx, my) {
+            const newScale = Math.max(0.1, Math.min(15, scale * factor));
+            const ratio = newScale / scale;
+            offsetX = mx - (mx - offsetX) * ratio;
+            offsetY = my - (my - offsetY) * ratio;
+            scale = newScale;
+            applyTransform();
+
+            if (isLocked) {
+                repositionLockedOverlay();
+            }
+        }
+
+        // ---------- Pointer helpers ----------
+        function getPointerPos(e) {
+            if (e.touches && e.touches[0]) return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+            return { x: e.clientX, y: e.clientY };
+        }
+
+        // ---------- Drag (pan mode) ----------
+        canvasWrap.addEventListener('mousedown', (e) => {
+            if (!canvas.width || currentMode !== 'pan') return;
+            isDragging = true;
+            canvasWrap.classList.add('grabbing');
+            dragStart = { x: e.clientX, y: e.clientY };
+            offsetStart = { x: offsetX, y: offsetY };
+        });
+
+        canvasWrap.addEventListener('touchstart', (e) => {
+            if (!canvas.width || currentMode !== 'pan' || e.touches.length !== 1) return;
+            isDragging = true;
+            const t = e.touches[0];
+            dragStart = { x: t.clientX, y: t.clientY };
+            offsetStart = { x: offsetX, y: offsetY };
+        }, { passive: true });
+
+        function onPointerMove(e) {
+            if (!canvas.width) return;
+
+            // Pan dragging
+            if (isDragging && currentMode === 'pan') {
+                const pos = getPointerPos(e);
+                offsetX = offsetStart.x + (pos.x - dragStart.x);
+                offsetY = offsetStart.y + (pos.y - dragStart.y);
+                applyTransform();
+                if (isLocked) repositionLockedOverlay();
+                return;
+            }
+
+            // Hover preview (only in pick mode and not locked)
+            if (currentMode === 'pick' && !isLocked) {
+                const now = Date.now();
+                if (now - lastHoverTime < HOVER_THROTTLE) return;
+                lastHoverTime = now;
+                liveHoverPreview(e);
+            }
+        }
+
+        window.addEventListener('mousemove', onPointerMove);
+        window.addEventListener('touchmove', (e) => {
+            if (isDragging) e.preventDefault();
+            onPointerMove(e);
+        }, { passive: false });
+
+        window.addEventListener('mouseup', () => { isDragging = false; canvasWrap.classList.remove('grabbing'); });
+        window.addEventListener('touchend', () => { isDragging = false; canvasWrap.classList.remove('grabbing'); });
+        window.addEventListener('touchcancel', () => { isDragging = false; canvasWrap.classList.remove('grabbing'); });
+
+        // Hover preview function (not locked)
+        function liveHoverPreview(e) {
+            const rect = canvasWrap.getBoundingClientRect();
+            const pos = getPointerPos(e);
+            const wrapX = pos.x - rect.left;
+            const wrapY = pos.y - rect.top;
+
+            if (wrapX < 0 || wrapY < 0 || wrapX > rect.width || wrapY > rect.height) {
+                magnifier.style.display = 'none';
+                colorBadge.style.display = 'none';
+                return;
+            }
+
+            const imgX = Math.round((wrapX - offsetX) / scale);
+            const imgY = Math.round((wrapY - offsetY) / scale);
+
+            if (imgX < 0 || imgY < 0 || imgX >= canvas.width || imgY >= canvas.height) {
+                magnifier.style.display = 'none';
+                colorBadge.style.display = 'none';
+                return;
+            }
+
+            const pixel = ctx.getImageData(imgX, imgY, 1, 1).data;
+            const [r, g, b] = pixel;
+
+            updateMagnifier(wrapX, wrapY, imgX, imgY);
+            const hex = rgbToHex(r, g, b);
+            badgeHex.textContent = hex;
+            badgeRgb.textContent = `rgb(${r}, ${g}, ${b})`;
+            colorBadge.style.display = 'block';
+            colorBadge.style.left = wrapX + 'px';
+            colorBadge.style.top = wrapY + 'px';
+            colorBadge.style.borderColor = hex;
+
+            showColorInfo(r, g, b);
+        }
+
+        // ============================================================
+        //   CLICK TO LOCK COLOR
+        // ============================================================
+        function handleClickLock(e) {
+            if (!canvas.width || currentMode !== 'pick') return;
+
+            const rect = canvasWrap.getBoundingClientRect();
+            const pos = getPointerPos(e);
+            const wrapX = pos.x - rect.left;
+            const wrapY = pos.y - rect.top;
+
+            if (wrapX < 0 || wrapY < 0 || wrapX > rect.width || wrapY > rect.height) return;
+
+            const imgX = Math.round((wrapX - offsetX) / scale);
+            const imgY = Math.round((wrapY - offsetY) / scale);
+
+            if (imgX < 0 || imgY < 0 || imgX >= canvas.width || imgY >= canvas.height) return;
+
+            const pixel = ctx.getImageData(imgX, imgY, 1, 1).data;
+            const [r, g, b] = pixel;
+
+            // Lock it
+            isLocked = true;
+            lockedImgX = imgX;
+            lockedImgY = imgY;
+            lockedR = r;
+            lockedG = g;
+            lockedB = b;
+
+            // Update badge and magnifier at click position
+            updateMagnifier(wrapX, wrapY, imgX, imgY);
+            const hex = rgbToHex(r, g, b);
+            badgeHex.textContent = hex;
+            badgeRgb.textContent = `rgb(${r}, ${g}, ${b})`;
+            colorBadge.style.display = 'block';
+            colorBadge.style.left = wrapX + 'px';
+            colorBadge.style.top = wrapY + 'px';
+            colorBadge.style.borderColor = 'var(--lock-orange)';
+            colorBadge.classList.add('locked');
+            magnifier.classList.add('locked');
+            lockIndicator.classList.add('show');
+            unlockBtn.classList.add('show');
+
+            showColorInfo(r, g, b);
+        }
+
+        // Mouse click
+        canvasWrap.addEventListener('click', (e) => {
+            if (currentMode === 'pick') {
+                handleClickLock(e);
+            }
+        });
+
+        // Touch tap
+        canvasWrap.addEventListener('touchend', (e) => {
+            if (currentMode === 'pick' && !isDragging) {
+                if (e.changedTouches.length === 1) {
+                    handleClickLock(e);
+                }
+            }
+        });
+
+        // Hide hover elements only when not locked
+        canvasWrap.addEventListener('mouseleave', () => {
+            if (!isLocked) {
+                magnifier.style.display = 'none';
+                colorBadge.style.display = 'none';
+            }
+        });
+
+        // Reposition locked overlays after transform change
+        function repositionLockedOverlay() {
+            if (!isLocked || !canvas.width) return;
+            const rect = canvasWrap.getBoundingClientRect();
+            const wrapX = lockedImgX * scale + offsetX;
+            const wrapY = lockedImgY * scale + offsetY;
+
+            if (wrapX < 0 || wrapY < 0 || wrapX > rect.width || wrapY > rect.height) {
+                magnifier.style.display = 'none';
+                colorBadge.style.display = 'none';
+            } else {
+                magnifier.style.display = 'block';
+                colorBadge.style.display = 'block';
+                updateMagnifier(wrapX, wrapY, lockedImgX, lockedImgY);
+                colorBadge.style.left = wrapX + 'px';
+                colorBadge.style.top = wrapY + 'px';
+            }
+        }
+
+        // Update magnifier position & background
+        function updateMagnifier(wrapX, wrapY, imgX, imgY) {
+            magnifier.style.display = 'block';
+            magnifier.style.left = (wrapX - 70) + 'px';
+            magnifier.style.top = (wrapY - 70) + 'px';
+            const zoom = 8, magSize = 140;
+            magnifier.style.backgroundImage = `url(${canvas.toDataURL()})`;
+            magnifier.style.backgroundSize = `${canvas.width * zoom}px ${canvas.height * zoom}px`;
+            magnifier.style.backgroundPosition = `-${imgX * zoom - magSize / 2}px -${imgY * zoom - magSize / 2}px`;
+        }
+
+        // ---------- Color Conversions ----------
+        function rgbToHex(r, g, b) {
+            return "#" + [r, g, b].map(v => v.toString(16).padStart(2, '0')).join('').toUpperCase();
+        }
+
+        function rgbToHsl(r, g, b) {
+            r /= 255; g /= 255; b /= 255;
+            const max = Math.max(r, g, b), min = Math.min(r, g, b);
+            let h, s, l = (max + min) / 2;
+            if (max === min) { h = s = 0; }
+            else {
+                const d = max - min;
+                s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+                switch (max) {
+                    case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                    case g: h = (b - r) / d + 2; break;
+                    case b: h = (r - g) / d + 4; break;
+                }
+                h /= 6;
+            }
+            return [Math.round(h * 360), Math.round(s * 100), Math.round(l * 100)];
+        }
+
+        function rgbToHsv(r, g, b) {
+            r /= 255; g /= 255; b /= 255;
+            const max = Math.max(r, g, b), min = Math.min(r, g, b);
+            const d = max - min;
+            let h, s = max === 0 ? 0 : d / max, v = max;
+            if (max === min) h = 0;
+            else {
+                switch (max) {
+                    case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                    case g: h = (b - r) / d + 2; break;
+                    case b: h = (r - g) / d + 4; break;
+                }
+                h /= 6;
+            }
+            return [Math.round(h * 360), Math.round(s * 100), Math.round(v * 100)];
+        }
+
+        function rgbToCmyk(r, g, b) {
+            r /= 255; g /= 255; b /= 255;
+            const k = 1 - Math.max(r, g, b);
+            if (k === 1) return [0, 0, 0, 100];
+            const c = (1 - r - k) / (1 - k);
+            const m = (1 - g - k) / (1 - k);
+            const y = (1 - b - k) / (1 - k);
+            return [Math.round(c * 100), Math.round(m * 100), Math.round(y * 100), Math.round(k * 100)];
+        }
+
+        function rgbToLab(r, g, b) {
+            let R = r / 255, G = g / 255, B = b / 255;
+            R = R > 0.04045 ? Math.pow((R + 0.055) / 1.055, 2.4) : R / 12.92;
+            G = G > 0.04045 ? Math.pow((G + 0.055) / 1.055, 2.4) : G / 12.92;
+            B = B > 0.04045 ? Math.pow((B + 0.055) / 1.055, 2.4) : B / 12.92;
+            let X = (R * 0.4124 + G * 0.3576 + B * 0.1805) * 100;
+            let Y = (R * 0.2126 + G * 0.7152 + B * 0.0722) * 100;
+            let Z = (R * 0.0193 + G * 0.1192 + B * 0.9505) * 100;
+            X /= 95.047; Y /= 100.0; Z /= 108.883;
+            X = X > 0.008856 ? Math.pow(X, 1 / 3) : (7.787 * X + 16 / 116);
+            Y = Y > 0.008856 ? Math.pow(Y, 1 / 3) : (7.787 * Y + 16 / 116);
+            Z = Z > 0.008856 ? Math.pow(Z, 1 / 3) : (7.787 * Z + 16 / 116);
+            return [Math.round(116 * Y - 16), Math.round(500 * (X - Y)), Math.round(200 * (Y - Z))];
+        }
+
+        function getColorName(r, g, b) {
+            let minDist = Infinity, closest = "Unknown";
+            for (const c of colorNames) {
+                const cr = parseInt(c.hex.slice(1, 3), 16);
+                const cg = parseInt(c.hex.slice(3, 5), 16);
+                const cb = parseInt(c.hex.slice(5, 7), 16);
+                const dist = Math.pow(r - cr, 2) + Math.pow(g - cg, 2) + Math.pow(b - cb, 2);
+                if (dist < minDist) { minDist = dist; closest = c.name; }
+            }
+            return closest;
+        }
+
+        function getColorFamily(h, s, l) {
+            if (s < 10) return l > 90 ? "Neutral Light" : l < 10 ? "Neutral Dark" : "Grayscale";
+            if (h < 15 || h >= 345) return "Red Family";
+            if (h < 45) return "Orange Family";
+            if (h < 70) return "Yellow Family";
+            if (h < 160) return "Green Family";
+            if (h < 200) return "Cyan Family";
+            if (h < 260) return "Blue Family";
+            if (h < 290) return "Purple Family";
+            if (h < 345) return "Pink Family";
+            return "Unknown";
+        }
+
+        function getTemperature(h, s) {
+            if (s < 10) return "Neutral";
+            if (h < 60 || h >= 300) return "Warm";
+            return "Cool";
+        }
+
+        function getMood(h, s, l) {
+            if (s < 15) return l > 70 ? "Calm, Pure, Minimal" : "Elegant, Serious, Formal";
+            if (l < 25) return "Mysterious, Powerful, Deep";
+            if (h < 30) return "Energetic, Passionate, Bold";
+            if (h < 60) return "Cheerful, Optimistic, Warm";
+            if (h < 150) return "Fresh, Natural, Balanced";
+            if (h < 210) return "Trustworthy, Calm, Professional";
+            if (h < 270) return "Creative, Spiritual, Royal";
+            if (h < 330) return "Romantic, Playful, Sweet";
+            return "Loving, Warm, Intense";
+        }
+
+        function getShades(r, g, b) {
+            const shades = [];
+            for (let i = 5; i >= 1; i--) {
+                shades.push(`rgb(${Math.round(r * i / 6)}, ${Math.round(g * i / 6)}, ${Math.round(b * i / 6)})`);
+            }
+            shades.push(`rgb(${r}, ${g}, ${b})`);
+            for (let i = 1; i <= 5; i++) {
+                shades.push(`rgb(${Math.round(r + (255 - r) * i / 6)}, ${Math.round(g + (255 - g) * i / 6)}, ${Math.round(b + (255 - b) * i / 6)})`);
+            }
+            return shades;
+        }
+
+        function escapeAttr(str) {
+            return String(str).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+
+        // ---------- Renderer ----------
+        let lastRenderedKey = '';
+        function showColorInfo(r, g, b) {
+            const hex = rgbToHex(r, g, b);
+            if (hex === lastRenderedKey) return;
+            lastRenderedKey = hex;
+
+            const hsl = rgbToHsl(r, g, b);
+            const hsv = rgbToHsv(r, g, b);
+            const cmyk = rgbToCmyk(r, g, b);
+            const lab = rgbToLab(r, g, b);
+            const name = getColorName(r, g, b);
+            const family = getColorFamily(hsl[0], hsl[1], hsl[2]);
+            const temp = getTemperature(hsl[0], hsl[1]);
+            const mood = getMood(hsl[0], hsl[1], hsl[2]);
+            const shades = getShades(r, g, b);
+
+            const colorCodes = [
+                { label: "HEX", value: hex },
+                { label: "HEXA", value: hex + "FF" },
+                { label: "RGB", value: `rgb(${r}, ${g}, ${b})` },
+                { label: "RGBA", value: `rgba(${r}, ${g}, ${b}, 1)` },
+                { label: "HSL", value: `hsl(${hsl[0]}, ${hsl[1]}%, ${hsl[2]}%)` },
+                { label: "HSLA", value: `hsla(${hsl[0]}, ${hsl[1]}%, ${hsl[2]}%, 1)` },
+                { label: "HSV", value: `hsv(${hsv[0]}, ${hsv[1]}%, ${hsv[2]}%)` },
+                { label: "CMYK", value: `cmyk(${cmyk[0]}%, ${cmyk[1]}%, ${cmyk[2]}%, ${cmyk[3]}%)` },
+                { label: "LAB", value: `lab(${lab[0]}%, ${lab[1]}, ${lab[2]})` },
+                { label: "CSS Var", value: `--color: ${hex};` },
+                { label: "JavaScript", value: `"${hex}"` },
+                { label: "Tailwind", value: `bg-[${hex}]` }
+            ];
+
+            const codesHTML = colorCodes.map(c => {
+                const esc = escapeAttr(c.value);
+                return `
+                    <div class="code-row">
+                        <span class="code-label">${c.label}</span>
+                        <span class="code-value" data-copy="${esc}">${c.value}</span>
+                        <button class="copy-btn" type="button" data-copy="${esc}">Copy</button>
+                    </div>
+                `;
+            }).join('');
+
+            const shadesHTML = shades.map(s => {
+                const esc = escapeAttr(s);
+                return `<div class="shade" style="background:${s}" title="${s}" data-copy="${esc}"></div>`;
+            }).join('');
+
+            infoPanel.innerHTML = `
+                <div class="color-preview" style="background:${hex}"></div>
+                <div class="color-name">${name}</div>
+                <div class="color-sub">${family} • ${temp}</div>
+
+                <div class="section">
+                    <h3><i class="fas fa-clipboard-list"></i> Color Codes (click to copy)</h3>
+                    ${codesHTML}
+                </div>
+
+                <div class="section">
+                    <h3><i class="fas fa-palette"></i> Shades & Tints</h3>
+                    <div class="shades-grid">${shadesHTML}</div>
+                </div>
+
+                <div class="section">
+                    <h3><i class="fas fa-brain"></i> Color Analysis</h3>
+                    <ul class="history-list">
+                        <li><b>Name:</b> ${name}</li>
+                        <li><b>Family:</b> ${family}</li>
+                        <li><b>Temperature:</b> ${temp}</li>
+                        <li><b>Mood:</b> ${mood}</li>
+                        <li><b>Hue:</b> ${hsl[0]}° (0°=Red, 120°=Green, 240°=Blue)</li>
+                        <li><b>Saturation:</b> ${hsl[1]}%</li>
+                        <li><b>Lightness:</b> ${hsl[2]}%</li>
+                        <li><b>Best Use:</b> ${getBestUse(hsl[0], hsl[1], hsl[2])}</li>
+                        <li><b>Psychology:</b> ${getPsychology(hsl[0], hsl[1], hsl[2])}</li>
+                    </ul>
+                </div>
+            `;
+        }
+
+        function getBestUse(h, s, l) {
+            if (s < 15) return "Backgrounds, Minimal UI";
+            if (h < 30) return "CTA Buttons, Alerts, Food Brands";
+            if (h < 60) return "Highlights, Warnings, Kids Design";
+            if (h < 150) return "Eco, Health, Finance, Nature";
+            if (h < 210) return "Tech, Corporate, Trust Brands";
+            if (h < 270) return "Luxury, Creative, Beauty";
+            if (h < 330) return "Fashion, Cosmetics, Romance";
+            return "Food, Energy, Sports";
+        }
+
+        function getPsychology(h, s, l) {
+            if (s < 15) return "Neutrality, clarity, simplicity";
+            if (h < 15) return "Passion, danger, love, power";
+            if (h < 45) return "Warmth, energy, creativity, enthusiasm";
+            if (h < 70) return "Happiness, optimism, attention";
+            if (h < 160) return "Growth, harmony, freshness, safety";
+            if (h < 200) return "Calmness, trust, communication";
+            if (h < 260) return "Intelligence, trust, depth, loyalty";
+            if (h < 290) return "Royalty, luxury, wisdom, mystery";
+            if (h < 345) return "Love, sweetness, playfulness";
+            return "Energy, urgency, excitement";
+        }
+
+        setMode('pick');
+    </script>
+</body>
+</html>

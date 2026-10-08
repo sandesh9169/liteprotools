@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Size Expander · Exact KB / MB</title>
+    <!-- ✅ FAVICON - Folder ke andar wali files -->
+    <link rel="icon" type="image/x-icon" href="favicon/favicon.ico">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-purple: #7c3aed;
+            --light-purple-bg: #f3f0ff;
+            --border-purple: #d8b4fe;
+            --text-dark: #1f2937;
+            --text-light: #6b7280;
+            --success-green: #6ee7b7;
+            --success-hover: #34d399;
+            --btn-shadow: 0 4px 6px -1px rgba(124, 58, 237, 0.4);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        html, body { min-height: 100%; }
+
+        body {
+            background-color: #f3f4f6;
+            background-image: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 30px 15px;
+            color: var(--text-dark);
+        }
+
+        /* ---------- HOME BUTTON ---------- */
+        .home-btn-wrapper {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 999;
+        }
+
+        .home-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: white;
+            color: var(--primary-purple);
+            border: 2px solid var(--border-purple);
+            padding: 10px 22px;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 700;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            box-shadow: 0 4px 10px rgba(124, 58, 237, 0.15);
+        }
+
+        .home-btn:hover {
+            background: var(--primary-purple);
+            color: white;
+            border-color: var(--primary-purple);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(124, 58, 237, 0.35);
+        }
+
+        .home-btn i { font-size: 15px; }
+
+        /* ---------- PAGE SHELL ---------- */
+        .page-shell {
+            width: 100%;
+            max-width: 1400px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        /* Main Card Container */
+        .main-card {
+            background: white;
+            width: 100%;
+            max-width: 600px;
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08), 0 0 0 1px rgba(124, 58, 237, 0.1);
+            padding: 35px 30px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        /* Header */
+        .page-header {
+            text-align: center;
+        }
+
+        .page-header h1 {
+            font-size: 26px;
+            color: var(--text-dark);
+            margin-bottom: 10px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .page-header h1 span {
+            background: var(--primary-purple);
+            color: white;
+            font-size: 14px;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            box-shadow: var(--btn-shadow);
+        }
+
+        .page-header p.subtitle {
+            color: var(--text-light);
+            font-size: 14px;
+            background: var(--light-purple-bg);
+            padding: 8px 20px;
+            border-radius: 30px;
+            display: inline-block;
+            font-weight: 600;
+            border: 1px solid var(--border-purple);
+        }
+
+        /* --- UPLOAD AREA --- */
+        .upload-area {
+            border: 2px dashed var(--border-purple);
+            background-color: #faf5ff;
+            border-radius: 20px;
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .upload-area:hover, .upload-area.dragover {
+            background-color: #f3e8ff;
+            border-color: var(--primary-purple);
+            transform: scale(1.02);
+        }
+
+        .folder-icon {
+            font-size: 48px;
+            color: var(--primary-purple);
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .upload-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 8px;
+        }
+
+        .upload-subtitle {
+            font-size: 13px;
+            color: var(--text-light);
+            background: white;
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 1px solid #e2e8f0;
+        }
+
+        #fileInput {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        /* File Info Badge */
+        .file-info {
+            background: var(--light-purple-bg);
+            border: 1px solid var(--border-purple);
+            color: var(--primary-purple);
+            padding: 12px 18px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            word-break: break-all;
+        }
+
+        .file-info i { font-size: 18px; }
+
+        /* --- SETTINGS BOX --- */
+        .settings-box {
+            background: #f8fafc;
+            padding: 25px 20px;
+            border-radius: 20px;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .tip {
+            font-size: 12px;
+            color: var(--primary-purple);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-align: center;
+            background: var(--light-purple-bg);
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: 1px dashed var(--border-purple);
+        }
+
+        .target-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .target-row input[type="number"] {
+            flex: 2 1 180px;
+            padding: 14px 18px;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-dark);
+            outline: none;
+            background: white;
+            transition: all 0.2s;
+            min-width: 0;
+            text-align: center;
+        }
+
+        .target-row input[type="number"]:focus {
+            border-color: var(--primary-purple);
+            box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+        }
+
+        .unit-toggle {
+            display: flex;
+            background: white;
+            border-radius: 12px;
+            padding: 4px;
+            border: 1px solid #e2e8f0;
+            flex: 1 1 auto;
+        }
+
+        .unit-toggle button {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--text-light);
+            font-weight: 700;
+            font-size: 15px;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .unit-toggle button.active {
+            background: var(--primary-purple);
+            color: white;
+            box-shadow: var(--btn-shadow);
+        }
+
+        .unit-toggle button:not(.active):hover {
+            background: var(--light-purple-bg);
+            color: var(--primary-purple);
+        }
+
+        .size-tip {
+            font-size: 12px;
+            color: var(--text-light);
+            text-align: center;
+            font-weight: 500;
+        }
+
+        /* --- ACTION BUTTONS --- */
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            flex: 1 1 180px;
+            padding: 16px 25px;
+            border: none;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-purple);
+            color: white;
+            box-shadow: var(--btn-shadow);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background-color: #6d28d9;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background-color: white;
+            color: var(--primary-purple);
+            border: 1px solid var(--border-purple);
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background-color: var(--light-purple-bg);
+            border-color: var(--primary-purple);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* --- DOWNLOAD AREA --- */
+        .download-area {
+            padding: 20px;
+            border-radius: 16px;
+            background: var(--light-purple-bg);
+            border: 1px dashed var(--border-purple);
+            text-align: center;
+            color: var(--text-light);
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            min-height: 80px;
+        }
+
+        .download-area a {
+            color: white;
+            text-decoration: none;
+            font-weight: 700;
+            background: var(--primary-purple);
+            padding: 12px 24px;
+            border-radius: 30px;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: var(--btn-shadow);
+        }
+
+        .download-area a:hover {
+            background: #6d28d9;
+            transform: translateY(-2px);
+        }
+
+        /* --- MESSAGES --- */
+        .error-msg {
+            color: #991b1b;
+            background: #fee2e2;
+            border-radius: 12px;
+            padding: 12px 18px;
+            font-size: 13px;
+            font-weight: 600;
+            border-left: 4px solid #dc2626;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .success-msg {
+            color: #166534;
+            background: #dcfce7;
+            border-radius: 12px;
+            padding: 12px 18px;
+            font-size: 13px;
+            font-weight: 600;
+            border-left: 4px solid #16a34a;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .hidden { display: none !important; }
+
+        /* Spinner */
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top: 3px solid white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Footer */
+        .footer {
+            margin-top: 10px;
+            text-align: center;
+            color: var(--primary-purple);
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* ================================================
+           ✅ DESKTOP FULL SCREEN FIT (900px and above)
+           ================================================ */
+        @media (min-width: 900px) {
+            body {
+                padding: 40px 30px;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .page-shell {
+                max-width: 1300px;
+                gap: 25px;
+            }
+
+            .main-card {
+                max-width: 720px;
+                padding: 48px 48px;
+                gap: 28px;
+                border-radius: 28px;
+            }
+
+            .page-header h1 { font-size: 34px; }
+            .page-header h1 span {
+                font-size: 15px;
+                padding: 8px 20px;
+            }
+            .page-header p.subtitle {
+                font-size: 15px;
+                padding: 10px 24px;
+            }
+
+            .upload-area { padding: 55px 30px; }
+            .folder-icon { font-size: 58px; }
+            .upload-title { font-size: 20px; }
+            .upload-subtitle { font-size: 14px; padding: 8px 18px; }
+
+            .file-info { font-size: 15px; padding: 14px 22px; }
+            .file-info i { font-size: 20px; }
+
+            .settings-box { padding: 30px 26px; gap: 22px; }
+
+            .target-row input[type="number"] {
+                font-size: 20px;
+                padding: 16px 22px;
+            }
+
+            .unit-toggle button {
+                font-size: 16px;
+                padding: 12px 18px;
+            }
+
+            .btn {
+                padding: 18px 35px;
+                font-size: 17px;
+            }
+
+            .download-area {
+                font-size: 15px;
+                padding: 24px;
+                min-height: 95px;
+            }
+
+            .download-area a {
+                padding: 14px 28px;
+                font-size: 15px;
+            }
+
+            .footer { font-size: 15px; margin-top: 20px; }
+        }
+
+        /* ✅ LARGE DESKTOP (1200px+) */
+        @media (min-width: 1200px) {
+            .main-card {
+                max-width: 780px;
+                padding: 55px 60px;
+            }
+
+            .page-header h1 { font-size: 38px; }
+            .upload-area { padding: 65px 35px; }
+            .folder-icon { font-size: 66px; }
+            .upload-title { font-size: 22px; }
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            body { padding-top: 75px; }
+            .home-btn-wrapper { top: 12px; right: 12px; }
+            .home-btn { padding: 8px 16px; font-size: 13px; }
+        }
+
+        @media (max-width: 500px) {
+            .main-card { padding: 25px 15px; }
+            .page-header h1 { font-size: 22px; }
+            .action-buttons { flex-direction: column; }
+            .target-row { flex-direction: column; }
+            .unit-toggle { width: 100%; }
+            .download-area { flex-direction: column; }
+            .download-area a { width: 100%; justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HOME BUTTON -->
+    <div class="home-btn-wrapper">
+        <a href="index.html" class="home-btn">
+            <i class="fas fa-home"></i> Home
+        </a>
+    </div>
+
+    <div class="page-shell">
+        <div class="main-card">
+            <!-- Header -->
+            <div class="page-header">
+                <h1>
+                    <i class="fas fa-expand-arrows-alt" style="color: var(--primary-purple);"></i>
+                    IMG Expander
+                    <span>KB / MB</span>
+                </h1>
+                <p class="subtitle">Match exact target size (smaller or bigger)</p>
+            </div>
+
+            <!-- Upload Area -->
+            <div class="upload-area" id="uploadArea">
+                <div class="folder-icon">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                </div>
+                <div class="upload-title">Drop image here or click</div>
+                <div class="upload-subtitle">PNG, JPG, WEBP, GIF, BMP</div>
+                <input type="file" id="fileInput" accept="image/*">
+            </div>
+
+            <!-- File Info -->
+            <div id="fileInfo" class="file-info hidden"></div>
+
+            <!-- Settings Box -->
+            <div class="settings-box">
+                <p class="tip"><i class="fas fa-bullseye"></i> Target Size (Exact)</p>
+
+                <div class="target-row">
+                    <input type="number" id="sizeValue" value="50" min="0.1" step="any" placeholder="Enter number">
+                    <div class="unit-toggle" id="unitToggle">
+                        <button type="button" data-unit="KB" class="active">KB</button>
+                        <button type="button" data-unit="MB">MB</button>
+                    </div>
+                </div>
+                <div class="size-tip">💡 Image will be re-encoded to match this exact size.</div>
+                <div id="sizeError" class="error-msg hidden"></div>
+                <div id="sizeSuccess" class="success-msg hidden"></div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <button class="btn btn-primary" id="expandBtn">
+                    <i class="fas fa-bolt"></i> Convert to Exact Size
+                </button>
+                <button class="btn btn-secondary" id="resetBtn">
+                    <i class="fas fa-redo"></i> Reset
+                </button>
+            </div>
+
+            <!-- Download Area -->
+            <div class="download-area" id="downloadArea">
+                <span>✨ Result image will appear here</span>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <i class="fa-solid fa-heart"></i> Made with Love · Create by Sandesh <i class="fa-solid fa-heart"></i>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            const fileInput = document.getElementById('fileInput');
+            const uploadArea = document.getElementById('uploadArea');
+            const fileInfo = document.getElementById('fileInfo');
+            const sizeValue = document.getElementById('sizeValue');
+            const unitToggle = document.getElementById('unitToggle');
+            const sizeError = document.getElementById('sizeError');
+            const sizeSuccess = document.getElementById('sizeSuccess');
+            const expandBtn = document.getElementById('expandBtn');
+            const resetBtn = document.getElementById('resetBtn');
+            const downloadArea = document.getElementById('downloadArea');
+
+            let currentFile = null;
+            let currentUnit = 'KB';
+            let lastObjectURL = null;
+
+            function formatBytes(bytes) {
+                if (bytes === 0) return '0 B';
+                const k = 1024;
+                const sizes = ['B', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            }
+
+            function showError(msg) {
+                sizeError.innerHTML = '<i class="fas fa-exclamation-circle"></i> ' + msg;
+                sizeError.classList.remove('hidden');
+                sizeSuccess.classList.add('hidden');
+                setTimeout(() => {
+                    if (sizeError.textContent.includes(msg)) sizeError.classList.add('hidden');
+                }, 5000);
+            }
+
+            function showSuccess(msg) {
+                sizeSuccess.innerHTML = '<i class="fas fa-check-circle"></i> ' + msg;
+                sizeSuccess.classList.remove('hidden');
+                sizeError.classList.add('hidden');
+                setTimeout(() => {
+                    if (sizeSuccess.textContent.includes(msg)) sizeSuccess.classList.add('hidden');
+                }, 5000);
+            }
+
+            function clearMessages() {
+                sizeError.classList.add('hidden');
+                sizeSuccess.classList.add('hidden');
+            }
+
+            function revokeLastURL() {
+                if (lastObjectURL) {
+                    URL.revokeObjectURL(lastObjectURL);
+                    lastObjectURL = null;
+                }
+            }
+
+            function handleFile(file) {
+                if (!file) return;
+                if (!file.type.startsWith('image/')) {
+                    showError('Please select a valid image file.');
+                    return;
+                }
+                currentFile = file;
+                fileInfo.innerHTML = `<i class="fas fa-file-image"></i> ${file.name} • ${formatBytes(file.size)}`;
+                fileInfo.classList.remove('hidden');
+                clearMessages();
+                revokeLastURL();
+                downloadArea.innerHTML = '<span>✨ Result image will appear here</span>';
+            }
+
+            function resetAll() {
+                fileInput.value = '';
+                currentFile = null;
+                fileInfo.classList.add('hidden');
+                fileInfo.textContent = '';
+                sizeValue.value = '50';
+                setUnit('KB');
+                clearMessages();
+                revokeLastURL();
+                downloadArea.innerHTML = '<span>✨ Result image will appear here</span>';
+            }
+
+            function setUnit(unit) {
+                currentUnit = unit;
+                unitToggle.querySelectorAll('button').forEach(btn => {
+                    btn.classList.toggle('active', btn.dataset.unit === unit);
+                });
+            }
+
+            function getTargetBytes() {
+                const val = parseFloat(sizeValue.value);
+                if (isNaN(val) || val <= 0) return null;
+                const multiplier = currentUnit === 'KB' ? 1024 : 1024 * 1024;
+                return Math.floor(val * multiplier);
+            }
+
+            async function convertToExactSize(file, targetBytes) {
+                const img = await new Promise((resolve, reject) => {
+                    const image = new Image();
+                    const url = URL.createObjectURL(file);
+                    image.onload = () => { URL.revokeObjectURL(url); resolve(image); };
+                    image.onerror = (e) => { URL.revokeObjectURL(url); reject(new Error('Image load failed')); };
+                    image.src = url;
+                });
+
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+
+                let currentWidth = img.naturalWidth;
+                let currentHeight = img.naturalHeight;
+                let blob = null;
+
+                for (let scaleAttempt = 0; scaleAttempt < 4; scaleAttempt++) {
+                    canvas.width = currentWidth;
+                    canvas.height = currentHeight;
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    ctx.drawImage(img, 0, 0, currentWidth, currentHeight);
+
+                    let low = 0.01, high = 1.0;
+                    let bestBlob = null;
+
+                    for (let i = 0; i < 12; i++) {
+                        const mid = (low + high) / 2;
+                        const b = await canvasToBlob(canvas, 'image/jpeg', mid);
+                        if (b.size <= targetBytes) {
+                            bestBlob = b;
+                            low = mid;
+                        } else {
+                            high = mid;
+                        }
+                    }
+
+                    if (!bestBlob) {
+                        currentWidth = Math.max(10, Math.floor(currentWidth * 0.7));
+                        currentHeight = Math.max(10, Math.floor(currentHeight * 0.7));
+                        continue;
+                    }
+
+                    blob = bestBlob;
+
+                    if (blob.size < targetBytes) {
+                        const padded = await padBlobToSize(blob, targetBytes);
+                        if (padded && padded.size === targetBytes) {
+                            return padded;
+                        }
+                    }
+
+                    if (Math.abs(blob.size - targetBytes) / targetBytes < 0.01) {
+                        return blob;
+                    }
+
+                    if (blob.size <= targetBytes) {
+                        const padded = await padBlobToSize(blob, targetBytes);
+                        if (padded) return padded;
+                    }
+
+                    if (blob.size < targetBytes * 0.5 && scaleAttempt < 3) {
+                        currentWidth = Math.min(img.naturalWidth * 2, Math.floor(currentWidth * 1.4));
+                        currentHeight = Math.min(img.naturalHeight * 2, Math.floor(currentHeight * 1.4));
+                        continue;
+                    }
+
+                    return blob;
+                }
+
+                if (blob && blob.size < targetBytes) {
+                    const padded = await padBlobToSize(blob, targetBytes);
+                    if (padded) return padded;
+                }
+                if (blob) return blob;
+
+                canvas.width = img.naturalWidth;
+                canvas.height = img.naturalHeight;
+                ctx.drawImage(img, 0, 0);
+                const fallback = await canvasToBlob(canvas, 'image/jpeg', 0.5);
+                return await padBlobToSize(fallback, targetBytes) || fallback;
+            }
+
+            function canvasToBlob(canvas, type, quality) {
+                return new Promise((resolve) => {
+                    canvas.toBlob((b) => resolve(b), type, quality);
+                });
+            }
+
+            async function padBlobToSize(blob, targetBytes) {
+                if (blob.size >= targetBytes) {
+                    if (blob.size === targetBytes) return blob;
+                    return null;
+                }
+
+                const buffer = await blob.arrayBuffer();
+                const padding = targetBytes - buffer.byteLength;
+                if (padding <= 0) return blob;
+
+                const newBuffer = new Uint8Array(targetBytes);
+                newBuffer.set(new Uint8Array(buffer), 0);
+
+                for (let i = buffer.byteLength; i < targetBytes; i++) {
+                    newBuffer[i] = Math.floor(Math.random() * 256);
+                }
+
+                return new Blob([newBuffer], { type: blob.type });
+            }
+
+            async function expandImage() {
+                if (!currentFile) {
+                    showError('Please upload an image first.');
+                    return;
+                }
+                const targetBytes = getTargetBytes();
+                if (targetBytes === null || targetBytes < 100) {
+                    showError('Please enter a valid target size (min 100 bytes).');
+                    return;
+                }
+
+                expandBtn.disabled = true;
+                const originalBtnText = expandBtn.innerHTML;
+                expandBtn.innerHTML = '<div class="spinner"></div> Converting...';
+                downloadArea.innerHTML = '<span>⏳ Processing image...</span>';
+                clearMessages();
+
+                try {
+                    const resultBlob = await convertToExactSize(currentFile, targetBytes);
+
+                    if (!resultBlob) {
+                        throw new Error('Could not produce image of target size.');
+                    }
+
+                    const finalSize = resultBlob.size;
+                    const url = URL.createObjectURL(resultBlob);
+                    revokeLastURL();
+                    lastObjectURL = url;
+
+                    const ext = 'jpg';
+                    const baseName = currentFile.name.replace(/\.[^/.]+$/, '') || 'image';
+                    const fileName = `${baseName}_${formatBytes(targetBytes).replace(/\s/g, '')}.${ext}`;
+
+                    downloadArea.innerHTML = `
+                        <span>✅ <strong>${formatBytes(finalSize)}</strong> (target: ${formatBytes(targetBytes)})</span>
+                        <a href="${url}" download="${fileName}"><i class="fas fa-download"></i> Download</a>
+                    `;
+
+                    if (finalSize === targetBytes) {
+                        showSuccess(`Perfect! Exact size: ${formatBytes(finalSize)}`);
+                    } else if (Math.abs(finalSize - targetBytes) / targetBytes < 0.02) {
+                        showSuccess(`Done! Size: ${formatBytes(finalSize)} (very close to target)`);
+                    } else {
+                        showSuccess(`Done! Size: ${formatBytes(finalSize)} (target was ${formatBytes(targetBytes)})`);
+                    }
+
+                } catch (err) {
+                    console.error(err);
+                    showError('Failed: ' + err.message);
+                    downloadArea.innerHTML = '<span>❌ Could not convert image</span>';
+                } finally {
+                    expandBtn.disabled = false;
+                    expandBtn.innerHTML = originalBtnText;
+                }
+            }
+
+            fileInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) handleFile(file);
+            });
+
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.classList.add('dragover');
+            });
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.classList.remove('dragover');
+            });
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+                const file = e.dataTransfer.files[0];
+                if (file) {
+                    handleFile(file);
+                    fileInput.value = '';
+                }
+            });
+
+            window.addEventListener('dragover', (e) => e.preventDefault());
+            window.addEventListener('drop', (e) => e.preventDefault());
+
+            unitToggle.addEventListener('click', (e) => {
+                const btn = e.target.closest('button');
+                if (!btn) return;
+                if (btn.dataset.unit) setUnit(btn.dataset.unit);
+            });
+
+            expandBtn.addEventListener('click', expandImage);
+            resetBtn.addEventListener('click', resetAll);
+            sizeValue.addEventListener('input', clearMessages);
+
+            window.addEventListener('beforeunload', revokeLastURL);
+
+            resetAll();
+        })();
+    </script>
+</body>
+</html>

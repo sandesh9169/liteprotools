@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+<title>PDF Size Expander</title>
+
+<!-- ✅ FAVICON -->
+<link rel="icon" type="image/x-icon" href="favicon/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png">
+
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', 'Poppins', system-ui, -apple-system, sans-serif;
+  }
+
+  body {
+    min-height: 100vh;
+    background: linear-gradient(145deg, #f8f0ff 0%, #f0e6ff 100%);
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* ---------- HOME BUTTON ---------- */
+  .home-btn-wrapper {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 999;
+  }
+
+  .home-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    color: #5b3b9e;
+    border: 1.5px solid rgba(200, 170, 255, 0.5);
+    padding: 0.65rem 1.3rem;
+    border-radius: 60px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 20px -8px rgba(106, 61, 232, 0.25);
+  }
+
+  .home-btn:hover {
+    background: linear-gradient(135deg, #6a3de8, #a884ff);
+    color: #fff;
+    border-color: transparent;
+    transform: translateY(-3px);
+    box-shadow: 0 14px 30px -10px rgba(106, 61, 232, 0.5);
+  }
+
+  .home-btn i { font-size: 0.9rem; }
+
+  /* ---------- MAIN GLASS CARD ---------- */
+  .container {
+    max-width: 540px;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.78);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-radius: 56px 40px 56px 40px;
+    padding: 2.2rem 2.2rem 2.4rem;
+    box-shadow: 0 30px 60px -15px rgba(90, 40, 140, 0.25),
+                0 0 0 1px rgba(200, 170, 255, 0.25) inset;
+    border: 1px solid rgba(220, 200, 255, 0.4);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .container::before {
+    content: '';
+    position: absolute;
+    width: 380px;
+    height: 380px;
+    background: radial-gradient(circle, rgba(168, 132, 255, 0.18) 0%, transparent 70%);
+    top: -140px;
+    right: -120px;
+    border-radius: 50%;
+    pointer-events: none;
+    animation: floatOrb 12s ease-in-out infinite alternate;
+  }
+
+  .container::after {
+    content: '';
+    position: absolute;
+    width: 320px;
+    height: 320px;
+    background: radial-gradient(circle, rgba(106, 61, 232, 0.12) 0%, transparent 70%);
+    bottom: -100px;
+    left: -80px;
+    border-radius: 50%;
+    pointer-events: none;
+    animation: floatOrb 16s ease-in-out infinite alternate-reverse;
+  }
+
+  @keyframes floatOrb {
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(40px, 30px) scale(1.15); }
+  }
+
+  .container > * {
+    position: relative;
+    z-index: 2;
+  }
+
+  /* ---------- HEADER ---------- */
+  .header {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    margin-bottom: 0.4rem;
+  }
+
+  /* Animated logo */
+  .logo-icon {
+    width: 54px;
+    height: 54px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #6a3de8 0%, #a884ff 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    box-shadow: 0 8px 22px rgba(106, 61, 232, 0.35),
+                0 0 0 3px rgba(255, 255, 255, 0.6) inset;
+    flex-shrink: 0;
+    overflow: hidden;
+    transition: transform 0.3s ease;
+  }
+
+  .logo-icon:hover {
+    transform: scale(1.08) rotate(-3deg);
+  }
+
+  .logo-icon::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent 40%, rgba(255,255,255,0.35) 50%, transparent 60%);
+    animation: shine 3s infinite;
+  }
+
+  @keyframes shine {
+    0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+    100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+  }
+
+  .logo-icon i {
+    color: #fff;
+    font-size: 24px;
+    z-index: 2;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+  }
+
+  .logo-icon .fa-bolt {
+    position: absolute;
+    font-size: 11px !important;
+    color: #ffd700 !important;
+    top: 6px;
+    right: 6px;
+    z-index: 3;
+    filter: drop-shadow(0 0 4px rgba(255, 215, 0, 0.8)) !important;
+    animation: zap 2s infinite;
+  }
+
+  @keyframes zap {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.6; transform: scale(0.85); }
+  }
+
+  .header h1 {
+    font-size: 1.6rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #3b1f7a, #7b4cff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    letter-spacing: -0.3px;
+    line-height: 1.15;
+  }
+
+  .subtitle {
+    color: #5b3b9e;
+    font-size: 0.82rem;
+    margin: 0.5rem 0 1.6rem 0;
+    padding: 0.5rem 1.1rem;
+    background: #ede4ff;
+    border-radius: 60px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    border-left: 5px solid #6a3de8;
+    font-weight: 600;
+  }
+
+  .subtitle i { color: #6a3de8; }
+
+  /* ---------- DROP ZONE ---------- */
+  .drop-zone {
+    border: 3px dashed #d9c8ff;
+    border-radius: 32px;
+    padding: 2.5rem 1.5rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: rgba(237, 228, 255, 0.4);
+    position: relative;
+  }
+
+  .drop-zone:hover,
+  .drop-zone.dragover {
+    border-color: #6a3de8;
+    background: rgba(237, 228, 255, 0.8);
+    transform: scale(1.01);
+    box-shadow: 0 20px 40px -15px rgba(106, 61, 232, 0.3);
+  }
+
+  .drop-zone .dz-icon {
+    width: 60px;
+    height: 60px;
+    margin: 0 auto 1rem;
+    border-radius: 40% 20% 40% 20% / 20% 40% 20% 40%;
+    background: linear-gradient(145deg, #6a3de8, #a884ff);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 12px 28px -10px rgba(106, 61, 232, 0.5),
+                0 0 0 3px rgba(255, 255, 255, 0.5) inset;
+    transition: all 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.2);
+  }
+
+  .drop-zone:hover .dz-icon {
+    transform: rotate(360deg) scale(1.08);
+  }
+
+  .dz-icon i {
+    color: #fff;
+    font-size: 26px;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+  }
+
+  .drop-zone p {
+    color: #2c1a4e;
+    font-size: 0.95rem;
+    font-weight: 600;
+  }
+
+  .drop-zone .small {
+    color: #7a5fa8;
+    font-size: 0.75rem;
+    margin-top: 0.3rem;
+    font-weight: 500;
+  }
+
+  /* ---------- FILE INFO ---------- */
+  .file-info {
+    display: none;
+    margin-top: 1.2rem;
+    padding: 1rem 1.2rem;
+    background: rgba(237, 228, 255, 0.6);
+    border-radius: 22px;
+    font-size: 0.85rem;
+    color: #2c1a4e;
+    border: 1.5px solid rgba(200, 170, 255, 0.4);
+    font-weight: 500;
+    line-height: 1.6;
+  }
+
+  .file-info strong {
+    color: #6a3de8;
+    font-weight: 700;
+  }
+
+  /* ---------- SIZE CONTROL ---------- */
+  .size-control {
+    margin-top: 1.4rem;
+    display: none;
+  }
+
+  .size-control > label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 700;
+    color: #5b3b9e;
+    margin-bottom: 0.8rem;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    padding-left: 0.3rem;
+  }
+
+  .size-control > label i {
+    color: #6a3de8;
+    font-size: 0.9rem;
+  }
+
+  .size-buttons {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.6rem;
+    margin-bottom: 0.9rem;
+  }
+
+  .size-btn {
+    padding: 0.75rem 0.5rem;
+    border: 1.5px solid rgba(200, 170, 255, 0.5);
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 18px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #5b3b9e;
+    transition: all 0.25s ease;
+    font-family: inherit;
+  }
+
+  .size-btn:hover {
+    border-color: #a884ff;
+    color: #3b1f7a;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px -10px rgba(106, 61, 232, 0.35);
+  }
+
+  .size-btn.active {
+    background: linear-gradient(135deg, #6a3de8, #a884ff);
+    border-color: transparent;
+    color: #fff;
+    box-shadow: 0 10px 22px -8px rgba(106, 61, 232, 0.5);
+  }
+
+  .custom-input {
+    display: flex;
+    gap: 0.6rem;
+    align-items: center;
+  }
+
+  .custom-input input {
+    flex: 1;
+    padding: 0.85rem 1.1rem;
+    border: 2px solid #d9c8ff;
+    border-radius: 22px;
+    font-size: 0.9rem;
+    outline: none;
+    background: rgba(255, 255, 255, 0.85);
+    color: #2c1a4e;
+    font-weight: 500;
+    transition: 0.25s;
+    font-family: inherit;
+  }
+
+  .custom-input input::placeholder { color: #a08cc4; }
+
+  .custom-input input:focus {
+    border-color: #6a3de8;
+    background: #fff;
+    box-shadow: 0 0 0 4px rgba(160, 120, 255, 0.18);
+  }
+
+  .custom-input select {
+    padding: 0.85rem 1rem;
+    border: 2px solid #d9c8ff;
+    border-radius: 22px;
+    font-size: 0.9rem;
+    background: rgba(255, 255, 255, 0.85);
+    color: #2c1a4e;
+    cursor: pointer;
+    outline: none;
+    font-weight: 600;
+    transition: 0.25s;
+    font-family: inherit;
+  }
+
+  .custom-input select:focus {
+    border-color: #6a3de8;
+    box-shadow: 0 0 0 4px rgba(160, 120, 255, 0.18);
+  }
+
+  /* ---------- ACTION BUTTON ---------- */
+  .action-btn {
+    width: 100%;
+    margin-top: 1.4rem;
+    padding: 1rem 1.5rem;
+    background: linear-gradient(135deg, #6a3de8, #a884ff);
+    color: #fff;
+    border: none;
+    border-radius: 60px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    font-family: inherit;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    box-shadow: 0 12px 28px -8px rgba(106, 61, 232, 0.5),
+                0 0 0 1px rgba(255, 255, 255, 0.15) inset;
+  }
+
+  .action-btn:hover {
+    transform: translateY(-4px) scale(1.02);
+    background: linear-gradient(135deg, #5b2fd0, #9a70ff);
+    box-shadow: 0 20px 40px -12px rgba(106, 61, 232, 0.6);
+    letter-spacing: 2px;
+  }
+
+  .action-btn:active { transform: translateY(1px) scale(0.99); }
+
+  .action-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  /* ---------- STATUS ---------- */
+  .status {
+    text-align: center;
+    margin-top: 1rem;
+    font-size: 0.85rem;
+    min-height: 1.4rem;
+    font-weight: 600;
+    padding: 0.5rem;
+    border-radius: 60px;
+    transition: 0.3s;
+  }
+
+  .status.success {
+    color: #059669;
+    background: rgba(16, 185, 129, 0.1);
+    border: 1.5px solid rgba(16, 185, 129, 0.3);
+  }
+
+  .status.error {
+    color: #dc2626;
+    background: rgba(239, 68, 68, 0.1);
+    border: 1.5px solid rgba(239, 68, 68, 0.3);
+  }
+
+  .status.loading {
+    color: #6a3de8;
+    background: rgba(237, 228, 255, 0.6);
+    border: 1.5px solid rgba(200, 170, 255, 0.4);
+  }
+
+  /* ---------- FOOTER NOTE ---------- */
+  .footer-note {
+    text-align: center;
+    margin-top: 1.5rem;
+    font-size: 0.75rem;
+    color: #7a5fa8;
+    font-weight: 500;
+    padding-top: 1rem;
+    border-top: 2px dashed rgba(160, 130, 255, 0.25);
+  }
+
+  .footer-note i { color: #6a3de8; }
+
+  /* ---------- MODAL ---------- */
+  .modal-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(44, 26, 78, 0.5);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    z-index: 10000;
+    animation: fadeIn 0.25s ease;
+  }
+
+  .modal-overlay.show { display: flex; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(30px) scale(0.95); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  .modal {
+    background: rgba(255, 255, 255, 0.98);
+    border-radius: 40px;
+    padding: 2.2rem 2rem 2rem;
+    max-width: 420px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 40px 80px -20px rgba(90, 40, 140, 0.5);
+    border: 1.5px solid rgba(220, 200, 255, 0.5);
+    animation: slideUp 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position: relative;
+  }
+
+  .modal-icon {
+    width: 76px;
+    height: 76px;
+    margin: 0 auto 1.1rem;
+    background: linear-gradient(135deg, #6a3de8, #a884ff);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: pop 0.5s ease 0.15s both;
+    box-shadow: 0 12px 30px -10px rgba(106, 61, 232, 0.6),
+                0 0 0 4px rgba(255, 255, 255, 0.6) inset;
+  }
+
+  @keyframes pop {
+    0% { transform: scale(0); }
+    70% { transform: scale(1.15); }
+    100% { transform: scale(1); }
+  }
+
+  .modal-icon i {
+    color: #fff;
+    font-size: 34px;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+  }
+
+  .modal h2 {
+    font-size: 1.4rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #3b1f7a, #7b4cff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    margin-bottom: 0.4rem;
+  }
+
+  .modal p {
+    color: #5b3b9e;
+    font-size: 0.85rem;
+    margin-bottom: 1.3rem;
+    line-height: 1.5;
+    font-weight: 500;
+  }
+
+  .modal-stats {
+    background: #ede4ff;
+    border-radius: 22px;
+    padding: 1rem;
+    margin-bottom: 1.4rem;
+    display: flex;
+    justify-content: space-around;
+    gap: 0.6rem;
+    border: 1.5px solid rgba(200, 170, 255, 0.4);
+  }
+
+  .modal-stats .stat { flex: 1; }
+
+  .modal-stats .stat-label {
+    font-size: 0.65rem;
+    color: #7a5fa8;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 0.3rem;
+    font-weight: 700;
+  }
+
+  .modal-stats .stat-value {
+    font-size: 1rem;
+    font-weight: 800;
+    color: #5b3b9e;
+    word-break: break-word;
+  }
+
+  .modal-stats .stat-value.new {
+    background: linear-gradient(135deg, #6a3de8, #a884ff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .modal-buttons {
+    display: flex;
+    gap: 0.6rem;
+    flex-direction: column;
+  }
+
+  .download-btn {
+    width: 100%;
+    padding: 0.95rem 1.2rem;
+    background: linear-gradient(135deg, #6a3de8, #a884ff);
+    color: #fff;
+    border: none;
+    border-radius: 60px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-family: inherit;
+    letter-spacing: 0.5px;
+    box-shadow: 0 12px 28px -8px rgba(106, 61, 232, 0.5);
+  }
+
+  .download-btn:hover {
+    transform: translateY(-3px) scale(1.02);
+    background: linear-gradient(135deg, #5b2fd0, #9a70ff);
+    box-shadow: 0 18px 36px -10px rgba(106, 61, 232, 0.6);
+  }
+
+  .download-btn i { font-size: 1rem; }
+
+  .close-btn {
+    width: 100%;
+    padding: 0.85rem;
+    background: rgba(237, 228, 255, 0.6);
+    color: #5b3b9e;
+    border: 1.5px solid rgba(200, 170, 255, 0.4);
+    border-radius: 60px;
+    font-size: 0.88rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+  }
+
+  .close-btn:hover {
+    background: #ede4ff;
+    border-color: #a884ff;
+    color: #3b1f7a;
+  }
+
+  .modal-close-x {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #ede4ff;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #7a5fa8;
+    transition: all 0.2s;
+    font-size: 0.85rem;
+  }
+
+  .modal-close-x:hover {
+    background: #d9c8ff;
+    color: #3b1f7a;
+    transform: rotate(90deg);
+  }
+
+  /* ---------- RESPONSIVE ---------- */
+  @media (max-width: 550px) {
+    body { padding-top: 5rem; }
+    .home-btn-wrapper { top: 14px; right: 14px; }
+    .home-btn { padding: 0.55rem 1rem; font-size: 0.78rem; }
+
+    .container {
+      padding: 1.6rem 1.4rem 1.8rem;
+      border-radius: 40px 28px 40px 28px;
+    }
+
+    .header h1 { font-size: 1.3rem; }
+    .logo-icon { width: 46px; height: 46px; border-radius: 14px; }
+    .logo-icon i { font-size: 20px; }
+
+    .size-buttons { grid-template-columns: repeat(2, 1fr); }
+    .drop-zone { padding: 1.8rem 1rem; }
+    .drop-zone .dz-icon { width: 50px; height: 50px; }
+    .dz-icon i { font-size: 22px; }
+
+    .action-btn { font-size: 0.9rem; padding: 0.85rem 1.2rem; }
+    .modal { padding: 1.8rem 1.4rem; border-radius: 32px; }
+    .modal-icon { width: 64px; height: 64px; }
+    .modal-icon i { font-size: 28px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HOME BUTTON -->
+<div class="home-btn-wrapper">
+  <a href="index.html" class="home-btn">
+    <i class="fas fa-home"></i> Home
+  </a>
+</div>
+
+<div class="container">
+  <!-- Header -->
+  <div class="header">
+    <div class="logo-icon">
+      <i class="fas fa-file-arrow-up"></i>
+      <i class="fas fa-bolt fa-bolt"></i>
+    </div>
+    <h1>PDF Size Expander</h1>
+  </div>
+
+  <p class="subtitle">
+    <i class="fas fa-arrow-up"></i>
+    Increase your PDF file size (KB / MB)
+  </p>
+
+  <!-- Drop Zone -->
+  <div class="drop-zone" id="dropZone">
+    <div class="dz-icon">
+      <i class="fas fa-cloud-upload-alt"></i>
+    </div>
+    <p><strong>Click to upload</strong> or drag &amp; drop</p>
+    <p class="small">PDF files only</p>
+    <input type="file" id="fileInput" accept="application/pdf" hidden>
+  </div>
+
+  <div class="file-info" id="fileInfo"></div>
+
+  <!-- Size Control -->
+  <div class="size-control" id="sizeControl">
+    <label><i class="fas fa-bullseye"></i> Target file size:</label>
+    <div class="size-buttons">
+      <button class="size-btn" data-mb="1">1 MB</button>
+      <button class="size-btn" data-mb="2">2 MB</button>
+      <button class="size-btn" data-mb="5">5 MB</button>
+      <button class="size-btn" data-mb="10">10 MB</button>
+      <button class="size-btn" data-mb="20">20 MB</button>
+      <button class="size-btn" data-mb="50">50 MB</button>
+    </div>
+    <div class="custom-input">
+      <input type="number" id="customSize" placeholder="Custom size" min="0.1" step="0.1">
+      <select id="customUnit">
+        <option value="1024">KB</option>
+        <option value="1048576" selected>MB</option>
+      </select>
+    </div>
+  </div>
+
+  <button class="action-btn" id="expandBtn">
+    <i class="fas fa-expand-arrows-alt"></i> Expand PDF Size
+  </button>
+  <div class="status" id="status"></div>
+
+  <p class="footer-note">
+    <i class="fas fa-shield-alt"></i> All processing happens in your browser. Files are never uploaded.
+  </p>
+</div>
+
+<!-- ===== DOWNLOAD MODAL ===== -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <button class="modal-close-x" id="modalCloseX" title="Close">
+      <i class="fas fa-times"></i>
+    </button>
+
+    <div class="modal-icon">
+      <i class="fas fa-check"></i>
+    </div>
+
+    <h2>PDF Expanded!</h2>
+    <p>Your PDF file has been expanded successfully.<br>Download it now.</p>
+
+    <div class="modal-stats">
+      <div class="stat">
+        <div class="stat-label">Original</div>
+        <div class="stat-value" id="statOriginal">-</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">New Size</div>
+        <div class="stat-value new" id="statNew">-</div>
+      </div>
+    </div>
+
+    <div class="modal-buttons">
+      <button class="download-btn" id="downloadBtn">
+        <i class="fas fa-download"></i> Download PDF
+      </button>
+      <button class="close-btn" id="closeBtn">Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const dropZone = document.getElementById('dropZone');
+  const fileInput = document.getElementById('fileInput');
+  const fileInfo = document.getElementById('fileInfo');
+  const sizeControl = document.getElementById('sizeControl');
+  const expandBtn = document.getElementById('expandBtn');
+  const statusEl = document.getElementById('status');
+  const customSize = document.getElementById('customSize');
+  const customUnit = document.getElementById('customUnit');
+  const sizeBtns = document.querySelectorAll('.size-btn');
+
+  const modalOverlay = document.getElementById('modalOverlay');
+  const modalCloseX = document.getElementById('modalCloseX');
+  const closeBtn = document.getElementById('closeBtn');
+  const downloadBtn = document.getElementById('downloadBtn');
+  const statOriginal = document.getElementById('statOriginal');
+  const statNew = document.getElementById('statNew');
+
+  let currentFile = null;
+  let targetBytes = 0;
+  let expandedBlob = null;
+  let expandedFileName = '';
+
+  function formatBytes(bytes) {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1048576) return (bytes / 1024).toFixed(2) + ' KB';
+    return (bytes / 1048576).toFixed(2) + ' MB';
+  }
+
+  function handleFile(file) {
+    if (!file || file.type !== 'application/pdf') {
+      showStatus('Please select a valid PDF file.', 'error');
+      return;
+    }
+
+    currentFile = file;
+    expandedBlob = null;
+    fileInfo.style.display = 'block';
+    fileInfo.innerHTML = `<strong>File:</strong> ${file.name}<br><strong>Current Size:</strong> ${formatBytes(file.size)}`;
+    sizeControl.style.display = 'block';
+    expandBtn.style.display = 'flex';
+    showStatus('', '');
+  }
+
+  dropZone.addEventListener('click', () => fileInput.click());
+
+  dropZone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    dropZone.classList.add('dragover');
+  });
+
+  dropZone.addEventListener('dragleave', () => {
+    dropZone.classList.remove('dragover');
+  });
+
+  dropZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropZone.classList.remove('dragover');
+    const file = e.dataTransfer.files[0];
+    handleFile(file);
+  });
+
+  fileInput.addEventListener('change', (e) => {
+    handleFile(e.target.files[0]);
+  });
+
+  sizeBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      sizeBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      targetBytes = parseFloat(btn.dataset.mb) * 1048576;
+      customSize.value = '';
+    });
+  });
+
+  customSize.addEventListener('input', () => {
+    if (customSize.value) {
+      sizeBtns.forEach(b => b.classList.remove('active'));
+      targetBytes = parseFloat(customSize.value) * parseFloat(customUnit.value);
+    }
+  });
+
+  customUnit.addEventListener('change', () => {
+    if (customSize.value) {
+      targetBytes = parseFloat(customSize.value) * parseFloat(customUnit.value);
+    }
+  });
+
+  function showStatus(msg, type) {
+    statusEl.innerHTML = msg;
+    statusEl.className = 'status ' + (type || '');
+  }
+
+  function openModal(originalSize, newSize, blob, fileName) {
+    statOriginal.textContent = formatBytes(originalSize);
+    statNew.textContent = formatBytes(newSize);
+    expandedBlob = blob;
+    expandedFileName = fileName;
+    modalOverlay.classList.add('show');
+  }
+
+  function closeModal() {
+    modalOverlay.classList.remove('show');
+  }
+
+  modalCloseX.addEventListener('click', closeModal);
+  closeBtn.addEventListener('click', closeModal);
+
+  modalOverlay.addEventListener('click', (e) => {
+    if (e.target === modalOverlay) closeModal();
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modalOverlay.classList.contains('show')) {
+      closeModal();
+    }
+  });
+
+  downloadBtn.addEventListener('click', () => {
+    if (!expandedBlob) return;
+
+    const url = URL.createObjectURL(expandedBlob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = expandedFileName;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+
+    const originalHTML = downloadBtn.innerHTML;
+    downloadBtn.innerHTML = `<i class="fas fa-check"></i> Downloaded!`;
+    setTimeout(() => {
+      downloadBtn.innerHTML = originalHTML;
+      closeModal();
+    }, 1200);
+  });
+
+  expandBtn.addEventListener('click', async () => {
+    if (!currentFile) {
+      showStatus('Please select a PDF file first.', 'error');
+      return;
+    }
+
+    if (!targetBytes || targetBytes <= currentFile.size) {
+      showStatus('Target size must be larger than current file size.', 'error');
+      return;
+    }
+
+    expandBtn.disabled = true;
+    showStatus('<i class="fas fa-spinner fa-spin"></i> Processing... Please wait.', 'loading');
+
+    try {
+      const arrayBuffer = await currentFile.arrayBuffer();
+      const originalBytes = new Uint8Array(arrayBuffer);
+
+      const paddingNeeded = targetBytes - originalBytes.length;
+
+      if (paddingNeeded <= 0) {
+        showStatus('Target size is smaller than current file.', 'error');
+        expandBtn.disabled = false;
+        return;
+      }
+
+      const pdfText = new TextDecoder('latin1').decode(originalBytes);
+      const eofIndex = pdfText.lastIndexOf('%%EOF');
+
+      let newBytes;
+
+      if (eofIndex !== -1) {
+        const before = originalBytes.slice(0, eofIndex);
+        const after = originalBytes.slice(eofIndex);
+
+        const prefix = '\n%PADDING_START\n';
+        const suffix = '\n%PADDING_END\n';
+
+        const lineData = 200;
+        const lineTotal = lineData + 2;
+
+        const fixedOverhead = new TextEncoder().encode(prefix + suffix).length;
+        let remaining = paddingNeeded - fixedOverhead;
+
+        if (remaining < 0) remaining = 0;
+
+        const fullLines = Math.floor(remaining / lineTotal);
+        const extraChars = remaining % lineTotal;
+
+        let padding = prefix;
+        const fillerChar = 'A';
+
+        for (let i = 0; i < fullLines; i++) {
+          padding += '%' + fillerChar.repeat(lineData) + '\n';
+        }
+
+        if (extraChars > 1) {
+          padding += '%' + fillerChar.repeat(Math.max(0, extraChars - 2)) + '\n';
+        }
+
+        padding += suffix;
+
+        const paddingBytes = new TextEncoder().encode(padding);
+
+        newBytes = new Uint8Array(before.length + paddingBytes.length + after.length);
+        newBytes.set(before, 0);
+        newBytes.set(paddingBytes, before.length);
+        newBytes.set(after, before.length + paddingBytes.length);
+      } else {
+        const padding = new Uint8Array(paddingNeeded);
+        padding.fill(0x20);
+        newBytes = new Uint8Array(originalBytes.length + padding.length);
+        newBytes.set(originalBytes, 0);
+        newBytes.set(padding, originalBytes.length);
+      }
+
+      const blob = new Blob([newBytes], { type: 'application/pdf' });
+      const baseName = currentFile.name.replace(/\.pdf$/i, '');
+      const fileName = baseName + '_expanded.pdf';
+
+      openModal(originalBytes.length, blob.size, blob, fileName);
+
+      showStatus(`<i class="fas fa-check-circle"></i> Success! New size: ${formatBytes(blob.size)}`, 'success');
+    } catch (err) {
+      console.error(err);
+      showStatus('<i class="fas fa-exclamation-circle"></i> Error processing file: ' + err.message, 'error');
+    } finally {
+      expandBtn.disabled = false;
+    }
+  });
+</script>
+</body>
+</html>

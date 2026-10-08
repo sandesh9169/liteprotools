@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Tags Extractor</title>
+
+    <!-- ✅ FAVICON -->
+    <link rel="icon" type="image/x-icon" href="favicon/favicon.ico">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png">
+
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary-purple: #7c3aed;
+            --light-purple-bg: #f3f0ff;
+            --border-purple: #d8b4fe;
+            --text-dark: #1f2937;
+            --text-light: #6b7280;
+            --success-green: #6ee7b7;
+            --success-hover: #34d399;
+            --btn-shadow: 0 4px 6px -1px rgba(124, 58, 237, 0.4);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        html, body { min-height: 100%; }
+
+        body {
+            background-color: #f3f4f6;
+            background-image: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 30px 15px;
+            color: var(--text-dark);
+        }
+
+        /* ---------- HOME BUTTON ---------- */
+        .home-btn-wrapper {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 999;
+        }
+
+        .home-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: white;
+            color: var(--primary-purple);
+            border: 2px solid var(--border-purple);
+            padding: 10px 22px;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 700;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            box-shadow: 0 4px 10px rgba(124, 58, 237, 0.15);
+        }
+
+        .home-btn:hover {
+            background: var(--primary-purple);
+            color: white;
+            border-color: var(--primary-purple);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(124, 58, 237, 0.35);
+        }
+
+        .home-btn i { font-size: 15px; }
+
+        /* ---------- PAGE SHELL ---------- */
+        .page-shell {
+            width: 100%;
+            max-width: 1400px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        /* Main Card Container */
+        .main-card {
+            background: white;
+            width: 100%;
+            max-width: 800px;
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08), 0 0 0 1px rgba(124, 58, 237, 0.1);
+            padding: 35px 30px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            gap: 22px;
+        }
+
+        /* Header */
+        .page-header {
+            text-align: center;
+        }
+
+        .page-header h1 {
+            font-size: 24px;
+            color: var(--text-dark);
+            margin-bottom: 10px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .page-header h1 i {
+            color: #ff0000;
+            font-size: 26px;
+        }
+
+        .page-header p.subtitle {
+            color: var(--text-light);
+            font-size: 14px;
+            background: var(--light-purple-bg);
+            padding: 8px 18px;
+            border-radius: 30px;
+            display: inline-block;
+            font-weight: 600;
+            border: 1px solid var(--border-purple);
+            line-height: 1.4;
+        }
+
+        /* Input Row */
+        .input-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .input-wrapper {
+            flex: 1;
+            min-width: 200px;
+            position: relative;
+        }
+
+        .input-wrapper i {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--primary-purple);
+            font-size: 15px;
+            pointer-events: none;
+        }
+
+        #urlInput {
+            width: 100%;
+            padding: 15px 18px 15px 48px;
+            border: 2px dashed var(--border-purple);
+            background: #faf5ff;
+            border-radius: 16px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-dark);
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        #urlInput::placeholder {
+            color: #a78bfa;
+            font-weight: 500;
+        }
+
+        #urlInput:focus {
+            border-color: var(--primary-purple);
+            border-style: solid;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+        }
+
+        #extractBtn {
+            padding: 15px 28px;
+            border: none;
+            border-radius: 30px;
+            background-color: var(--primary-purple);
+            color: white;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: var(--btn-shadow);
+            white-space: nowrap;
+        }
+
+        #extractBtn:hover:not(:disabled) {
+            background-color: #6d28d9;
+            transform: translateY(-2px);
+        }
+
+        #extractBtn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Loader */
+        .loader {
+            display: none;
+            text-align: center;
+            padding: 30px;
+            background: var(--light-purple-bg);
+            border-radius: 16px;
+            border: 1px dashed var(--border-purple);
+        }
+
+        .loader.active { display: block; }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(124, 58, 237, 0.15);
+            border-top-color: var(--primary-purple);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loader p {
+            color: var(--primary-purple);
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        /* Error Box */
+        .error {
+            display: none;
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 16px 20px;
+            border-radius: 14px;
+            border: 1px solid #fecaca;
+            font-size: 13px;
+            font-weight: 600;
+            white-space: pre-wrap;
+            line-height: 1.6;
+            gap: 10px;
+            align-items: flex-start;
+        }
+
+        .error.active { display: flex; }
+
+        .error i {
+            font-size: 16px;
+            margin-top: 2px;
+            flex-shrink: 0;
+        }
+
+        /* Result Area */
+        .result {
+            display: none;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .result.active { display: flex; animation: slideDown 0.3s ease; }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Field Card */
+        .field {
+            background: #f8fafc;
+            border-radius: 16px;
+            padding: 18px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .field-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .field-label {
+            color: var(--primary-purple);
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .copy-btn {
+            padding: 7px 16px;
+            font-size: 12px;
+            font-weight: 700;
+            background: var(--primary-purple);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: var(--btn-shadow);
+        }
+
+        .copy-btn:hover {
+            background: #6d28d9;
+            transform: translateY(-1px);
+        }
+
+        .copy-btn.copied {
+            background: var(--success-green);
+            color: #166534;
+        }
+
+        .field-content {
+            font-size: 14px;
+            line-height: 1.7;
+            color: var(--text-dark);
+            white-space: pre-wrap;
+            word-break: break-word;
+            max-height: 250px;
+            overflow-y: auto;
+            padding: 12px 15px;
+            background: white;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            font-weight: 500;
+        }
+
+        .field-content::-webkit-scrollbar { width: 6px; }
+        .field-content::-webkit-scrollbar-thumb { background: var(--border-purple); border-radius: 3px; }
+
+        .tags-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 12px;
+            background: white;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            min-height: 50px;
+        }
+
+        .tag {
+            background: var(--light-purple-bg);
+            color: var(--primary-purple);
+            padding: 7px 15px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+            border: 1px solid var(--border-purple);
+            transition: all 0.2s;
+        }
+
+        .tag:hover {
+            background: var(--primary-purple);
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        .empty {
+            color: var(--text-light);
+            font-style: italic;
+            font-size: 13px;
+            padding: 8px;
+        }
+
+        /* Raw Toggle */
+        .raw-toggle {
+            background: var(--light-purple-bg);
+            color: var(--primary-purple);
+            padding: 12px 20px;
+            font-size: 13px;
+            font-weight: 700;
+            border: 1px solid var(--border-purple);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+        }
+
+        .raw-toggle:hover {
+            background: var(--primary-purple);
+            color: white;
+            border-color: var(--primary-purple);
+        }
+
+        .raw-content {
+            display: none;
+            margin-top: 12px;
+            background: #1e293b;
+            padding: 18px;
+            border-radius: 12px;
+            font-size: 11px;
+            max-height: 350px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+            color: #e2e8f0;
+            line-height: 1.6;
+        }
+
+        .raw-content::-webkit-scrollbar { width: 6px; }
+        .raw-content::-webkit-scrollbar-thumb { background: var(--primary-purple); border-radius: 3px; }
+
+        /* Footer */
+        .footer {
+            margin-top: 10px;
+            text-align: center;
+            color: var(--primary-purple);
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* ================================================
+           ✅ DESKTOP FULL SCREEN FIT (900px and above)
+           ================================================ */
+        @media (min-width: 900px) {
+            body {
+                padding: 40px 30px;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .page-shell {
+                max-width: 1300px;
+                gap: 25px;
+            }
+
+            .main-card {
+                max-width: 950px;
+                padding: 50px 55px;
+                gap: 28px;
+                border-radius: 28px;
+            }
+
+            .page-header h1 { font-size: 32px; }
+            .page-header h1 i { font-size: 34px; }
+            .page-header p.subtitle {
+                font-size: 15px;
+                padding: 10px 24px;
+            }
+
+            #urlInput {
+                font-size: 16px;
+                padding: 18px 22px 18px 54px;
+                border-radius: 18px;
+            }
+
+            .input-wrapper i { font-size: 17px; left: 20px; }
+
+            #extractBtn {
+                padding: 18px 38px;
+                font-size: 16px;
+                border-radius: 34px;
+            }
+
+            .field {
+                padding: 22px;
+                border-radius: 18px;
+            }
+
+            .field-label {
+                font-size: 13px;
+            }
+
+            .copy-btn {
+                padding: 9px 20px;
+                font-size: 13px;
+            }
+
+            .field-content {
+                font-size: 15px;
+                padding: 16px 20px;
+                max-height: 320px;
+            }
+
+            .tag {
+                padding: 9px 18px;
+                font-size: 14px;
+            }
+
+            .tags-container {
+                padding: 16px;
+            }
+
+            .raw-toggle {
+                padding: 14px 24px;
+                font-size: 14px;
+            }
+
+            .raw-content {
+                font-size: 12px;
+                padding: 22px;
+                max-height: 450px;
+            }
+
+            .loader { padding: 40px; }
+            .spinner { width: 50px; height: 50px; }
+            .loader p { font-size: 15px; }
+
+            .error {
+                font-size: 14px;
+                padding: 18px 24px;
+            }
+
+            .footer { font-size: 15px; margin-top: 20px; }
+        }
+
+        /* ✅ LARGE DESKTOP (1200px+) */
+        @media (min-width: 1200px) {
+            .main-card {
+                max-width: 1050px;
+                padding: 55px 65px;
+            }
+
+            .page-header h1 { font-size: 36px; }
+            .page-header h1 i { font-size: 38px; }
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            body { padding-top: 75px; }
+            .home-btn-wrapper { top: 12px; right: 12px; }
+            .home-btn { padding: 8px 16px; font-size: 13px; }
+            .main-card { padding: 25px 18px; border-radius: 20px; }
+            .page-header h1 { font-size: 20px; }
+            .input-group { flex-direction: column; }
+            #extractBtn { width: 100%; justify-content: center; }
+            .field-content { font-size: 13px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HOME BUTTON -->
+    <div class="home-btn-wrapper">
+        <a href="index.html" class="home-btn">
+            <i class="fas fa-home"></i> Home
+        </a>
+    </div>
+
+    <div class="page-shell">
+        <div class="main-card">
+            <!-- Header -->
+            <div class="page-header">
+                <h1>
+                    <i class="fab fa-youtube"></i>
+                    YouTube Metadata Extractor
+                </h1>
+                <p class="subtitle">Extract title, description & tags — one-click copy</p>
+            </div>
+
+            <!-- Input Row -->
+            <div class="input-group">
+                <div class="input-wrapper">
+                    <i class="fas fa-link"></i>
+                    <input type="text" id="urlInput" placeholder="Paste YouTube URL or video ID..." autocomplete="off" />
+                </div>
+                <button id="extractBtn">
+                    <i class="fas fa-search"></i> Extract
+                </button>
+            </div>
+
+            <!-- Loader -->
+            <div class="loader" id="loader">
+                <div class="spinner"></div>
+                <p>Fetching video metadata...</p>
+            </div>
+
+            <!-- Error Box -->
+            <div class="error" id="error">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span id="errorText"></span>
+            </div>
+
+            <!-- Result -->
+            <div class="result" id="result">
+                <!-- Title -->
+                <div class="field">
+                    <div class="field-header">
+                        <span class="field-label"><i class="fas fa-heading"></i> Title</span>
+                        <button class="copy-btn" data-copy="title">
+                            <i class="fas fa-copy"></i> Copy
+                        </button>
+                    </div>
+                    <div class="field-content" id="titleOutput"></div>
+                </div>
+
+                <!-- Description -->
+                <div class="field">
+                    <div class="field-header">
+                        <span class="field-label"><i class="fas fa-align-left"></i> Description</span>
+                        <button class="copy-btn" data-copy="desc">
+                            <i class="fas fa-copy"></i> Copy
+                        </button>
+                    </div>
+                    <div class="field-content" id="descOutput"></div>
+                </div>
+
+                <!-- Tags -->
+                <div class="field">
+                    <div class="field-header">
+                        <span class="field-label"><i class="fas fa-tags"></i> Tags</span>
+                        <button class="copy-btn" data-copy="tags">
+                            <i class="fas fa-copy"></i> Copy
+                        </button>
+                    </div>
+                    <div class="tags-container" id="tagsOutput"></div>
+                </div>
+
+                <!-- Raw Toggle -->
+                <button class="raw-toggle" id="rawToggle">
+                    <i class="fas fa-code"></i> Show Raw Response
+                </button>
+                <div class="raw-content" id="rawOutput"></div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <i class="fa-solid fa-heart"></i> Made with Love · Create by Sandesh <i class="fa-solid fa-heart"></i>
+        </div>
+    </div>
+
+    <script>
+        const urlInput = document.getElementById('urlInput');
+        const extractBtn = document.getElementById('extractBtn');
+        const loader = document.getElementById('loader');
+        const errorEl = document.getElementById('error');
+        const errorText = document.getElementById('errorText');
+        const result = document.getElementById('result');
+        const titleOutput = document.getElementById('titleOutput');
+        const descOutput = document.getElementById('descOutput');
+        const tagsOutput = document.getElementById('tagsOutput');
+        const rawOutput = document.getElementById('rawOutput');
+        const rawToggle = document.getElementById('rawToggle');
+
+        let currentData = { title: '', description: '', tags: [] };
+
+        function getVideoId(input) {
+            input = (input || '').trim();
+            if (/^[a-zA-Z0-9_-]{11}$/.test(input)) return input;
+            const patterns = [
+                /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})/,
+                /[?&]v=([a-zA-Z0-9_-]{11})/,
+            ];
+            for (const p of patterns) {
+                const m = input.match(p);
+                if (m) return m[1];
+            }
+            return null;
+        }
+
+        function showError(msg) {
+            errorText.textContent = msg;
+            errorEl.classList.add('active');
+        }
+
+        function hideError() {
+            errorEl.classList.remove('active');
+            errorText.textContent = '';
+        }
+
+        function stripJinaHeader(text) {
+            let cleaned = text;
+            cleaned = cleaned.replace(/^Title:.*$/m, '');
+            cleaned = cleaned.replace(/^URL Source:.*$/m, '');
+            cleaned = cleaned.replace(/^Published Time:.*$/m, '');
+            cleaned = cleaned.replace(/^Markdown Content:\s*$/m, '');
+            return cleaned.trim();
+        }
+
+        function extractDescription(text) {
+            const descLabelMatch = text.match(/Description:\s*([\s\S]*?)(?=\n(?:Tags|Keywords|Published Time|Markdown Content|URL Source|$))/i);
+            if (descLabelMatch && descLabelMatch[1].trim().length > 10) {
+                return descLabelMatch[1].trim();
+            }
+
+            const mdContentMatch = text.match(/Markdown Content:\s*([\s\S]*)/i);
+            if (mdContentMatch) {
+                const content = mdContentMatch[1];
+                const lines = content.split('\n').map(l => l.trim()).filter(Boolean);
+                let desc = '';
+                for (const line of lines) {
+                    if (line.startsWith('#') || line.startsWith('![') || (line.startsWith('[') && line.includes(']('))) {
+                        if (desc.length > 20) break;
+                        continue;
+                    }
+                    if (line.length > 20 && !line.includes('http')) {
+                        desc += (desc ? '\n' : '') + line;
+                    }
+                    if (desc.length > 500) break;
+                }
+                if (desc.trim().length > 20) return desc.trim();
+            }
+
+            const cleaned = stripJinaHeader(text);
+            const paragraphs = cleaned.split(/\n\s*\n/).map(p => p.trim()).filter(p => p.length > 30);
+            for (const p of paragraphs) {
+                if (p.startsWith('#') || p.startsWith('!') || p.includes('Subscribe') || p.includes('http')) continue;
+                return p;
+            }
+            return '';
+        }
+
+        function extractTags(text) {
+            let tags = [];
+
+            const kwMatch = text.match(/Keywords:\s*(.+)/i);
+            if (kwMatch) {
+                tags = kwMatch[1].split(',').map(t => t.trim()).filter(Boolean);
+            }
+
+            if (tags.length === 0) {
+                const metaMatch = text.match(/name=["']keywords["']\s+content=["']([^"']+)["']/i);
+                if (metaMatch) {
+                    tags = metaMatch[1].split(',').map(t => t.trim()).filter(Boolean);
+                }
+            }
+
+            if (tags.length === 0) {
+                const jsonMatch = text.match(/["']keywords["']\s*:\s*["']([^"']+)["']/i);
+                if (jsonMatch) {
+                    tags = jsonMatch[1].split(',').map(t => t.trim()).filter(Boolean);
+                }
+            }
+
+            if (tags.length === 0) {
+                const tagsArrayMatch = text.match(/["']tags["']\s*:\s*\[([^\]]+)\]/i);
+                if (tagsArrayMatch) {
+                    tags = tagsArrayMatch[1]
+                        .split(',')
+                        .map(t => t.replace(/["'\s]/g, '').trim())
+                        .filter(Boolean);
+                }
+            }
+
+            if (tags.length === 0) {
+                const ogTags = [...text.matchAll(/property=["']og:video:tag["']\s+content=["']([^"']+)["']/gi)];
+                if (ogTags.length > 0) {
+                    tags = ogTags.map(m => m[1].trim()).filter(Boolean);
+                }
+            }
+
+            tags = [...new Set(tags.map(t => t.replace(/^["'\s]+|["'\s]+$/g, '').trim()).filter(t => t.length > 0 && t.length < 100))];
+
+            return tags;
+        }
+
+        function parseMetadata(text, oembedData) {
+            const data = { title: '', description: '', tags: [] };
+
+            if (oembedData && oembedData.title) {
+                data.title = oembedData.title;
+            } else {
+                const titleMatch = text.match(/^Title:\s*(.+)$/m);
+                if (titleMatch) data.title = titleMatch[1].trim();
+            }
+
+            data.description = extractDescription(text);
+
+            if (!data.description) {
+                const ogDesc = text.match(/property=["']og:description["']\s*content=["']([^"']+)["']/i);
+                if (ogDesc) data.description = ogDesc[1].trim();
+            }
+
+            data.tags = extractTags(text);
+
+            return data;
+        }
+
+        function renderResult(data) {
+            currentData = data;
+
+            titleOutput.textContent = data.title || '— not found —';
+            titleOutput.style.color = data.title ? '#1f2937' : '#9ca3af';
+
+            descOutput.textContent = data.description || '— not found —';
+            descOutput.style.color = data.description ? '#1f2937' : '#9ca3af';
+
+            tagsOutput.innerHTML = '';
+            if (data.tags.length > 0) {
+                data.tags.forEach(tag => {
+                    const span = document.createElement('span');
+                    span.className = 'tag';
+                    span.textContent = tag;
+                    tagsOutput.appendChild(span);
+                });
+            } else {
+                tagsOutput.innerHTML = '<span class="empty">— no tags found —</span>';
+            }
+
+            result.classList.add('active');
+        }
+
+        document.querySelectorAll('.copy-btn').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const target = btn.dataset.copy;
+                let textToCopy = '';
+
+                if (target === 'title') textToCopy = currentData.title || '';
+                else if (target === 'desc') textToCopy = currentData.description || '';
+                else if (target === 'tags') textToCopy = currentData.tags.join(', ');
+
+                if (!textToCopy) return;
+
+                try {
+                    if (navigator.clipboard && window.isSecureContext) {
+                        await navigator.clipboard.writeText(textToCopy);
+                    } else {
+                        throw new Error('Fallback');
+                    }
+                } catch (err) {
+                    const ta = document.createElement('textarea');
+                    ta.value = textToCopy;
+                    ta.style.position = 'fixed';
+                    ta.style.top = '-1000px';
+                    document.body.appendChild(ta);
+                    ta.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(ta);
+                }
+
+                const originalHTML = btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                btn.classList.add('copied');
+                setTimeout(() => {
+                    btn.innerHTML = originalHTML;
+                    btn.classList.remove('copied');
+                }, 1500);
+            });
+        });
+
+        rawToggle.addEventListener('click', () => {
+            const isHidden = rawOutput.style.display === 'none' || !rawOutput.style.display;
+            rawOutput.style.display = isHidden ? 'block' : 'none';
+            rawToggle.innerHTML = isHidden
+                ? '<i class="fas fa-code"></i> Hide Raw Response'
+                : '<i class="fas fa-code"></i> Show Raw Response';
+        });
+
+        async function extractData() {
+            const videoId = getVideoId(urlInput.value);
+            if (!videoId) {
+                showError('Invalid YouTube URL. Please enter a valid video link.');
+                return;
+            }
+
+            extractBtn.disabled = true;
+            loader.classList.add('active');
+            result.classList.remove('active');
+            hideError();
+            rawOutput.style.display = 'none';
+            rawToggle.innerHTML = '<i class="fas fa-code"></i> Show Raw Response';
+
+            const targetUrl = `https://www.youtube.com/watch?v=${videoId}`;
+            const jinaUrl = `https://r.jina.ai/${targetUrl}`;
+            const oembedUrl = `https://www.youtube.com/oembed?url=${encodeURIComponent(targetUrl)}&format=json`;
+
+            try {
+                const [jinaRes, oembedRes] = await Promise.allSettled([
+                    fetch(jinaUrl, { headers: { 'Accept': 'text/plain' } }),
+                    fetch(oembedUrl)
+                ]);
+
+                let text = '';
+                let oembedData = null;
+
+                if (jinaRes.status === 'fulfilled' && jinaRes.value.ok) {
+                    text = await jinaRes.value.text();
+                } else {
+                    throw new Error('Failed to fetch from r.jina.ai. It may be temporarily unavailable.');
+                }
+
+                if (oembedRes.status === 'fulfilled' && oembedRes.value.ok) {
+                    try {
+                        oembedData = await oembedRes.value.json();
+                    } catch (e) {
+                        console.warn('oEmbed parse failed', e);
+                    }
+                }
+
+                if (!text || text.length < 100) {
+                    throw new Error('Response content is empty. YouTube may have blocked access.');
+                }
+
+                const metadata = parseMetadata(text, oembedData);
+                renderResult(metadata);
+
+                rawOutput.textContent = text;
+
+                const warnings = [];
+                if (!metadata.description) warnings.push('description');
+                if (metadata.tags.length === 0) warnings.push('tags');
+                if (warnings.length > 0) {
+                    showError(`Could not extract: ${warnings.join(', ')}. Click "Show Raw Response" to inspect the fetched content.`);
+                }
+
+            } catch (err) {
+                console.error(err);
+                showError(
+                    (err.message || 'Fetch failed') +
+                    '\n\nPossible reasons: r.jina.ai is temporarily unavailable, or YouTube has restricted this request. Please try again later.'
+                );
+            } finally {
+                loader.classList.remove('active');
+                extractBtn.disabled = false;
+            }
+        }
+
+        extractBtn.addEventListener('click', extractData);
+        urlInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') extractData();
+        });
+    </script>
+</body>
+</html>

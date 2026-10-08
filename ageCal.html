@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <title>Age & Duration Calculator · Lite Pro Tools</title>
+
+  <!-- ✅ FAVICON (same as main site) -->
+  <link rel="icon" type="image/x-icon" href="favicon/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png">
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', 'Poppins', system-ui, -apple-system, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background: linear-gradient(145deg, #f8f0ff 0%, #f0e6ff 100%);
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* ---------- HOME BUTTON ---------- */
+    .home-btn-wrapper {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 999;
+    }
+
+    .home-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.9);
+      color: #6a3de8;
+      border: 2px solid #d9c8ff;
+      padding: 10px 22px;
+      border-radius: 30px;
+      font-size: 14px;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      box-shadow: 0 4px 14px rgba(106, 61, 232, 0.18);
+      backdrop-filter: blur(10px);
+    }
+
+    .home-btn:hover {
+      background: linear-gradient(135deg, #6a3de8, #a884ff);
+      color: white;
+      border-color: #6a3de8;
+      transform: translateY(-2px);
+      box-shadow: 0 10px 24px rgba(106, 61, 232, 0.4);
+    }
+
+    .home-btn i {
+      font-size: 15px;
+    }
+
+    /* ---------- HEADER (same style as main site) ---------- */
+    .header {
+      width: 100%;
+      max-width: 680px;
+      background: rgba(255, 255, 255, 0.78);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-radius: 56px 56px 40px 40px;
+      padding: 2rem 2rem 1.6rem;
+      box-shadow: 0 30px 60px -15px rgba(90, 40, 140, 0.25),
+                  0 0 0 1px rgba(200, 170, 255, 0.25) inset;
+      border: 1px solid rgba(220, 200, 255, 0.4);
+      margin-bottom: 1.8rem;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+
+    .header:hover {
+      box-shadow: 0 35px 70px -15px rgba(90, 40, 140, 0.35);
+    }
+
+    .header .brand {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.9rem;
+      flex-wrap: wrap;
+    }
+
+    /* ---------- LOGO ICON (same animated logo) ---------- */
+    .logo-icon {
+      width: 58px;
+      height: 58px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, #6a3de8 0%, #a884ff 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      box-shadow: 0 8px 22px rgba(106, 61, 232, 0.35),
+                  0 0 0 3px rgba(255, 255, 255, 0.6) inset;
+      flex-shrink: 0;
+      overflow: hidden;
+      transition: transform 0.3s ease;
+    }
+
+    .logo-icon:hover {
+      transform: scale(1.08) rotate(-3deg);
+    }
+
+    .logo-icon::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(45deg, transparent 40%, rgba(255,255,255,0.35) 50%, transparent 60%);
+      animation: shine 3s infinite;
+    }
+
+    @keyframes shine {
+      0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+      100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+    }
+
+    .logo-icon i {
+      color: #fff;
+      font-size: 26px;
+      z-index: 2;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+    }
+
+    .logo-icon .fa-bolt {
+      position: absolute;
+      font-size: 13px !important;
+      color: #ffd700 !important;
+      top: 7px;
+      right: 7px;
+      z-index: 3;
+      filter: drop-shadow(0 0 4px rgba(255, 215, 0, 0.8)) !important;
+      animation: zap 2s infinite;
+    }
+
+    @keyframes zap {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.6; transform: scale(0.85); }
+    }
+
+    .header h1 {
+      font-size: 2.1rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #3b1f7a, #7b4cff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      letter-spacing: -0.3px;
+    }
+
+    .header h1 small {
+      font-size: 0.8rem;
+      font-weight: 400;
+      background: #ede4ff;
+      padding: 0.2rem 1rem;
+      border-radius: 60px;
+      color: #5b3b9e;
+      margin-left: 0.4rem;
+      background-clip: unset;
+      -webkit-background-clip: unset;
+    }
+
+    .header .subtitle {
+      color: #7a5fa8;
+      margin-top: 0.4rem;
+      font-weight: 400;
+      font-size: 0.9rem;
+      letter-spacing: 0.5px;
+    }
+
+    /* 🔒 Trust mini-banner */
+    .privacy-mini {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 0.8rem;
+      background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+      border-left: 4px solid #10b981;
+      border-radius: 40px;
+      padding: 0.35rem 1rem;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: #047857;
+      border: 1px solid #a7f3d0;
+    }
+
+    .privacy-mini i { color: #059669; }
+
+    /* ---------- MAIN GLASS CARD ---------- */
+    .glass-card {
+      max-width: 680px;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.78);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-radius: 48px;
+      border: 1px solid rgba(220, 200, 255, 0.4);
+      box-shadow: 0 30px 60px -15px rgba(90, 40, 140, 0.2),
+                  0 0 0 1px rgba(200, 170, 255, 0.15) inset;
+      padding: 2.2rem 2rem;
+      transition: all 0.3s ease;
+    }
+
+    .glass-card:hover {
+      box-shadow: 0 40px 70px -18px rgba(90, 40, 140, 0.3),
+                  0 0 0 1px rgba(200, 170, 255, 0.2) inset;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      margin-bottom: 1.2rem;
+    }
+
+    label {
+      font-size: 0.82rem;
+      font-weight: 600;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+      color: #5b3b9e;
+      padding-left: 0.6rem;
+      opacity: 0.85;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    label i { color: #6a3de8; }
+
+    input[type="date"] {
+      width: 100%;
+      padding: 1rem 1.2rem;
+      font-size: 1.05rem;
+      font-weight: 500;
+      font-family: inherit;
+      background: rgba(255, 255, 255, 0.85);
+      border: 1.8px solid #d9c8ff;
+      border-radius: 28px;
+      color: #2c1a4e;
+      outline: none;
+      transition: all 0.25s ease;
+      cursor: pointer;
+      letter-spacing: 0.5px;
+      box-shadow: 0 6px 14px -8px rgba(106, 61, 232, 0.15);
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    input[type="date"]:hover {
+      border-color: #a884ff;
+      background: #fff;
+      box-shadow: 0 8px 20px -8px rgba(106, 61, 232, 0.25);
+    }
+
+    input[type="date"]:focus {
+      border-color: #6a3de8;
+      box-shadow: 0 0 0 4px rgba(160, 120, 255, 0.18),
+                  0 8px 20px -8px rgba(106, 61, 232, 0.3);
+      background: #fff;
+    }
+
+    input[type="date"]::-webkit-calendar-picker-indicator {
+      filter: invert(0.35) sepia(1) saturate(6) hue-rotate(230deg);
+      cursor: pointer;
+      padding: 6px;
+      border-radius: 50%;
+      transition: background 0.2s;
+    }
+
+    input[type="date"]::-webkit-calendar-picker-indicator:hover {
+      background: rgba(180, 140, 255, 0.18);
+    }
+
+    /* Swap button */
+    .swap-wrapper {
+      display: flex;
+      justify-content: center;
+      margin: -0.3rem 0 1rem;
+    }
+
+    .swap-btn {
+      background: rgba(160, 120, 255, 0.12);
+      border: 2px solid #d9c8ff;
+      color: #5b3b9e;
+      font-size: 0.85rem;
+      font-weight: 600;
+      padding: 0.55rem 1.3rem;
+      border-radius: 60px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: inherit;
+      letter-spacing: 0.4px;
+      backdrop-filter: blur(8px);
+    }
+
+    .swap-btn:hover {
+      background: #ede4ff;
+      border-color: #a884ff;
+      transform: translateY(-2px);
+      box-shadow: 0 10px 22px -10px rgba(106, 61, 232, 0.5);
+    }
+
+    .swap-btn:active {
+      transform: translateY(0) scale(0.97);
+    }
+
+    /* Calculate button (same gradient as main site) */
+    .calc-btn {
+      width: 100%;
+      padding: 1.05rem 1.8rem;
+      font-size: 1.1rem;
+      font-weight: 600;
+      font-family: inherit;
+      letter-spacing: 0.5px;
+      color: #fff;
+      background: linear-gradient(135deg, #6a3de8, #a884ff);
+      border: none;
+      border-radius: 60px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      box-shadow: 0 12px 28px -8px rgba(106, 61, 232, 0.45),
+                  0 0 0 1px rgba(255, 255, 255, 0.15) inset;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 1.8rem;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    }
+
+    .calc-btn:hover {
+      transform: translateY(-3px);
+      background: linear-gradient(135deg, #5b2fd0, #9a70ff);
+      box-shadow: 0 22px 36px -10px rgba(106, 61, 232, 0.55),
+                  0 0 0 1.5px rgba(255, 255, 255, 0.25) inset;
+    }
+
+    .calc-btn:active {
+      transform: translateY(1px) scale(0.99);
+      box-shadow: 0 8px 18px -6px rgba(106, 61, 232, 0.4),
+                  0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+    }
+
+    /* ---------- RESULT CARD ---------- */
+    .result-container {
+      background: linear-gradient(145deg, #faf6ff, #f2e9ff);
+      border-radius: 36px;
+      padding: 1.8rem 1.5rem;
+      border: 1px solid rgba(200, 170, 255, 0.35);
+      box-shadow: 0 20px 40px -18px rgba(106, 61, 232, 0.25),
+                  0 0 0 1px rgba(255, 255, 255, 0.6) inset;
+      transition: all 0.3s ease;
+    }
+
+    .result-title {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      font-weight: 700;
+      color: #5b3b9e;
+      margin-bottom: 1.2rem;
+      padding-left: 0.3rem;
+      opacity: 0.9;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .result-title i {
+      color: #6a3de8;
+      font-size: 1rem;
+      filter: drop-shadow(0 0 6px rgba(106, 61, 232, 0.4));
+    }
+
+    .age-grid {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      gap: 0.8rem;
+      text-align: center;
+    }
+
+    .age-item { flex: 1; }
+
+    .age-number {
+      font-size: 3rem;
+      font-weight: 800;
+      line-height: 1;
+      background: linear-gradient(135deg, #3b1f7a, #7b4cff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      letter-spacing: -1px;
+      margin-bottom: 0.2rem;
+      transition: transform 0.3s ease;
+    }
+
+    .age-item:hover .age-number {
+      transform: scale(1.08);
+    }
+
+    .age-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #7a5fa8;
+    }
+
+    .divider {
+      width: 1.5px;
+      height: 44px;
+      background: linear-gradient(to bottom, transparent, rgba(160, 130, 255, 0.4), transparent);
+      border-radius: 10px;
+    }
+
+    /* Extra info */
+    .extra-info {
+      margin-top: 1.4rem;
+      padding-top: 1.2rem;
+      border-top: 1.5px dashed rgba(160, 130, 255, 0.3);
+      display: flex;
+      justify-content: space-around;
+      flex-wrap: wrap;
+      gap: 0.8rem;
+      text-align: center;
+    }
+
+    .extra-item {
+      flex: 1;
+      min-width: 90px;
+      background: rgba(255, 255, 255, 0.6);
+      border-radius: 20px;
+      padding: 0.7rem 0.4rem;
+      border: 1px solid rgba(200, 170, 255, 0.25);
+      transition: all 0.25s ease;
+    }
+
+    .extra-item:hover {
+      background: #fff;
+      border-color: #a884ff;
+      transform: translateY(-3px);
+      box-shadow: 0 10px 20px -10px rgba(106, 61, 232, 0.3);
+    }
+
+    .extra-number {
+      font-size: 1.35rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #3b1f7a, #7b4cff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .extra-label {
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #7a5fa8;
+      font-weight: 600;
+      margin-top: 0.15rem;
+    }
+
+    .hint {
+      font-size: 0.88rem;
+      color: #c62828;
+      text-align: center;
+      margin-top: 1rem;
+      padding: 0.5rem 0.8rem;
+      border-radius: 40px;
+      transition: 0.2s;
+      min-height: 1.8rem;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .success-hint {
+      color: #059669;
+      background: rgba(16, 185, 129, 0.08);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+    }
+
+    .error-hint {
+      color: #c62828;
+      background: rgba(239, 68, 68, 0.08);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+    }
+
+    /* ---------- FOOTER ---------- */
+    .footer {
+      width: 100%;
+      max-width: 680px;
+      text-align: center;
+      padding: 1.4rem 1.5rem;
+      background: rgba(255, 255, 255, 0.78);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-radius: 40px;
+      border: 1px solid rgba(220, 200, 255, 0.4);
+      box-shadow: 0 12px 28px -10px rgba(80, 40, 160, 0.08);
+      margin-top: 1.5rem;
+      color: #7a5fa8;
+      font-weight: 400;
+      font-size: 0.88rem;
+      transition: 0.3s ease;
+    }
+
+    .footer:hover {
+      border-color: #a884ff;
+      box-shadow: 0 16px 36px -12px rgba(106, 61, 232, 0.12);
+    }
+
+    .footer i { color: #6a3de8; }
+
+    .footer .heart {
+      display: inline-block;
+      animation: pulse 1.8s infinite;
+      color: #ef4444;
+    }
+
+    .footer .privacy-note {
+      font-size: 0.75rem;
+      margin-top: 0.4rem;
+      color: #059669;
+      font-weight: 600;
+    }
+
+    .footer .privacy-note i { color: #059669; }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.15); }
+    }
+
+    /* ---------- RESPONSIVE ---------- */
+    @media (max-width: 600px) {
+      body { padding: 1rem; padding-top: 4.5rem; }
+      .home-btn-wrapper { top: 12px; right: 12px; }
+      .home-btn { padding: 8px 16px; font-size: 13px; }
+      .header { padding: 1.5rem 1.2rem 1.2rem; border-radius: 40px 40px 30px 30px; }
+      .header h1 { font-size: 1.6rem; }
+      .header h1 small { font-size: 0.65rem; padding: 0.1rem 0.7rem; }
+      .header .subtitle { font-size: 0.78rem; }
+      .logo-icon { width: 48px; height: 48px; border-radius: 14px; }
+      .logo-icon i { font-size: 20px; }
+      .logo-icon .fa-bolt { font-size: 11px !important; top: 5px; right: 5px; }
+
+      .glass-card { padding: 1.6rem 1.2rem; border-radius: 36px; }
+      input[type="date"] { font-size: 0.95rem; padding: 0.85rem 1rem; }
+      .calc-btn { font-size: 1rem; padding: 0.9rem 1.4rem; }
+      .age-number { font-size: 2.3rem; }
+      .age-grid { gap: 0.4rem; }
+      .extra-number { font-size: 1.1rem; }
+      .extra-item { padding: 0.5rem 0.3rem; }
+      .footer { padding: 1rem; font-size: 0.78rem; }
+      .privacy-mini { font-size: 0.65rem; padding: 0.25rem 0.8rem; }
+    }
+
+    @media (max-width: 400px) {
+      .header h1 { font-size: 1.35rem; }
+      .header h1 small { display: none; }
+      .age-number { font-size: 1.9rem; }
+      .age-label { font-size: 0.65rem; }
+      .extra-number { font-size: 0.95rem; }
+      .extra-label { font-size: 0.6rem; }
+      .divider { height: 34px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HOME BUTTON -->
+  <div class="home-btn-wrapper">
+    <a href="index.html" class="home-btn">
+      <i class="fas fa-home"></i> Home
+    </a>
+  </div>
+
+  <!-- ========== HEADER ========== -->
+  <header class="header">
+    <div class="brand">
+      <!-- ✅ LOGO (same animated style as main site) -->
+      <div class="logo-icon">
+        <i class="fas fa-hourglass-half"></i>
+        <i class="fas fa-bolt fa-bolt"></i>
+      </div>
+      <h1>
+        Duration Calculator
+        <small>Age &amp; Time Difference</small>
+      </h1>
+    </div>
+
+    <p class="subtitle"><i class="fas fa-star" style="color:#ffa200;"></i> Start · End · Exact Difference</p>
+
+    <div class="privacy-mini">
+      <i class="fas fa-shield-alt"></i> 100% Private · Runs in your browser
+    </div>
+  </header>
+
+  <!-- ========== MAIN CARD ========== -->
+  <div class="glass-card">
+
+    <!-- START DATE -->
+    <div class="input-group">
+      <label for="startDate"><i class="fas fa-calendar-plus"></i> Start Date</label>
+      <input type="date" id="startDate" required>
+    </div>
+
+    <!-- SWAP BUTTON -->
+    <div class="swap-wrapper">
+      <button class="swap-btn" id="swapBtn" title="Swap dates">
+        <i class="fas fa-arrows-alt-v"></i> Swap Dates
+      </button>
+    </div>
+
+    <!-- END DATE -->
+    <div class="input-group">
+      <label for="endDate"><i class="fas fa-flag-checkered"></i> End Date</label>
+      <input type="date" id="endDate" required>
+    </div>
+
+    <!-- CALCULATE BUTTON -->
+    <button class="calc-btn" id="calculateBtn">
+      <i class="fas fa-calculator"></i>
+      <span>Calculate Difference</span>
+      <i class="fas fa-arrow-right"></i>
+    </button>
+
+    <!-- RESULT -->
+    <div class="result-container">
+      <div class="result-title">
+        <i class="fas fa-magic"></i> Exact Difference
+      </div>
+
+      <div class="age-grid">
+        <div class="age-item">
+          <div class="age-number" id="years">—</div>
+          <div class="age-label">Years</div>
+        </div>
+        <div class="divider"></div>
+        <div class="age-item">
+          <div class="age-number" id="months">—</div>
+          <div class="age-label">Months</div>
+        </div>
+        <div class="divider"></div>
+        <div class="age-item">
+          <div class="age-number" id="days">—</div>
+          <div class="age-label">Days</div>
+        </div>
+      </div>
+
+      <!-- EXTRA INFO -->
+      <div class="extra-info">
+        <div class="extra-item">
+          <div class="extra-number" id="totalDays">—</div>
+          <div class="extra-label">Total Days</div>
+        </div>
+        <div class="extra-item">
+          <div class="extra-number" id="totalWeeks">—</div>
+          <div class="extra-label">Total Weeks</div>
+        </div>
+        <div class="extra-item">
+          <div class="extra-number" id="totalMonths">—</div>
+          <div class="extra-label">Total Months</div>
+        </div>
+      </div>
+
+      <div id="message" class="hint"></div>
+    </div>
+  </div>
+
+  <!-- ========== FOOTER ========== -->
+  <footer class="footer">
+    <p>
+      <i class="fas fa-heart heart"></i>
+      Made with Love · Created by <strong style="color:#3b1f7a;">Sandesh Sharma</strong>
+      <i class="fas fa-heart heart"></i>
+    </p>
+    <p class="privacy-note">
+      <i class="fas fa-shield-alt"></i> Your data is never uploaded · No server connection · 100% browser-based
+    </p>
+  </footer>
+
+  <script>
+    (function() {
+      const startInput = document.getElementById('startDate');
+      const endInput = document.getElementById('endDate');
+      const swapBtn = document.getElementById('swapBtn');
+      const calculateBtn = document.getElementById('calculateBtn');
+      const yearsEl = document.getElementById('years');
+      const monthsEl = document.getElementById('months');
+      const daysEl = document.getElementById('days');
+      const totalDaysEl = document.getElementById('totalDays');
+      const totalWeeksEl = document.getElementById('totalWeeks');
+      const totalMonthsEl = document.getElementById('totalMonths');
+      const messageEl = document.getElementById('message');
+
+      function toISO(date) {
+        const y = date.getFullYear();
+        const m = String(date.getMonth() + 1).padStart(2, '0');
+        const d = String(date.getDate()).padStart(2, '0');
+        return `${y}-${m}-${d}`;
+      }
+
+      const today = new Date();
+      const defaultStart = new Date(2000, 0, 1);
+      startInput.value = toISO(defaultStart);
+      endInput.value = toISO(today);
+
+      startInput.max = toISO(today);
+      endInput.max = toISO(today);
+
+      swapBtn.addEventListener('click', () => {
+        const s = startInput.value;
+        const e = endInput.value;
+        startInput.value = e;
+        endInput.value = s;
+        calculateDifference();
+      });
+
+      function calculateDifference() {
+        const sVal = startInput.value;
+        const eVal = endInput.value;
+
+        if (!sVal || !eVal) {
+          setMessage('Please select both start and end dates.', false);
+          resetDisplay();
+          return;
+        }
+
+        const startDate = new Date(sVal + 'T00:00:00');
+        const endDate = new Date(eVal + 'T00:00:00');
+
+        if (isNaN(startDate) || isNaN(endDate)) {
+          setMessage('Invalid date. Please try again.', false);
+          resetDisplay();
+          return;
+        }
+
+        if (endDate < startDate) {
+          setMessage('End date must be after Start date. (Tip: use Swap)', false);
+          resetDisplay();
+          return;
+        }
+
+        let years = endDate.getFullYear() - startDate.getFullYear();
+        let months = endDate.getMonth() - startDate.getMonth();
+        let days = endDate.getDate() - startDate.getDate();
+
+        if (days < 0) {
+          const prevMonthDate = new Date(endDate.getFullYear(), endDate.getMonth(), 0);
+          const daysInPrevMonth = prevMonthDate.getDate();
+          days += daysInPrevMonth;
+          months--;
+        }
+
+        if (months < 0) {
+          months += 12;
+          years--;
+        }
+
+        const MS_PER_DAY = 1000 * 60 * 60 * 24;
+        const totalDays = Math.floor((endDate - startDate) / MS_PER_DAY);
+        const totalWeeks = Math.floor(totalDays / 7);
+        const totalMonths = years * 12 + months;
+
+        yearsEl.textContent = years;
+        monthsEl.textContent = months;
+        daysEl.textContent = days;
+        totalDaysEl.textContent = totalDays.toLocaleString();
+        totalWeeksEl.textContent = totalWeeks.toLocaleString();
+        totalMonthsEl.textContent = totalMonths;
+
+        if (totalDays === 0) {
+          setMessage('Same dates — difference is 0.', true);
+        } else {
+          setMessage('Difference calculated successfully', true);
+        }
+      }
+
+      function setMessage(text, isSuccess = true) {
+        const icon = isSuccess
+          ? '<i class="fas fa-check-circle"></i>'
+          : '<i class="fas fa-exclamation-circle"></i>';
+        messageEl.innerHTML = icon + ' ' + text;
+        messageEl.classList.toggle('success-hint', isSuccess);
+        messageEl.classList.toggle('error-hint', !isSuccess);
+      }
+
+      function resetDisplay() {
+        yearsEl.textContent = '—';
+        monthsEl.textContent = '—';
+        daysEl.textContent = '—';
+        totalDaysEl.textContent = '—';
+        totalWeeksEl.textContent = '—';
+        totalMonthsEl.textContent = '—';
+      }
+
+      calculateBtn.addEventListener('click', calculateDifference);
+      startInput.addEventListener('change', calculateDifference);
+      endInput.addEventListener('change', calculateDifference);
+
+      [startInput, endInput].forEach(inp => {
+        inp.addEventListener('keypress', e => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            calculateDifference();
+          }
+        });
+      });
+
+      window.addEventListener('load', () => {
+        setTimeout(calculateDifference, 80);
+      });
+
+    })();
+  </script>
+</body>
+</html>

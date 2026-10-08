@@ -1,0 +1,1541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Border To Photo - Upload & Edit</title>
+    <!-- ✅ FAVICON - Folder ke andar wali files -->
+    <link rel="icon" type="image/x-icon" href="favicon/favicon.ico">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-purple: #7c3aed;
+            --light-purple-bg: #f3f0ff;
+            --border-purple: #d8b4fe;
+            --text-dark: #1f2937;
+            --text-light: #6b7280;
+            --success-green: #6ee7b7;
+            --success-hover: #34d399;
+            --btn-shadow: 0 4px 6px -1px rgba(124, 58, 237, 0.4);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f3f4f6;
+            background-image: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            color: var(--text-dark);
+        }
+
+        /* ---------- HOME BUTTON ---------- */
+        .home-btn-wrapper {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 999;
+        }
+
+        .home-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: white;
+            color: var(--primary-purple);
+            border: 2px solid var(--border-purple);
+            padding: 10px 22px;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 700;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            box-shadow: 0 4px 10px rgba(124, 58, 237, 0.15);
+        }
+
+        .home-btn:hover {
+            background: var(--primary-purple);
+            color: white;
+            border-color: var(--primary-purple);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(124, 58, 237, 0.35);
+        }
+
+        .home-btn i {
+            font-size: 15px;
+        }
+
+        /* ===== UPLOAD SCREEN ===== */
+        .upload-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            max-width: 600px;
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08), 0 0 0 1px rgba(124, 58, 237, 0.1);
+            padding: 50px 30px;
+            text-align: center;
+            gap: 20px;
+        }
+
+        .upload-screen h1 {
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .upload-screen p {
+            font-size: 14px;
+            color: var(--text-light);
+            max-width: 400px;
+            line-height: 1.5;
+        }
+
+        .drop-zone {
+            width: 100%;
+            max-width: 500px;
+            height: 280px;
+            border: 2px dashed var(--border-purple);
+            border-radius: 20px;
+            background: #faf5ff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 20px;
+        }
+
+        .drop-zone:hover {
+            border-color: var(--primary-purple);
+            background: #f3e8ff;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(124, 58, 237, 0.15);
+        }
+
+        .drop-zone.dragover {
+            border-color: var(--primary-purple);
+            background: #e9d5ff;
+            transform: scale(1.02);
+        }
+
+        .folder-icon {
+            font-size: 48px;
+            color: var(--primary-purple);
+        }
+
+        .upload-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .upload-subtitle {
+            font-size: 13px;
+            color: var(--text-light);
+            background: white;
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .upload-btn {
+            background: var(--primary-purple);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 30px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: var(--btn-shadow);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .upload-btn:hover {
+            background: #6d28d9;
+            transform: translateY(-2px);
+        }
+
+        /* ===== EDITOR SCREEN ===== */
+        .editor-screen {
+            display: none;
+            max-width: 1200px;
+            width: 100%;
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08), 0 0 0 1px rgba(124, 58, 237, 0.1);
+            overflow: hidden;
+            min-height: 80vh;
+        }
+
+        .editor-screen.active {
+            display: flex;
+        }
+
+        /* ===== LEFT: PREVIEW ===== */
+        .preview-panel {
+            flex: 1.2;
+            background: #f8fafc;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 30px;
+            position: relative;
+            border-right: 1px solid #e2e8f0;
+            min-width: 0;
+        }
+
+        .preview-wrapper {
+            background: white;
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            max-width: 100%;
+            max-height: 100%;
+            border: 1px solid #e2e8f0;
+        }
+
+        .canvas-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border-radius: 8px;
+        }
+
+        canvas {
+            display: block;
+            max-width: 100%;
+            max-height: 60vh;
+            object-fit: contain;
+            border-radius: 8px;
+        }
+
+        .change-image-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: white;
+            border: 1px solid var(--border-purple);
+            padding: 10px 18px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--primary-purple);
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .change-image-btn:hover {
+            background: var(--light-purple-bg);
+            border-color: var(--primary-purple);
+            transform: translateY(-2px);
+        }
+
+        /* ===== RIGHT: CONTROLS ===== */
+        .controls-panel {
+            flex: 0.9;
+            padding: 25px 20px;
+            overflow-y: auto;
+            background: white;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            max-height: 85vh;
+            min-width: 0;
+        }
+
+        .controls-panel::-webkit-scrollbar { width: 6px; }
+        .controls-panel::-webkit-scrollbar-thumb { background: var(--border-purple); border-radius: 3px; }
+
+        .section-title {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: var(--primary-purple);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Presets */
+        .preset-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .preset-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 5px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            background: #f8fafc;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-light);
+            text-transform: uppercase;
+            gap: 8px;
+        }
+
+        .preset-item:hover { border-color: var(--border-purple); background: white; }
+        .preset-item.active {
+            border-color: var(--primary-purple);
+            background: var(--light-purple-bg);
+            color: var(--primary-purple);
+            box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15);
+        }
+
+        .preset-swatch {
+            width: 40px;
+            height: 30px;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+            background: #fff;
+        }
+
+        /* Aspect */
+        .aspect-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+        }
+
+        .aspect-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 2px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            background: #f8fafc;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 9px;
+            font-weight: 700;
+            color: var(--text-light);
+            text-transform: uppercase;
+            gap: 6px;
+        }
+
+        .aspect-item:hover { border-color: var(--border-purple); }
+        .aspect-item.active { border-color: var(--primary-purple); background: var(--light-purple-bg); color: var(--primary-purple); }
+
+        .aspect-icon {
+            width: 24px;
+            height: 18px;
+            border: 1.5px solid currentColor;
+            border-radius: 3px;
+        }
+
+        /* Controls */
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            background: #f8fafc;
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .control-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .control-header span:last-child {
+            font-size: 12px;
+            color: var(--primary-purple);
+            font-weight: 700;
+            background: var(--light-purple-bg);
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: #e2e8f0;
+            border-radius: 4px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary-purple);
+            border: 3px solid white;
+            box-shadow: 0 2px 6px rgba(124, 58, 237, 0.4);
+            cursor: pointer;
+        }
+
+        select, input[type="text"] {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 13px;
+            background: white;
+            color: var(--text-dark);
+            outline: none;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+
+        select:focus, input[type="text"]:focus {
+            border-color: var(--primary-purple);
+            box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+        }
+
+        /* Color Row */
+        .color-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .color-swatch {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            border: 2px solid #e2e8f0;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex-shrink: 0;
+            position: relative;
+        }
+
+        .color-swatch:hover {
+            transform: scale(1.1);
+            border-color: var(--border-purple);
+        }
+
+        .color-swatch.active {
+            border-color: var(--primary-purple);
+            box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.25);
+            transform: scale(1.05);
+        }
+
+        .color-swatch.transparent {
+            background: repeating-conic-gradient(#e2e8f0 0% 25%, #fff 0% 50%) 50% / 12px 12px;
+        }
+
+        .color-swatch.custom-picker {
+            background: conic-gradient(from 0deg, #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: 700;
+            color: white;
+            text-shadow: 0 0 3px rgba(0,0,0,0.6);
+        }
+
+        .color-swatch.custom-picker input[type="color"] {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+            border: none;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 4px;
+            background: #e2e8f0;
+            padding: 4px;
+            border-radius: 10px;
+            margin-bottom: 12px;
+        }
+
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 8px 8px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-light);
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .tab:hover { color: var(--text-dark); }
+        .tab.active {
+            background: white;
+            color: var(--primary-purple);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+        }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* Gradient Builder */
+        .gradient-builder {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .gradient-preview {
+            height: 40px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            background: linear-gradient(90deg, #000000, #ffffff);
+        }
+
+        .gradient-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .gradient-row label {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-light);
+            text-transform: uppercase;
+            min-width: 50px;
+        }
+
+        .gradient-color-box {
+            position: relative;
+            width: 45px;
+            height: 32px;
+            border-radius: 8px;
+            border: 2px solid #e2e8f0;
+            overflow: hidden;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .gradient-color-box input[type="color"] {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+            border: none;
+        }
+
+        /* Toggle */
+        .toggle-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8fafc;
+            padding: 12px 15px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .toggle-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .switch {
+            position: relative;
+            width: 48px;
+            height: 26px;
+            background: #cbd5e1;
+            border-radius: 13px;
+            cursor: pointer;
+            transition: all 0.3s;
+            flex-shrink: 0;
+        }
+
+        .switch.active { background: var(--primary-purple); }
+
+        .switch::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: all 0.3s;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+        }
+
+        .switch.active::after { left: 25px; }
+
+        /* Download */
+        .download-row {
+            display: flex;
+            gap: 8px;
+        }
+
+        .download-btn {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid var(--border-purple);
+            border-radius: 10px;
+            background: white;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--primary-purple);
+            cursor: pointer;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .download-btn:hover {
+            background: var(--light-purple-bg);
+            border-color: var(--primary-purple);
+            transform: translateY(-2px);
+        }
+
+        .download-btn.primary {
+            background: var(--primary-purple);
+            border-color: var(--primary-purple);
+            color: white;
+            box-shadow: var(--btn-shadow);
+        }
+
+        .download-btn.primary:hover {
+            background: #6d28d9;
+            transform: translateY(-2px);
+        }
+
+        #fileInput { display: none; }
+
+        /* Footer */
+        .footer {
+            margin-top: 25px;
+            text-align: center;
+            color: var(--primary-purple);
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+            width: 100%;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 900px) {
+            body {
+                padding: 10px;
+                align-items: flex-start;
+                padding-top: 70px;
+            }
+
+            .home-btn-wrapper {
+                top: 12px;
+                right: 12px;
+            }
+
+            .home-btn {
+                padding: 8px 16px;
+                font-size: 13px;
+            }
+
+            .upload-screen {
+                padding: 30px 20px;
+                min-height: 70vh;
+            }
+
+            .drop-zone {
+                height: 240px;
+            }
+
+            .editor-screen.active {
+                flex-direction: column;
+                min-height: auto;
+            }
+
+            .preview-panel {
+                padding: 20px 15px;
+                border-right: none;
+                border-bottom: 1px solid #e2e8f0;
+                min-height: 320px;
+            }
+
+            canvas {
+                max-height: 40vh;
+            }
+
+            .change-image-btn {
+                top: 10px;
+                left: 10px;
+                padding: 8px 14px;
+                font-size: 12px;
+            }
+
+            .controls-panel {
+                padding: 20px 15px;
+                max-height: none;
+            }
+
+            .preset-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .preset-swatch {
+                width: 32px;
+                height: 24px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .preset-item {
+                font-size: 9px;
+                padding: 8px 2px;
+            }
+
+            .preset-swatch {
+                width: 28px;
+                height: 22px;
+            }
+
+            .aspect-item {
+                font-size: 8px;
+                padding: 6px 1px;
+            }
+
+            .aspect-icon {
+                width: 20px;
+                height: 15px;
+            }
+
+            .color-swatch {
+                width: 30px;
+                height: 30px;
+            }
+
+            .download-row {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HOME BUTTON -->
+    <div class="home-btn-wrapper">
+        <a href="index.html" class="home-btn">
+            <i class="fas fa-home"></i> Home
+        </a>
+    </div>
+
+    <div style="width: 100%; display: flex; flex-direction: column; align-items: center;">
+        
+        <div class="upload-screen" id="uploadScreen">
+            <h1>Add Border To Photo</h1>
+            <p>Upload your image to start customizing borders, mats, captions and more</p>
+
+            <div class="drop-zone" id="dropZone">
+                <div class="folder-icon">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                </div>
+                <div class="upload-title">Drag & Drop your image here</div>
+                <div class="upload-subtitle">JPG, PNG, WEBP · Click to browse</div>
+                <button class="upload-btn" id="browseBtn">
+                    <i class="fas fa-image"></i> Choose Image
+                </button>
+            </div>
+        </div>
+
+        <!-- ===== EDITOR SCREEN ===== -->
+        <div class="editor-screen" id="editorScreen">
+            <!-- LEFT: PREVIEW -->
+            <div class="preview-panel">
+                <button class="change-image-btn" id="changeImageBtn">
+                    <i class="fas fa-exchange-alt"></i> Change
+                </button>
+                <div class="preview-wrapper">
+                    <div class="canvas-container">
+                        <canvas id="previewCanvas"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT: CONTROLS -->
+            <div class="controls-panel">
+
+                <!-- PRESETS -->
+                <div>
+                    <div class="section-title"><i class="fas fa-magic"></i> Presets</div>
+                    <div class="preset-grid" id="presetGrid">
+                        <div class="preset-item active" data-preset="classic"><div class="preset-swatch" style="background: #fff; border: 2px solid #333;"></div>Classic</div>
+                        <div class="preset-item" data-preset="golden"><div class="preset-swatch" style="background: #fff; border: 2px solid #d4a843;"></div>Golden</div>
+                        <div class="preset-item" data-preset="double"><div class="preset-swatch" style="background: #fff; border: 2px solid #333; box-shadow: inset 0 0 0 2px #fff, inset 0 0 0 4px #333;"></div>Double</div>
+                        <div class="preset-item" data-preset="vintage"><div class="preset-swatch" style="background: #f5e6d3; border: 2px solid #a0784a;"></div>Vintage</div>
+                        <div class="preset-item" data-preset="polaroid"><div class="preset-swatch" style="background: #f0f0f0; border: 1px solid #ccc; border-bottom: 8px solid #f0f0f0;"></div>Polaroid</div>
+                        <div class="preset-item" data-preset="white"><div class="preset-swatch" style="background: #fff; border: 2px solid #e0e0e0;"></div>White</div>
+                        <div class="preset-item" data-preset="film"><div class="preset-swatch" style="background: #2a2a2a; border: 2px solid #2a2a2a;"></div>Film</div>
+                        <div class="preset-item" data-preset="minimal"><div class="preset-swatch" style="background: #f5f5f5; border: 2px solid #ccc;"></div>Minimal</div>
+                        <div class="preset-item" data-preset="bold"><div class="preset-swatch" style="background: #1a1a1a; border: 2px solid #1a1a1a;"></div>Bold</div>
+                    </div>
+                </div>
+
+                <!-- ASPECT -->
+                <div>
+                    <div class="section-title"><i class="fas fa-crop-alt"></i> Aspect Ratio</div>
+                    <div class="aspect-grid" id="aspectGrid">
+                        <div class="aspect-item active" data-ratio="original"><div class="aspect-icon" style="width: 20px; height: 16px;"></div>Original</div>
+                        <div class="aspect-item" data-ratio="1:1"><div class="aspect-icon" style="width: 18px; height: 18px;"></div>1:1</div>
+                        <div class="aspect-item" data-ratio="4:5"><div class="aspect-icon" style="width: 15px; height: 19px;"></div>4:5</div>
+                        <div class="aspect-item" data-ratio="16:9"><div class="aspect-icon" style="width: 24px; height: 14px;"></div>16:9</div>
+                        <div class="aspect-item" data-ratio="9:16"><div class="aspect-icon" style="width: 12px; height: 22px;"></div>9:16</div>
+                        <div class="aspect-item" data-ratio="4:3"><div class="aspect-icon" style="width: 22px; height: 16px;"></div>4:3</div>
+                        <div class="aspect-item" data-ratio="3:2"><div class="aspect-icon" style="width: 22px; height: 15px;"></div>3:2</div>
+                        <div class="aspect-item" data-ratio="2:3"><div class="aspect-icon" style="width: 15px; height: 22px;"></div>2:3</div>
+                    </div>
+                </div>
+
+                <!-- BORDER -->
+                <div>
+                    <div class="section-title"><i class="fas fa-border-all"></i> Border</div>
+
+                    <div class="control-group">
+                        <div class="control-header"><span>Width</span><span id="borderWidthVal">0px</span></div>
+                        <input type="range" id="borderWidth" min="0" max="80" value="0" step="1">
+                    </div>
+
+                    <div class="control-group" style="margin-top: 10px;">
+                        <div class="control-header"><span>Style</span></div>
+                        <select id="borderStyle">
+                            <option value="solid">Solid</option>
+                            <option value="dashed">Dashed</option>
+                            <option value="dotted">Dotted</option>
+                            <option value="double">Double</option>
+                        </select>
+                    </div>
+
+                    <div class="control-group" style="margin-top: 10px;">
+                        <div class="control-header"><span>Corner Radius</span><span id="borderRadiusVal">0%</span></div>
+                        <input type="range" id="borderRadius" min="0" max="50" value="0" step="1">
+                    </div>
+
+                    <div class="control-group" style="margin-top: 10px;">
+                        <div class="control-header"><span>Color</span></div>
+                        <div class="tabs">
+                            <div class="tab active" data-tab="solid-color">Solid</div>
+                            <div class="tab" data-tab="gradient-color">Gradient</div>
+                        </div>
+
+                        <div class="tab-content active" id="solid-color">
+                            <div class="color-row" id="borderColorRow">
+                                <div class="color-swatch active" style="background: #000000;" data-color="#000000"></div>
+                                <div class="color-swatch" style="background: #ffffff;" data-color="#ffffff"></div>
+                                <div class="color-swatch" style="background: #d4a843;" data-color="#d4a843"></div>
+                                <div class="color-swatch" style="background: #4a7cf0;" data-color="#4a7cf0"></div>
+                                <div class="color-swatch" style="background: #e74c3c;" data-color="#e74c3c"></div>
+                                <div class="color-swatch" style="background: #27ae60;" data-color="#27ae60"></div>
+                                <div class="color-swatch" style="background: #8e44ad;" data-color="#8e44ad"></div>
+                                <div class="color-swatch transparent" data-color="transparent"></div>
+                                <div class="color-swatch custom-picker" title="Custom Color">
+                                    +
+                                    <input type="color" id="borderCustomColor" value="#000000">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="tab-content" id="gradient-color">
+                            <div class="gradient-builder">
+                                <div class="gradient-preview" id="borderGradientPreview"></div>
+                                <div class="gradient-row">
+                                    <label>Color 1</label>
+                                    <div class="gradient-color-box" style="background:#ff6b6b;">
+                                        <input type="color" id="borderGradColor1" value="#ff6b6b">
+                                    </div>
+                                    <label>Color 2</label>
+                                    <div class="gradient-color-box" style="background:#4a7cf0;">
+                                        <input type="color" id="borderGradColor2" value="#4a7cf0">
+                                    </div>
+                                </div>
+                                <div class="gradient-row">
+                                    <label>Type</label>
+                                    <select id="borderGradType" style="flex:1;">
+                                        <option value="linear">Linear</option>
+                                        <option value="radial">Radial</option>
+                                    </select>
+                                </div>
+                                <div class="gradient-row">
+                                    <label>Angle</label>
+                                    <input type="range" id="borderGradAngle" min="0" max="360" value="90" style="flex:1;">
+                                    <span id="borderGradAngleVal" style="font-size:11px;color:var(--primary-purple);font-weight:700;min-width:35px;text-align:right;">90°</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- INNER MAT -->
+                <div>
+                    <div class="section-title"><i class="fas fa-layer-group"></i> Inner Mat</div>
+                    <div class="toggle-row">
+                        <span class="toggle-label">Enable Mat</span>
+                        <div class="switch active" id="matToggle"></div>
+                    </div>
+
+                    <div class="control-group" style="margin-top: 10px;">
+                        <div class="control-header"><span>Mat Width</span><span id="matWidthVal">8px</span></div>
+                        <input type="range" id="matWidth" min="0" max="60" value="8" step="1">
+                    </div>
+
+                    <div class="control-group" style="margin-top: 10px;">
+                        <div class="control-header"><span>Mat Color</span></div>
+                        <div class="color-row" id="matColorRow">
+                            <div class="color-swatch active" style="background: #ffffff;" data-color="#ffffff"></div>
+                            <div class="color-swatch" style="background: #f0f0f0;" data-color="#f0f0f0"></div>
+                            <div class="color-swatch" style="background: #d4a843;" data-color="#d4a843"></div>
+                            <div class="color-swatch" style="background: #4a7cf0;" data-color="#4a7cf0"></div>
+                            <div class="color-swatch" style="background: #1a1a1a;" data-color="#1a1a1a"></div>
+                            <div class="color-swatch transparent" data-color="transparent"></div>
+                            <div class="color-swatch custom-picker" title="Custom Color">
+                                +
+                                <input type="color" id="matCustomColor" value="#ffffff">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CAPTION -->
+                <div>
+                    <div class="section-title"><i class="fas fa-font"></i> Caption</div>
+                    <div class="toggle-row">
+                        <span class="toggle-label">Show Caption</span>
+                        <div class="switch active" id="captionToggle"></div>
+                    </div>
+
+                    <div class="control-group" style="margin-top: 10px;">
+                        <input type="text" id="captionText" placeholder="Enter caption text..." value="My Photo">
+                    </div>
+
+                    <div class="control-group" style="margin-top: 10px;">
+                        <div class="control-header"><span>Font Size</span><span id="fontSizeVal">27</span></div>
+                        <input type="range" id="fontSize" min="10" max="60" value="27" step="1">
+                    </div>
+
+                    <div class="control-group" style="margin-top: 10px;">
+                        <div class="control-header"><span>Alignment</span></div>
+                        <select id="captionAlign">
+                            <option value="center">Align Center</option>
+                            <option value="left">Align Left</option>
+                            <option value="right">Align Right</option>
+                        </select>
+                    </div>
+
+                    <div class="control-group" style="margin-top: 10px;">
+                        <div class="control-header"><span>Text Color</span></div>
+                        <div class="color-row" id="captionColorRow">
+                            <div class="color-swatch active" style="background: #1a1a1a;" data-color="#1a1a1a"></div>
+                            <div class="color-swatch" style="background: #ffffff; border-color:#b0b8c0;" data-color="#ffffff"></div>
+                            <div class="color-swatch" style="background: #4a7cf0;" data-color="#4a7cf0"></div>
+                            <div class="color-swatch" style="background: #e74c3c;" data-color="#e74c3c"></div>
+                            <div class="color-swatch" style="background: #d4a843;" data-color="#d4a843"></div>
+                            <div class="color-swatch custom-picker" title="Custom Color">
+                                +
+                                <input type="color" id="captionCustomColor" value="#1a1a1a">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DOWNLOAD -->
+                <div>
+                    <div class="download-row">
+                        <button class="download-btn" id="downloadPng"><i class="fas fa-file-image"></i> PNG</button>
+                        <button class="download-btn" id="downloadJpg"><i class="fas fa-file-image"></i> JPEG</button>
+                        <button class="download-btn" id="downloadWebp"><i class="fas fa-file-image"></i> WEBP</button>
+                    </div>
+                    <button class="download-btn primary" id="downloadBtn" style="width: 100%; margin-top: 10px; padding: 14px;">
+                        <i class="fas fa-download"></i> DOWNLOAD BORDERED IMAGE
+                    </button>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <i class="fa-solid fa-heart"></i> Made with Love · Create by Sandesh <i class="fa-solid fa-heart"></i>
+        </div>
+    </div>
+
+    <input type="file" id="fileInput" accept="image/*">
+
+    <script>
+        (function() {
+            const state = {
+                image: null,
+                borderWidth: 0,
+                borderStyle: 'solid',
+                borderRadius: 0,
+                borderColorMode: 'solid',
+                borderColor: '#000000',
+                borderGradColor1: '#ff6b6b',
+                borderGradColor2: '#4a7cf0',
+                borderGradType: 'linear',
+                borderGradAngle: 90,
+                matEnabled: true,
+                matWidth: 8,
+                matColor: '#ffffff',
+                captionEnabled: true,
+                captionText: 'My Photo',
+                fontSize: 27,
+                captionAlign: 'center',
+                captionColor: '#1a1a1a',
+                aspectRatio: 'original',
+                preset: 'classic'
+            };
+
+            const uploadScreen = document.getElementById('uploadScreen');
+            const editorScreen = document.getElementById('editorScreen');
+            const dropZone = document.getElementById('dropZone');
+            const browseBtn = document.getElementById('browseBtn');
+            const fileInput = document.getElementById('fileInput');
+            const changeImageBtn = document.getElementById('changeImageBtn');
+
+            const canvas = document.getElementById('previewCanvas');
+            const ctx = canvas.getContext('2d');
+
+            const borderWidthSlider = document.getElementById('borderWidth');
+            const borderWidthVal = document.getElementById('borderWidthVal');
+            const borderRadiusSlider = document.getElementById('borderRadius');
+            const borderRadiusVal = document.getElementById('borderRadiusVal');
+            const matWidthSlider = document.getElementById('matWidth');
+            const matWidthVal = document.getElementById('matWidthVal');
+            const fontSizeSlider = document.getElementById('fontSize');
+            const fontSizeVal = document.getElementById('fontSizeVal');
+
+            const borderStyleSelect = document.getElementById('borderStyle');
+            const captionAlignSelect = document.getElementById('captionAlign');
+            const captionTextInput = document.getElementById('captionText');
+
+            const matToggle = document.getElementById('matToggle');
+            const captionToggle = document.getElementById('captionToggle');
+
+            const borderColorRow = document.getElementById('borderColorRow');
+            const matColorRow = document.getElementById('matColorRow');
+            const captionColorRow = document.getElementById('captionColorRow');
+
+            const borderCustomColor = document.getElementById('borderCustomColor');
+            const matCustomColor = document.getElementById('matCustomColor');
+            const captionCustomColor = document.getElementById('captionCustomColor');
+
+            const borderGradColor1 = document.getElementById('borderGradColor1');
+            const borderGradColor2 = document.getElementById('borderGradColor2');
+            const borderGradType = document.getElementById('borderGradType');
+            const borderGradAngle = document.getElementById('borderGradAngle');
+            const borderGradAngleVal = document.getElementById('borderGradAngleVal');
+            const borderGradientPreview = document.getElementById('borderGradientPreview');
+
+            const presetGrid = document.getElementById('presetGrid');
+            const aspectGrid = document.getElementById('aspectGrid');
+
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const parent = tab.closest('.control-group');
+                    parent.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    parent.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                    tab.classList.add('active');
+                    const target = parent.querySelector('#' + tab.dataset.tab);
+                    if (target) target.classList.add('active');
+                    state.borderColorMode = tab.dataset.tab === 'gradient-color' ? 'gradient' : 'solid';
+                    render();
+                });
+            });
+
+            browseBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                fileInput.click();
+            });
+
+            dropZone.addEventListener('click', () => fileInput.click());
+
+            dropZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropZone.classList.add('dragover');
+            });
+
+            dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+
+            dropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropZone.classList.remove('dragover');
+                const file = e.dataTransfer.files[0];
+                if (file && file.type.startsWith('image/')) loadImageFile(file);
+                else alert('Please drop a valid image file (JPG, PNG, WEBP)');
+            });
+
+            changeImageBtn.addEventListener('click', () => fileInput.click());
+
+            fileInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) loadImageFile(file);
+                fileInput.value = '';
+            });
+
+            function loadImageFile(file) {
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        state.image = img;
+                        uploadScreen.style.display = 'none';
+                        editorScreen.classList.add('active');
+                        applyPreset('classic');
+                        render();
+                    };
+                    img.src = ev.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+
+            function getBorderGradient(ctx, w, h) {
+                const angle = state.borderGradAngle;
+                const rad = (angle - 90) * Math.PI / 180;
+                const cx = w / 2, cy = h / 2;
+                const len = Math.max(w, h);
+                const x1 = cx - Math.cos(rad) * len / 2;
+                const y1 = cy - Math.sin(rad) * len / 2;
+                const x2 = cx + Math.cos(rad) * len / 2;
+                const y2 = cy + Math.sin(rad) * len / 2;
+
+                let grad;
+                if (state.borderGradType === 'radial') {
+                    const r = Math.max(w, h) / 2;
+                    grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+                } else {
+                    grad = ctx.createLinearGradient(x1, y1, x2, y2);
+                }
+                grad.addColorStop(0, state.borderGradColor1);
+                grad.addColorStop(1, state.borderGradColor2);
+                return grad;
+            }
+
+            function updateGradientPreview() {
+                let bg;
+                if (state.borderGradType === 'radial') {
+                    bg = `radial-gradient(circle, ${state.borderGradColor1}, ${state.borderGradColor2})`;
+                } else {
+                    bg = `linear-gradient(${state.borderGradAngle}deg, ${state.borderGradColor1}, ${state.borderGradColor2})`;
+                }
+                borderGradientPreview.style.background = bg;
+            }
+
+            function render() {
+                if (!state.image) return;
+
+                const img = state.image;
+                const imgW = img.width || img.naturalWidth;
+                const imgH = img.height || img.naturalHeight;
+
+                let targetW = imgW, targetH = imgH;
+                const ratio = state.aspectRatio;
+                if (ratio !== 'original') {
+                    const [rw, rh] = ratio.split(':').map(Number);
+                    const targetRatio = rw / rh;
+                    const imgRatio = imgW / imgH;
+                    if (imgRatio > targetRatio) {
+                        targetW = imgW;
+                        targetH = imgW / targetRatio;
+                    } else {
+                        targetH = imgH;
+                        targetW = imgH * targetRatio;
+                    }
+                }
+
+                const bw = state.borderWidth;
+                const mw = state.matEnabled ? state.matWidth : 0;
+                const totalPad = bw + mw;
+
+                let captionH = 0;
+                if (state.captionEnabled && state.captionText.trim() !== '') {
+                    captionH = state.fontSize * 2.2;
+                }
+
+                const finalW = targetW + totalPad * 2;
+                const finalH = targetH + totalPad * 2 + captionH;
+
+                canvas.width = finalW;
+                canvas.height = finalH;
+                ctx.clearRect(0, 0, finalW, finalH);
+
+                if (state.borderColorMode === 'gradient') {
+                    ctx.fillStyle = getBorderGradient(ctx, finalW, finalH);
+                } else {
+                    ctx.fillStyle = state.borderColor === 'transparent' ? 'rgba(0,0,0,0)' : state.borderColor;
+                }
+                ctx.fillRect(0, 0, finalW, finalH);
+
+                if (state.matEnabled && state.matWidth > 0) {
+                    ctx.fillStyle = state.matColor === 'transparent' ? 'rgba(0,0,0,0)' : state.matColor;
+                    ctx.fillRect(bw, bw, finalW - bw * 2, finalH - bw * 2);
+                }
+
+                const imgX = totalPad;
+                const imgY = totalPad;
+
+                if (state.borderRadius > 0) {
+                    const radius = (Math.min(targetW, targetH) * state.borderRadius) / 100;
+                    ctx.save();
+                    ctx.beginPath();
+                    roundRect(ctx, imgX, imgY, targetW, targetH, radius);
+                    ctx.clip();
+                    ctx.drawImage(img, 0, 0, imgW, imgH, imgX, imgY, targetW, targetH);
+                    ctx.restore();
+                } else {
+                    ctx.drawImage(img, 0, 0, imgW, imgH, imgX, imgY, targetW, targetH);
+                }
+
+                if (bw > 0 && state.borderColorMode === 'solid') {
+                    ctx.save();
+                    ctx.strokeStyle = state.borderColor === 'transparent' ? 'rgba(0,0,0,0)' : state.borderColor;
+                    ctx.lineWidth = bw;
+
+                    if (state.borderStyle === 'dashed') {
+                        ctx.setLineDash([bw * 3, bw * 2]);
+                        ctx.strokeRect(bw / 2, bw / 2, finalW - bw, finalH - bw);
+                    } else if (state.borderStyle === 'dotted') {
+                        ctx.setLineDash([bw * 0.5, bw * 1.5]);
+                        ctx.lineCap = 'round';
+                        ctx.strokeRect(bw / 2, bw / 2, finalW - bw, finalH - bw);
+                    } else if (state.borderStyle === 'double') {
+                        ctx.lineWidth = bw / 3;
+                        ctx.strokeRect(bw / 2, bw / 2, finalW - bw, finalH - bw);
+                        ctx.strokeRect(bw * 1.5, bw * 1.5, finalW - bw * 3, finalH - bw * 3);
+                    } else {
+                        ctx.strokeRect(bw / 2, bw / 2, finalW - bw, finalH - bw);
+                    }
+                    ctx.restore();
+                }
+
+                drawCaption(finalW, totalPad, targetH, captionH);
+            }
+
+            function drawCaption(finalW, totalPad, targetH, captionH) {
+                if (!state.captionEnabled || !state.captionText.trim() || captionH <= 0) return;
+                const captionY = totalPad + targetH + captionH / 2;
+                ctx.save();
+                ctx.fillStyle = state.captionColor;
+                ctx.font = `600 ${state.fontSize}px "Segoe UI", Roboto, sans-serif`;
+                ctx.textBaseline = 'middle';
+
+                let textX;
+                if (state.captionAlign === 'center') {
+                    ctx.textAlign = 'center';
+                    textX = finalW / 2;
+                } else if (state.captionAlign === 'left') {
+                    ctx.textAlign = 'left';
+                    textX = totalPad + 10;
+                } else {
+                    ctx.textAlign = 'right';
+                    textX = finalW - totalPad - 10;
+                }
+                ctx.fillText(state.captionText, textX, captionY);
+                ctx.restore();
+            }
+
+            function roundRect(ctx, x, y, w, h, r) {
+                if (r > w / 2) r = w / 2;
+                if (r > h / 2) r = h / 2;
+                ctx.moveTo(x + r, y);
+                ctx.lineTo(x + w - r, y);
+                ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+                ctx.lineTo(x + w, y + h - r);
+                ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+                ctx.lineTo(x + r, y + h);
+                ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+                ctx.lineTo(x, y + r);
+                ctx.quadraticCurveTo(x, y, x + r, y);
+                ctx.closePath();
+            }
+
+            function applyPreset(preset) {
+                state.preset = preset;
+                const presets = {
+                    classic: { borderWidth: 20, borderStyle: 'solid', borderColorMode: 'solid', borderColor: '#000000', matEnabled: false, matWidth: 0, captionEnabled: true, fontSize: 22, borderRadius: 0 },
+                    golden: { borderWidth: 16, borderStyle: 'solid', borderColorMode: 'solid', borderColor: '#d4a843', matEnabled: true, matWidth: 8, matColor: '#ffffff', captionEnabled: true, fontSize: 20, borderRadius: 0 },
+                    double: { borderWidth: 24, borderStyle: 'double', borderColorMode: 'solid', borderColor: '#333333', matEnabled: false, matWidth: 0, captionEnabled: true, fontSize: 20, borderRadius: 0 },
+                    vintage: { borderWidth: 20, borderStyle: 'solid', borderColorMode: 'solid', borderColor: '#a0784a', matEnabled: true, matWidth: 12, matColor: '#f5e6d3', captionEnabled: true, fontSize: 24, borderRadius: 0 },
+                    polaroid: { borderWidth: 24, borderStyle: 'solid', borderColorMode: 'solid', borderColor: '#f0f0f0', matEnabled: false, matWidth: 0, captionEnabled: true, fontSize: 28, borderRadius: 0 },
+                    white: { borderWidth: 24, borderStyle: 'solid', borderColorMode: 'solid', borderColor: '#ffffff', matEnabled: false, matWidth: 0, captionEnabled: true, fontSize: 22, borderRadius: 0 },
+                    film: { borderWidth: 30, borderStyle: 'solid', borderColorMode: 'solid', borderColor: '#2a2a2a', matEnabled: false, matWidth: 0, captionEnabled: true, fontSize: 18, borderRadius: 0 },
+                    minimal: { borderWidth: 12, borderStyle: 'solid', borderColorMode: 'solid', borderColor: '#cccccc', matEnabled: true, matWidth: 16, matColor: '#f5f5f5', captionEnabled: true, fontSize: 18, borderRadius: 0 },
+                    bold: { borderWidth: 32, borderStyle: 'solid', borderColorMode: 'solid', borderColor: '#1a1a1a', matEnabled: false, matWidth: 0, captionEnabled: true, fontSize: 26, borderRadius: 0 }
+                };
+                const p = presets[preset];
+                if (!p) return;
+                Object.assign(state, p);
+
+                borderWidthSlider.value = state.borderWidth;
+                borderWidthVal.textContent = state.borderWidth + 'px';
+                borderStyleSelect.value = state.borderStyle;
+                borderRadiusSlider.value = state.borderRadius;
+                borderRadiusVal.textContent = state.borderRadius + '%';
+                matWidthSlider.value = state.matWidth;
+                matWidthVal.textContent = state.matWidth + 'px';
+                fontSizeSlider.value = state.fontSize;
+                fontSizeVal.textContent = state.fontSize;
+                matToggle.classList.toggle('active', state.matEnabled);
+                captionToggle.classList.toggle('active', state.captionEnabled);
+
+                const parent = document.querySelector('#borderColorRow').closest('.control-group');
+                parent.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                parent.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                parent.querySelector('.tab[data-tab="solid-color"]').classList.add('active');
+                document.getElementById('solid-color').classList.add('active');
+                state.borderColorMode = 'solid';
+
+                document.querySelectorAll('#borderColorRow .color-swatch[data-color]').forEach(el => {
+                    el.classList.toggle('active', el.dataset.color === state.borderColor);
+                });
+                document.querySelectorAll('#matColorRow .color-swatch[data-color]').forEach(el => {
+                    el.classList.toggle('active', el.dataset.color === state.matColor);
+                });
+                document.querySelectorAll('.preset-item').forEach(el => {
+                    el.classList.toggle('active', el.dataset.preset === preset);
+                });
+                render();
+            }
+
+            borderWidthSlider.addEventListener('input', (e) => {
+                state.borderWidth = parseInt(e.target.value);
+                borderWidthVal.textContent = state.borderWidth + 'px';
+                render();
+            });
+
+            borderStyleSelect.addEventListener('change', (e) => {
+                state.borderStyle = e.target.value;
+                render();
+            });
+
+            borderRadiusSlider.addEventListener('input', (e) => {
+                state.borderRadius = parseInt(e.target.value);
+                borderRadiusVal.textContent = state.borderRadius + '%';
+                render();
+            });
+
+            borderColorRow.addEventListener('click', (e) => {
+                if (e.target.closest('.custom-picker')) return;
+                const swatch = e.target.closest('.color-swatch');
+                if (!swatch || !swatch.dataset.color) return;
+                state.borderColor = swatch.dataset.color;
+                borderColorRow.querySelectorAll('.color-swatch').forEach(el => el.classList.remove('active'));
+                swatch.classList.add('active');
+                render();
+            });
+
+            borderCustomColor.addEventListener('input', (e) => {
+                state.borderColor = e.target.value;
+                borderColorRow.querySelectorAll('.color-swatch').forEach(el => el.classList.remove('active'));
+                borderCustomColor.parentElement.classList.add('active');
+                switchTab('borderColorRow', 'solid-color');
+                state.borderColorMode = 'solid';
+                render();
+            });
+
+            matToggle.addEventListener('click', () => {
+                state.matEnabled = !state.matEnabled;
+                matToggle.classList.toggle('active', state.matEnabled);
+                render();
+            });
+
+            matWidthSlider.addEventListener('input', (e) => {
+                state.matWidth = parseInt(e.target.value);
+                matWidthVal.textContent = state.matWidth + 'px';
+                render();
+            });
+
+            matColorRow.addEventListener('click', (e) => {
+                if (e.target.closest('.custom-picker')) return;
+                const swatch = e.target.closest('.color-swatch');
+                if (!swatch || !swatch.dataset.color) return;
+                state.matColor = swatch.dataset.color;
+                matColorRow.querySelectorAll('.color-swatch').forEach(el => el.classList.remove('active'));
+                swatch.classList.add('active');
+                render();
+            });
+
+            matCustomColor.addEventListener('input', (e) => {
+                state.matColor = e.target.value;
+                matColorRow.querySelectorAll('.color-swatch').forEach(el => el.classList.remove('active'));
+                matCustomColor.parentElement.classList.add('active');
+                render();
+            });
+
+            captionToggle.addEventListener('click', () => {
+                state.captionEnabled = !state.captionEnabled;
+                captionToggle.classList.toggle('active', state.captionEnabled);
+                render();
+            });
+
+            captionTextInput.addEventListener('input', (e) => {
+                state.captionText = e.target.value;
+                render();
+            });
+
+            fontSizeSlider.addEventListener('input', (e) => {
+                state.fontSize = parseInt(e.target.value);
+                fontSizeVal.textContent = state.fontSize;
+                render();
+            });
+
+            captionAlignSelect.addEventListener('change', (e) => {
+                state.captionAlign = e.target.value;
+                render();
+            });
+
+            captionColorRow.addEventListener('click', (e) => {
+                if (e.target.closest('.custom-picker')) return;
+                const swatch = e.target.closest('.color-swatch');
+                if (!swatch || !swatch.dataset.color) return;
+                state.captionColor = swatch.dataset.color;
+                captionColorRow.querySelectorAll('.color-swatch').forEach(el => el.classList.remove('active'));
+                swatch.classList.add('active');
+                render();
+            });
+
+            captionCustomColor.addEventListener('input', (e) => {
+                state.captionColor = e.target.value;
+                captionColorRow.querySelectorAll('.color-swatch').forEach(el => el.classList.remove('active'));
+                captionCustomColor.parentElement.classList.add('active');
+                render();
+            });
+
+            borderGradColor1.addEventListener('input', (e) => {
+                state.borderGradColor1 = e.target.value;
+                e.target.parentElement.style.background = e.target.value;
+                updateGradientPreview();
+                switchTab('borderColorRow', 'gradient-color');
+                state.borderColorMode = 'gradient';
+                render();
+            });
+
+            borderGradColor2.addEventListener('input', (e) => {
+                state.borderGradColor2 = e.target.value;
+                e.target.parentElement.style.background = e.target.value;
+                updateGradientPreview();
+                switchTab('borderColorRow', 'gradient-color');
+                state.borderColorMode = 'gradient';
+                render();
+            });
+
+            borderGradType.addEventListener('change', (e) => {
+                state.borderGradType = e.target.value;
+                updateGradientPreview();
+                render();
+            });
+
+            borderGradAngle.addEventListener('input', (e) => {
+                state.borderGradAngle = parseInt(e.target.value);
+                borderGradAngleVal.textContent = state.borderGradAngle + '°';
+                updateGradientPreview();
+                render();
+            });
+
+            function switchTab(colorRowId, tabName) {
+                const group = document.getElementById(colorRowId).closest('.control-group');
+                group.querySelectorAll('.tab').forEach(t => {
+                    t.classList.toggle('active', t.dataset.tab === tabName);
+                });
+                group.querySelectorAll('.tab-content').forEach(c => {
+                    c.classList.toggle('active', c.id === tabName);
+                });
+            }
+
+            presetGrid.addEventListener('click', (e) => {
+                const item = e.target.closest('.preset-item');
+                if (!item) return;
+                applyPreset(item.dataset.preset);
+            });
+
+            aspectGrid.addEventListener('click', (e) => {
+                const item = e.target.closest('.aspect-item');
+                if (!item) return;
+                state.aspectRatio = item.dataset.ratio;
+                aspectGrid.querySelectorAll('.aspect-item').forEach(el => el.classList.remove('active'));
+                item.classList.add('active');
+                render();
+            });
+
+            function downloadImage(format) {
+                if (!state.image) return;
+                const link = document.createElement('a');
+                link.download = `bordered-photo.${format}`;
+                link.href = canvas.toDataURL(`image/${format}`, 0.95);
+                link.click();
+            }
+
+            document.getElementById('downloadPng').addEventListener('click', () => downloadImage('png'));
+            document.getElementById('downloadJpg').addEventListener('click', () => downloadImage('jpeg'));
+            document.getElementById('downloadWebp').addEventListener('click', () => downloadImage('webp'));
+            document.getElementById('downloadBtn').addEventListener('click', () => downloadImage('png'));
+
+            updateGradientPreview();
+
+        })();
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
+    <title>Lite Pro Tools · Unique Tools | 100% Private</title>
+
+    <link rel="icon" type="image/x-icon" href="favicon/favicon.ico">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Poppins', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(145deg, #f8f0ff 0%, #f0e6ff 100%);
+            padding: 0 1.5rem 1.5rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* ---------- STICKY HEADER ---------- */
+        .sticky-header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            width: 100%;
+            max-width: 1300px;
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border-radius: 0 0 30px 30px;
+            padding: 0.8rem 1.5rem;
+            box-shadow: 0 10px 30px -10px rgba(90, 40, 140, 0.15);
+            border-bottom: 1px solid rgba(220, 200, 255, 0.4);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.8rem;
+            transition: all 0.3s ease;
+        }
+
+        .sticky-header .logo-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #6a3de8 0%, #a884ff 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            box-shadow: 0 6px 18px rgba(106, 61, 232, 0.35),
+                        0 0 0 3px rgba(255, 255, 255, 0.6) inset;
+            flex-shrink: 0;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+
+        .sticky-header .logo-icon:hover {
+            transform: scale(1.08) rotate(-3deg);
+        }
+
+        .sticky-header .logo-icon::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent 40%, rgba(255,255,255,0.35) 50%, transparent 60%);
+            animation: shine 3s infinite;
+        }
+
+        @keyframes shine {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+
+        .sticky-header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #3b1f7a, #7b4cff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: -0.3px;
+            margin: 0;
+        }
+
+        /* ---------- MAIN CONTENT ---------- */
+        .main-content {
+            width: 100%;
+            max-width: 1300px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .header-card {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.78);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border-radius: 40px;
+            padding: 1.5rem 2.5rem;
+            box-shadow: 0 30px 60px -15px rgba(90, 40, 140, 0.25),
+                        0 0 0 1px rgba(200, 170, 255, 0.25) inset;
+            border: 1px solid rgba(220, 200, 255, 0.4);
+            margin-bottom: 2.2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 500;            /* header-card upar rahe */
+            overflow: visible;
+        }
+
+        .header-card:hover {
+            box-shadow: 0 35px 70px -15px rgba(90, 40, 140, 0.35);
+        }
+
+        .header-card .subtitle {
+            color: #7a5fa8;
+            margin-bottom: 1rem;
+            font-weight: 400;
+            font-size: 1rem;
+            letter-spacing: 0.5px;
+        }
+
+        /* ---------- NAV TABS (FIXED) ---------- */
+        .nav-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+            position: relative;
+            z-index: 600;            /* tabs container upar */
+            overflow: visible;
+        }
+
+        .nav-tabs .tab {
+            position: relative;
+            padding: 0.6rem 1.8rem;
+            border-radius: 60px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #5b3b9e;
+            background: rgba(255, 255, 255, 0.6);
+            border: 2px solid #d9c8ff;
+            cursor: pointer;
+            transition: 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-tabs .tab:hover {
+            background: #ede4ff;
+            border-color: #a884ff;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(106, 61, 232, 0.15);
+            z-index: 700;            /* hovered tab upar aaye */
+        }
+
+        .nav-tabs .tab.active {
+            background: #6a3de8;
+            color: white;
+            border-color: #7b4cff;
+            box-shadow: 0 8px 24px rgba(106, 61, 232, 0.3);
+        }
+
+        .nav-tabs .tab i {
+            font-size: 1rem;
+        }
+
+        /* ---------- DROPDOWN (FIXED) ---------- */
+        /* Dropdown ko fixed positioning use karke poore viewport ke relative rakha */
+        .tab .dropdown {
+            position: absolute;
+            top: calc(100% + 8px);
+            /* Default center align */
+            left: 50%;
+            transform: translateX(-50%) translateY(6px);
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border-radius: 24px;
+            padding: 1.2rem 1.2rem 1rem;
+            min-width: 260px;
+            max-width: 320px;
+            box-shadow: 0 30px 60px -12px rgba(90, 40, 140, 0.35),
+                        0 0 0 1px rgba(200, 170, 255, 0.3) inset;
+            border: 1px solid rgba(220, 200, 255, 0.6);
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 99999;          /* SABSE UPAR */
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+            text-align: left;
+        }
+
+        /* Arrow */
+        .tab .dropdown::before {
+            content: '';
+            position: absolute;
+            top: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 16px;
+            height: 16px;
+            background: rgba(255, 255, 255, 0.98);
+            border-left: 1px solid rgba(220, 200, 255, 0.6);
+            border-top: 1px solid rgba(220, 200, 255, 0.6);
+            transform: translateX(-50%) rotate(45deg);
+            border-radius: 3px 0 0 0;
+        }
+
+        .tab:hover .dropdown {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* Special handling: last tabs ke liye dropdown ko right-align karo
+           taaki woh screen se bahar na jaaye */
+        .nav-tabs .tab:nth-last-child(1) .dropdown,
+        .nav-tabs .tab:nth-last-child(2) .dropdown {
+            left: auto;
+            right: 0;
+            transform: translateX(0) translateY(6px);
+        }
+
+        .nav-tabs .tab:nth-last-child(1):hover .dropdown,
+        .nav-tabs .tab:nth-last-child(2):hover .dropdown {
+            transform: translateX(0) translateY(0);
+        }
+
+        .nav-tabs .tab:nth-last-child(1) .dropdown::before,
+        .nav-tabs .tab:nth-last-child(2) .dropdown::before {
+            left: auto;
+            right: 30px;
+            transform: translateX(0) rotate(45deg);
+        }
+
+        /* First tab ke liye left-align */
+        .nav-tabs .tab:nth-child(2) .dropdown {
+            left: 0;
+            transform: translateX(0) translateY(6px);
+        }
+        .nav-tabs .tab:nth-child(2):hover .dropdown {
+            transform: translateX(0) translateY(0);
+        }
+        .nav-tabs .tab:nth-child(2) .dropdown::before {
+            left: 30px;
+            transform: translateX(0) rotate(45deg);
+        }
+
+        .dropdown .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.55rem 0.9rem;
+            border-radius: 14px;
+            font-weight: 500;
+            font-size: 0.85rem;
+            color: #2c1a4e;
+            text-decoration: none;
+            transition: background 0.2s ease, transform 0.2s ease;
+            background: transparent;
+            border: none;
+            width: 100%;
+            cursor: pointer;
+            text-align: left;
+            white-space: nowrap;
+        }
+
+        .dropdown .dropdown-item i {
+            width: 1.2rem;
+            font-size: 1rem;
+            color: #6a3de8;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .dropdown .dropdown-item:hover {
+            background: #ede4ff;
+            transform: translateX(4px);
+        }
+
+        .dropdown .divider {
+            height: 1px;
+            background: rgba(200, 170, 255, 0.4);
+            margin: 0.2rem 0.5rem;
+        }
+
+        /* ---------- PRIVACY BANNER ---------- */
+        .privacy-banner {
+            width: 100%;
+            background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+            border-left: 8px solid #10b981;
+            border-radius: 28px;
+            padding: 1.2rem 2rem;
+            margin-bottom: 1.8rem;
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+            flex-wrap: wrap;
+            box-shadow: 0 8px 24px -8px rgba(16, 185, 129, 0.2);
+            border: 1px solid #a7f3d0;
+            transition: 0.3s;
+            position: relative;
+            z-index: 1;
+        }
+
+        .privacy-banner:hover {
+            box-shadow: 0 12px 32px -8px rgba(16, 185, 129, 0.3);
+        }
+
+        .privacy-banner .lock-icon {
+            font-size: 2.2rem;
+            color: #059669;
+            filter: drop-shadow(0 4px 8px rgba(5, 150, 105, 0.2));
+        }
+
+        .privacy-banner .privacy-text {
+            flex: 1;
+        }
+
+        .privacy-banner .privacy-text strong {
+            display: block;
+            font-size: 1.15rem;
+            color: #065f46;
+            margin-bottom: 0.15rem;
+        }
+
+        .privacy-banner .privacy-text span {
+            font-size: 0.92rem;
+            color: #047857;
+            font-weight: 500;
+        }
+
+        .privacy-banner .privacy-text i {
+            color: #059669;
+            margin-right: 4px;
+        }
+
+        .privacy-badge {
+            background: #059669;
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 0.3rem 1rem;
+            border-radius: 60px;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+            text-transform: uppercase;
+        }
+
+        /* ---------- TOOL CARDS ---------- */
+        .container {
+            width: 100%;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 1.8rem;
+            padding: 0.5rem 0 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .tool-card {
+            background: rgba(255, 255, 255, 0.78);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border-radius: 40px;
+            padding: 1.8rem 1.2rem 1.5rem;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 200px;
+            border: 1px solid rgba(220, 200, 255, 0.4);
+            box-shadow: 0 12px 28px -10px rgba(80, 40, 160, 0.12);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+            cursor: default;
+        }
+
+        .tool-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(145deg, rgba(106, 61, 232, 0.03), rgba(168, 132, 255, 0.06));
+            border-radius: 40px;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .tool-card:hover::before { opacity: 1; }
+
+        .tool-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            border-color: #a884ff;
+            box-shadow: 0 24px 48px -14px rgba(106, 61, 232, 0.25);
+        }
+
+        .tool-card .icon {
+            font-size: 2.5rem;
+            color: #6a3de8;
+            margin-bottom: 0.5rem;
+            filter: drop-shadow(0 4px 8px rgba(106, 61, 232, 0.15));
+            transition: 0.3s ease;
+        }
+
+        .tool-card:hover .icon {
+            transform: scale(1.1) rotate(-4deg);
+        }
+
+        .tool-card .tool-name {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #2c1a4e;
+            margin-bottom: 0.2rem;
+            line-height: 1.3;
+        }
+
+        .tool-card .tool-desc {
+            font-size: 0.75rem;
+            color: #7a5fa8;
+            margin-bottom: 0.8rem;
+            font-weight: 400;
+        }
+
+        .tool-card .btn {
+            padding: 0.6rem 1.6rem;
+            border-radius: 60px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            background: #6a3de8;
+            color: white;
+            border: none;
+            transition: 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 6px 16px rgba(106, 61, 232, 0.2);
+            cursor: pointer !important;
+            min-width: 100px;
+            justify-content: center;
+            user-select: none;
+            -webkit-user-select: none;
+            position: relative;
+            z-index: 5;
+        }
+
+        .tool-card .btn:hover {
+            background: #4a27b0;
+            transform: scale(1.05) translateY(-2px);
+            box-shadow: 0 10px 24px rgba(74, 39, 176, 0.3);
+        }
+
+        .tool-card .btn:active {
+            transform: scale(0.95);
+        }
+
+        /* Color variants */
+        .tool-card:nth-child(1) .icon { color: #6a3de8; }
+        .tool-card:nth-child(2) .icon { color: #10b981; }
+        .tool-card:nth-child(3) .icon { color: #f59e0b; }
+        .tool-card:nth-child(4) .icon { color: #ef4444; }
+        .tool-card:nth-child(5) .icon { color: #8b5cf6; }
+        .tool-card:nth-child(6) .icon { color: #ec4899; }
+        .tool-card:nth-child(7) .icon { color: #06b6d4; }
+        .tool-card:nth-child(8) .icon { color: #f472b6; }
+        .tool-card:nth-child(9) .icon { color: #34d399; }
+        .tool-card:nth-child(10) .icon { color: #f59e0b; }
+
+        .tag {
+            display: inline-block;
+            font-size: 0.55rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 0.1rem 0.7rem;
+            border-radius: 30px;
+            background: #ede4ff;
+            color: #5b3b9e;
+            margin-bottom: 0.3rem;
+        }
+
+        .tag.pdf-tag { background: #ede4ff; color: #5b3b9e; }
+        .tag.image-tag { background: #dbeafe; color: #1e40af; }
+        .tag.zip-tag { background: #fef3c7; color: #92400e; }
+        .tag.security-tag { background: #fce4ec; color: #c62828; }
+        .tag.qr-tag { background: #d1fae5; color: #065f46; }
+        .tag.fav-tag { background: #fce7f3; color: #be185d; }
+
+        /* ---------- FOOTER ---------- */
+        .footer {
+            width: 100%;
+            max-width: 1300px;
+            text-align: center;
+            padding: 1.8rem 1.5rem;
+            background: rgba(255, 255, 255, 0.78);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border-radius: 40px 40px 30px 30px;
+            border: 1px solid rgba(220, 200, 255, 0.4);
+            box-shadow: 0 12px 28px -10px rgba(80, 40, 160, 0.08);
+            margin-top: 0.5rem;
+            color: #7a5fa8;
+            font-weight: 400;
+            font-size: 0.95rem;
+            transition: 0.3s ease;
+            position: relative;
+            z-index: 1;
+        }
+
+        .footer:hover {
+            border-color: #a884ff;
+            box-shadow: 0 16px 36px -12px rgba(106, 61, 232, 0.12);
+        }
+
+        .footer i { color: #6a3de8; }
+
+        .footer .heart {
+            display: inline-block;
+            animation: pulse 1.8s infinite;
+            color: #ef4444;
+        }
+
+        .footer .privacy-note {
+            font-size: 0.8rem;
+            margin-top: 0.4rem;
+            color: #059669;
+            font-weight: 600;
+        }
+
+        .footer .privacy-note i { color: #059669; }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+        }
+
+        /* ---------- TOAST ---------- */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #2c1a4e;
+            color: white;
+            padding: 0.8rem 2rem;
+            border-radius: 60px;
+            font-weight: 600;
+            box-shadow: 0 12px 30px rgba(44, 26, 78, 0.4);
+            z-index: 999999;
+            display: none;
+            align-items: center;
+            gap: 0.8rem;
+            border: 1px solid #a884ff;
+            max-width: 90%;
+        }
+
+        .toast.show {
+            display: flex;
+            animation: slideUp 0.4s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+            to { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+
+        .toast i {
+            color: #f59e0b;
+            font-size: 1.2rem;
+        }
+
+        /* ---------- RESPONSIVE ---------- */
+        @media (max-width: 600px) {
+            body { padding: 0 0.8rem 0.8rem 0.8rem; }
+
+            .sticky-header {
+                padding: 0.6rem 1rem;
+                border-radius: 0 0 20px 20px;
+                gap: 0.5rem;
+            }
+            .sticky-header .logo-icon { width: 36px; height: 36px; border-radius: 10px; }
+            .sticky-header h1 { font-size: 1.4rem; }
+
+            .header-card { padding: 1rem; border-radius: 24px; margin-bottom: 1.2rem; }
+            .header-card .subtitle { font-size: 0.8rem; margin-bottom: 0.8rem; }
+
+            .nav-tabs { gap: 0.4rem; }
+            .nav-tabs .tab { padding: 0.4rem 0.8rem; font-size: 0.7rem; }
+
+            /* Mobile pe dropdown ko center se left align karo */
+            .tab .dropdown {
+                min-width: 200px;
+                max-width: 260px;
+                padding: 0.8rem 0.6rem;
+                left: 0;
+                right: auto;
+                transform: translateX(0) translateY(6px);
+                border-radius: 18px;
+                z-index: 99999;
+            }
+            .tab .dropdown::before {
+                left: 30px;
+                right: auto;
+                transform: translateX(0) rotate(45deg);
+            }
+            .tab:hover .dropdown {
+                transform: translateX(0) translateY(0);
+            }
+            /* Mobile pe last tabs ke liye right align override */
+            .nav-tabs .tab:nth-last-child(1) .dropdown,
+            .nav-tabs .tab:nth-last-child(2) .dropdown {
+                left: auto;
+                right: 0;
+                transform: translateX(0) translateY(6px);
+            }
+            .nav-tabs .tab:nth-last-child(1):hover .dropdown,
+            .nav-tabs .tab:nth-last-child(2):hover .dropdown {
+                transform: translateX(0) translateY(0);
+            }
+            .nav-tabs .tab:nth-last-child(1) .dropdown::before,
+            .nav-tabs .tab:nth-last-child(2) .dropdown::before {
+                left: auto;
+                right: 25px;
+                transform: translateX(0) rotate(45deg);
+            }
+
+            .dropdown .dropdown-item {
+                font-size: 0.75rem;
+                padding: 0.4rem 0.7rem;
+                gap: 0.5rem;
+            }
+            .dropdown .dropdown-item i {
+                font-size: 0.85rem;
+                width: 1rem;
+            }
+
+            .container { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 0.8rem; }
+            .tool-card { min-height: 160px; padding: 1rem 0.6rem; border-radius: 24px; }
+            .tool-card .tool-name { font-size: 0.8rem; }
+            .tool-card .tool-desc { display: none; }
+            .tool-card .btn { padding: 0.4rem 0.8rem; font-size: 0.7rem; min-width: 70px; }
+
+            .footer { padding: 1rem; font-size: 0.8rem; border-radius: 24px; }
+            .toast { font-size: 0.8rem; padding: 0.5rem 1rem; bottom: 15px; }
+
+            .privacy-banner {
+                padding: 1rem;
+                flex-direction: column;
+                text-align: center;
+                gap: 0.6rem;
+                border-radius: 20px;
+            }
+            .privacy-banner .lock-icon { font-size: 1.8rem; }
+            .privacy-banner .privacy-text strong { font-size: 0.95rem; }
+            .privacy-banner .privacy-text span { font-size: 0.75rem; }
+            .privacy-badge { font-size: 0.6rem; padding: 0.2rem 0.8rem; }
+        }
+
+        @media (max-width: 400px) {
+            .container { grid-template-columns: 1fr 1fr; gap: 0.6rem; }
+            .tool-card { min-height: 130px; padding: 0.6rem 0.4rem; border-radius: 20px; }
+            .tool-card .icon { font-size: 1.6rem; }
+            .tool-card .tool-name { font-size: 0.7rem; }
+            .tool-card .btn { padding: 0.3rem 0.5rem; font-size: 0.65rem; min-width: 60px; }
+            .tool-card .btn i { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sticky-header">
+        <div class="logo-icon">
+            <img src="favicon/apple-touch-icon.png" alt="Lite Pro Tools Logo" style="width: 100%; height: 100%; object-fit: cover;">
+        </div>
+        <h1>Lite Pro Tools</h1>
+    </div>
+
+    <div class="main-content">
+
+        <div class="header-card">
+            <p class="subtitle"><i class="fas fa-star" style="color:#ffa200;"></i> PDF · Image · Zip · QR · More Tools </p>
+
+            <div class="nav-tabs">
+                <span class="tab active" id="tabAll"><i class="fas fa-th"></i> All</span>
+
+                <span class="tab" id="tabPdf">
+                    <i class="fas fa-file-pdf"></i> PDF
+                    <div class="dropdown" id="dropdownPdf"></div>
+                </span>
+
+                <span class="tab" id="tabImage">
+                    <i class="fas fa-image"></i> Image
+                    <div class="dropdown" id="dropdownImage"></div>
+                </span>
+
+                <span class="tab" id="tabZip">
+                    <i class="fas fa-file-archive"></i> Zip
+                    <div class="dropdown" id="dropdownZip"></div>
+                </span>
+
+                <span class="tab" id="tabQr">
+                    <i class="fas fa-qrcode"></i> QR
+                    <div class="dropdown" id="dropdownQr"></div>
+                </span>
+
+                <span class="tab" id="tabFav">
+                    <i class="fas fa-star"></i> Favourite
+                    <div class="dropdown" id="dropdownFav"></div>
+                </span>
+            </div>
+        </div>
+
+        <div class="privacy-banner">
+            <div class="lock-icon"><i class="fas fa-shield-alt"></i></div>
+            <div class="privacy-text">
+                <strong><i class="fas fa-lock"></i> Your Data is 100% Safe — Never Saved Anywhere</strong>
+                <span>
+                    <i class="fas fa-check-circle"></i> This website does NOT connect to any server.
+                    <i class="fas fa-check-circle"></i> All tools run entirely in your browser —
+                    <i class="fas fa-check-circle"></i> No files are uploaded, no any data saved.
+                </span>
+            </div>
+            <div class="privacy-badge"><i class="fas fa-user-secret"></i> 100% Private</div>
+        </div>
+
+        <main class="container" id="toolContainer">
+            <!-- PDF TOOLS -->
+            <div class="tool-card" data-category="pdf">
+                <span class="tag pdf-tag">PDF</span>
+                <div class="icon"><i class="fas fa-lock"></i></div>
+                <div class="tool-name">PDF Locker</div>
+                <div class="tool-desc">Protect your PDF files with AES-256 encryption and a strong password.</div>
+                <a href="PDFLocker.html" class="btn"><i class="fas fa-arrow-right"></i> Open</a>
+            </div>
+            <div class="tool-card" data-category="pdf">
+                <span class="tag pdf-tag">PDF</span>
+                <div class="icon"><i class="fas fa-unlock"></i></div>
+                <div class="tool-name">PDF Unlocker</div>
+                <div class="tool-desc">Remove passwords from protected PDF files instantly.</div>
+                <a href="PDFUnlocker.html" class="btn"><i class="fas fa-arrow-right"></i> Open</a>
+            </div>
+            <div class="tool-card" data-category="pdf">
+                <span class="tag pdf-tag">PDF</span>
+                <div class="icon"><i class="fas fa-file-image"></i></div>
+                <div class="tool-name">PDF To Images</div>
+                <div class="tool-desc">Convert PDF pages into high-quality PNG images instantly.</div>
+                <a href="pdftopic.html" class="btn"><i class="fas fa-arrow-right"></i> Open</a>
+            </div>
+            <div class="tool-card" data-category="pdf">
+                <span class="tag pdf-tag">PDF</span>
+                <div class="icon"><i class="fas fa-cut"></i></div>
+                <div class="tool-name">PDF Cutter</div>
+                <div class="tool-desc">Extract or remove single pages from any PDF file.</div>
+                <a href="pdfcutter.html" class="btn"><i class="fas fa-arrow-right"></i> Open</a>
+            </div>
+            <div class="tool-card" data-category="pdf">
+                <span class="tag pdf-tag">PDF</span>
+                <div class="icon"><i class="fas fa-object-group"></i></div>
+                <div class="tool-name">PDF Merge</div>
+                <div class="tool-desc">Combine multiple PDF files into one organized document.</div>
+                <a href="pdfmarge.html" class="btn"><i class="fas fa-arrow-right"></i> Open</a>
+            </div>
+            <div class="tool-card" data-category="pdf">
+                <span class="tag pdf-tag">PDF</span>
+                <div class="icon"><i class="fas fa-compress-alt"></i></div>
+                <div class="tool-name">PDF Compressor</div>
+                <div class="tool-desc">Reduce PDF file size without losing quality.</div>
+                <a href="compresspdf.html" class="btn"><i class="fas fa-arrow-right"></i> Open</a>
+            </div>
+
+                    <div class="tool-card" data-category="pdf">
+            <span class="tag pdf-tag">PDF</span>
+            <div class="icon"><i class="fas fa-expand-alt"></i></div>
+            <div class="tool-name">PDF Size Expander</div>
+            <div class="tool-desc">Increase PDF file size by adding extra data or quality.</div>
+            <a href="PDFsizeExpander.html" class="btn"><i class="fas fa-arrow-right"></i> Open</a>
+        </div>
+
+            <div class="tool-card" data-category="pdf">
+                <span class="tag pdf-tag">PDF</span>
+                <div class="icon"><i class="fas fa-language"></i></div>
+                <div class="tool-name">PDF Translator</div>
+                <div class="tool-desc">Translate PDF files into Hindi, English, Marathi & Urdu.</div>
+                <a href="pdftranslalor.html" class="btn"><i class="fas fa-arrow-right"></i> Open</a>
+            </div>
+
+            <!-- IMAGE TOOLS -->
+            <div class="tool-card" data-category="image">
+                <span class="tag image-tag">IMAGE</span>
+                <div class="icon"><i class="fas fa-eraser"></i></div>
+                <div class="tool-name">Background Remover</div>
+                <div class="tool-desc">Remove image backgrounds automatically with AI.</div>
+                <a href="removebg.html" class="btn"><i class="fas fa-arrow-right"></i> Open</a>
+            </div>
+            <div class="tool-card" data-category="image">
+                <span class="tag image-tag">IMAGE</span>
+                <div class="icon"><i class="fas fa-exchange-alt"></i></div>
+                <div class="tool-name">Image Converter</div>
+                <div class="tool-desc">Convert images between PNG, JPG & JPEG formats instantly.</div>
+                <a href="pngjpgjpeg.html" class="btn"><i class="fas fa-arrow-right"></i> Open</a>
+            </div>
+            <div class="tool-card" data-category="image">
+                <span class="tag image-tag">IMAGE</span>
+                <div class="icon"><i class="fas fa-weight"></i></div>
+                <div class="tool-name">Image Compressor</div>
+                <div class="tool-desc">Reduce image file size (KB) without losing quality.</div>
+                <a href="mbtokb.html" class="btn"><i class="fas fa-arrow-right"></i> Open</a>
+            </div>
+            <div class="tool-card" data-category="image">
+                <span class="tag image-tag">IMAGE</span>
+                <div class="icon"><i class="fas fa-file-pdf"></i></div>
+                <div class="tool-name">Image To PDF</div>
+                <div class="tool-desc">Convert a single image into a PDF document quickly.</div>
+                <a href="imagetopdf.html" class="btn"><i class="fas fa-arrow-right"></i> Open</a>
+            </div>
+            <div class="tool-card" data-category="image">
+                <span class="tag image-tag">IMAGE</span>
+                <div class="icon"><i class="fas fa-images"></i></div>
+                <div class="tool-name">Multi Image To PDF</div>
+                <div class="tool-desc">Combine multiple images into one PDF file.</div>
+                <a href="multipicpdf.html" class="btn"><i class="fas fa-arrow-right"></i> Open</a>
+            </div>
+            <div class="tool-card" data-category="image">
+                <span class="tag image-tag">IMAGE</span>
+                <div class="icon"><i class="fas fa-id-card"></i></div>
+                <div class="tool-name">Merge Photo & Signature</div>
+                <div class="tool-desc">Combine passport-size photo with signature into one image.</div>
+                <a href="photo&sing.html" class="btn"><i class="fas fa-arrow-right"></i> Open</a>
+            </div>
+            <div class="tool-card" data-category="image">
+                <span class="tag image-tag">IMAGE</span>
+                <div class="icon"><i class="fas fa-circle-notch"></i></div>
+                <div class="tool-name">Circle Crop Image</div>
+                <div class="tool-desc">Crop any image into a perfect circle online.</div>
+                <a href="CircleCropPhoto.html" class="btn"><i class="fas fa-arrow-right"></i> Open</a>
+            </div>
+            <div class="tool-card" data-category="image">
+                <span class="tag image-tag">IMAGE</span>
+                <div class="icon"><i class="fas fa-tint"></i></div>
+                <div class="tool-name">Add Watermark to Image</div>
+                <div class="tool-desc">Add text watermark to any image online.</div>
+                <a href="AddWatermark.html" class="btn"><i class="fas fa-arrow-right"></i> Open</a>
+            </div>
+            <div class="tool-card" data-category="image">
+                <span class="tag image-tag">IMAGE</span>
+                <div class="icon"><i class="fas fa-id-card"></i></div>
+                <div class="tool-name">Enhance Passport Photo</div>
+                <div class="tool-desc">Enhance your passport photo to meet official standards.</div>
+                <a href="inhancePhoto.html" class="btn"><i class="fas fa-arrow-right"></i> Open</a>
+            </div>
+            <div class="tool-card" data-category="image">
+                <span class="tag image-tag">IMAGE</span>
+                <div class="icon"><i class="fas fa-image"></i></div>
+                <div class="tool-name">Add Border To Photo</div>
+                <div class="tool-desc">Add stylish borders, mats & captions to your photos.</div>
+                <a href="AddBorderToPhoto.html" class="btn"><i class="fas fa-arrow-right"></i> Open</a>
+            </div>
+            <div class="tool-card" data-category="image">
+                <span class="tag image-tag">IMAGE</span>
+                <div class="icon"><i class="fas fa-compress-arrows-alt"></i></div>
+                <div class="tool-name">Exact KB Image Resizer</div>
+                <div class="tool-desc">Resize & compress images to an exact KB size.</div>
+                <a href="ExactKBImageResizer.html" class="btn"><i class="fas fa-arrow-right"></i> Open</a>
+            </div>
+            <div class="tool-card" data-category="image">
+                <span class="tag image-tag">IMAGE</span>
+                <div class="icon"><i class="fas fa-expand-arrows-alt"></i></div>
+                <div class="tool-name">Expand IMG Size MB or KB</div>
+                <div class="tool-desc">Increase image file size to any exact KB or MB value.</div>
+                <a href="IMGsizeExpander.html" class="btn"><i class="fas fa-arrow-right"></i> Open</a>
+            </div>
+
+            <!-- ZIP TOOLS -->
+            <div class="tool-card" data-category="zip">
+                <span class="tag zip-tag">ZIP</span>
+                <div class="icon"><i class="fas fa-file-archive"></i></div>
+                <div class="tool-name">File To Zip</div>
+                <div class="tool-desc">Compress multiple files into a single ZIP archive.</div>
+                <a href="ziploved.html" class="btn"><i class="fas fa-arrow-right"></i> Open</a>
+            </div>
+            <div class="tool-card" data-category="zip">
+                <span class="tag zip-tag">ZIP</span>
+                <div class="icon"><i class="fas fa-unlock-alt"></i></div>
+                <div class="tool-name">Unzip Files</div>
+                <div class="tool-desc">Extract ZIP files online without installing software.</div>
+                <a href="unzip.html" class="btn"><i class="fas fa-arrow-right"></i> Open</a>
+            </div>
+
+            <!-- QR TOOLS -->
+            <div class="tool-card" data-category="qr">
+                <span class="tag qr-tag">QR</span>
+                <div class="icon"><i class="fas fa-qrcode"></i></div>
+                <div class="tool-name">QR Code Generator</div>
+                <div class="tool-desc">Generate custom QR codes for links, text, Wi-Fi & more.</div>
+                <a href="QRcodeGen.html" class="btn"><i class="fas fa-arrow-right"></i> Open</a>
+            </div>
+            <div class="tool-card" data-category="qr">
+                <span class="tag qr-tag">QR</span>
+                <div class="icon"><i class="fas fa-indian-rupee-sign"></i></div>
+                <div class="tool-name">UPI ID to QR Code</div>
+                <div class="tool-desc">Convert any UPI ID into a scannable QR code instantly.</div>
+                <a href="UPItoQRcode.html" class="btn"><i class="fas fa-arrow-right"></i> Open</a>
+            </div>
+
+            <!-- FAVOURITE TOOLS -->
+            <div class="tool-card" data-category="fav">
+                <span class="tag fav-tag">FAV</span>
+                <div class="icon"><i class="fas fa-file-alt"></i></div>
+                <div class="tool-name">Resume Builder</div>
+                <div class="tool-desc">Create professional resumes in minutes with easy templates.</div>
+                <a href="ResumeBuilder.html" class="btn"><i class="fas fa-arrow-right"></i> Open</a>
+            </div>
+            <div class="tool-card" data-category="fav">
+                <span class="tag fav-tag">FAV</span>
+                <div class="icon"><i class="fas fa-signature"></i></div>
+                <div class="tool-name">Signature Maker</div>
+                <div class="tool-desc">Create handwritten signatures with 100+ fonts.</div>
+                <a href="SignatureMaker.html" class="btn"><i class="fas fa-arrow-right"></i> Open</a>
+            </div>
+            <div class="tool-card" data-category="fav">
+                <span class="tag fav-tag">FAV</span>
+                <div class="icon"><i class="fas fa-eye-dropper"></i></div>
+                <div class="tool-name">Image Color Picker</div>
+                <div class="tool-desc">Pick colors from any image and get HEX, RGB & HSL codes.</div>
+                <a href="ColorPicker.html" class="btn"><i class="fas fa-arrow-right"></i> Open</a>
+            </div>
+            <div class="tool-card" data-category="fav">
+                <span class="tag fav-tag">FAV</span>
+                <div class="icon"><i class="fas fa-keyboard"></i></div>
+                <div class="tool-name">Typing Test</div>
+                <div class="tool-desc">Test your typing speed and accuracy. Get WPM score in 60 seconds.</div>
+                <a href="TypingTest.html" class="btn"><i class="fas fa-arrow-right"></i> Open</a>
+            </div>
+            <div class="tool-card" data-category="fav">
+                <span class="tag fav-tag">FAV</span>
+                <div class="icon"><i class="fas fa-cake-candles"></i></div>
+                <div class="tool-name">Age Calculator</div>
+                <div class="tool-desc">Calculate your exact age in years, months, days, hours & minutes instantly.</div>
+                <a href="ageCal.html" class="btn"><i class="fas fa-arrow-right"></i> Open</a>
+            </div>
+            <div class="tool-card" data-category="fav">
+                <span class="tag fav-tag">FAV</span>
+                <div class="icon"><i class="fab fa-youtube"></i></div>
+                <div class="tool-name">YT Tags & Description Extractor</div>
+                <div class="tool-desc">Extract YouTube video tags, description and other details instantly.</div>
+                <a href="YouTubeTagExtractor.html" class="btn"><i class="fas fa-arrow-right"></i> Open</a>
+            </div>
+            <div class="tool-card" data-category="fav">
+                <span class="tag fav-tag">FAV</span>
+                <div class="icon"><i class="fab fa-youtube"></i></div>
+                <div class="tool-name">YT Thumbnail Downloader</div>
+                <div class="tool-desc">Download YouTube channel logos and profile pictures in HD quality.</div>
+                <a href="ytlogodl.html" class="btn"><i class="fas fa-arrow-right"></i> Open</a>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <p>
+                <i class="fas fa-heart heart"></i>
+                Made with Love · Created by <strong style="color:#3b1f7a;">Sandesh Sharma</strong>
+                <i class="fas fa-heart heart"></i>
+            </p>
+            <p class="privacy-note">
+                <i class="fas fa-shield-alt"></i> Your files are never uploaded · No server connection · 100% browser-based · Your Data 100% Safe
+            </p>
+            <p style="font-size:0.8rem; margin-top:0.3rem; color:#9a82bf;">
+                © 2026 Unique Tools · All rights reserved
+            </p>
+        </footer>
+
+    </div>
+
+    <div class="toast" id="toast">
+        <i class="fas fa-info-circle"></i>
+        <span id="toastMessage">Loading...</span>
+    </div>
+
+    <script>
+        (function() {
+            const allCards = document.querySelectorAll('.tool-card');
+            const categories = {
+                pdf: { container: document.getElementById('dropdownPdf'), tools: [] },
+                image: { container: document.getElementById('dropdownImage'), tools: [] },
+                zip: { container: document.getElementById('dropdownZip'), tools: [] },
+                qr: { container: document.getElementById('dropdownQr'), tools: [] },
+                fav: { container: document.getElementById('dropdownFav'), tools: [] }
+            };
+
+            allCards.forEach(card => {
+                const cat = card.dataset.category;
+                if (!cat || !categories[cat]) return;
+                const nameEl = card.querySelector('.tool-name');
+                const linkEl = card.querySelector('.btn');
+                const iconEl = card.querySelector('.icon i');
+                if (!nameEl || !linkEl) return;
+                const name = nameEl.textContent.trim();
+                const href = linkEl.getAttribute('href') || '#';
+                let iconClass = 'fas fa-tools';
+                if (iconEl) iconClass = iconEl.className;
+                categories[cat].tools.push({ name, href, iconClass });
+            });
+
+            function createDropdownItem(tool) {
+                const a = document.createElement('a');
+                a.href = tool.href;
+                a.className = 'dropdown-item';
+                a.innerHTML = `<i class="${tool.iconClass}"></i> ${tool.name}`;
+                return a;
+            }
+
+            Object.keys(categories).forEach(cat => {
+                const { container, tools } = categories[cat];
+                if (!container) return;
+                container.innerHTML = '';
+                if (tools.length === 0) {
+                    const empty = document.createElement('div');
+                    empty.className = 'dropdown-item';
+                    empty.style.cursor = 'default';
+                    empty.style.opacity = '0.6';
+                    empty.innerHTML = '<i class="fas fa-info-circle"></i> No tools';
+                    container.appendChild(empty);
+                    return;
+                }
+                tools.forEach(tool => container.appendChild(createDropdownItem(tool)));
+            });
+
+            const tabs = {
+                all: document.getElementById('tabAll'),
+                pdf: document.getElementById('tabPdf'),
+                image: document.getElementById('tabImage'),
+                zip: document.getElementById('tabZip'),
+                qr: document.getElementById('tabQr'),
+                fav: document.getElementById('tabFav')
+            };
+
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+            let toastTimeout = null;
+
+            function showToast(message, duration = 3500) {
+                toastMessage.textContent = message;
+                toast.classList.add('show');
+                if (toastTimeout) clearTimeout(toastTimeout);
+                toastTimeout = setTimeout(() => toast.classList.remove('show'), duration);
+            }
+
+            function filterTools(category) {
+                allCards.forEach(card => {
+                    card.style.display = (category === 'all' || card.dataset.category === category) ? 'flex' : 'none';
+                });
+                Object.values(tabs).forEach(t => t.classList.remove('active'));
+                if (tabs[category]) tabs[category].classList.add('active');
+            }
+
+            tabs.all.addEventListener('click', () => filterTools('all'));
+            tabs.pdf.addEventListener('click', (e) => { if (!e.target.closest('.dropdown-item')) filterTools('pdf'); });
+            tabs.image.addEventListener('click', (e) => { if (!e.target.closest('.dropdown-item')) filterTools('image'); });
+            tabs.zip.addEventListener('click', (e) => { if (!e.target.closest('.dropdown-item')) filterTools('zip'); });
+            tabs.qr.addEventListener('click', (e) => { if (!e.target.closest('.dropdown-item')) filterTools('qr'); });
+            tabs.fav.addEventListener('click', (e) => { if (!e.target.closest('.dropdown-item')) filterTools('fav'); });
+
+            filterTools('all');
+
+            document.querySelectorAll('.tool-card .btn').forEach(btn => {
+                btn.style.cursor = 'pointer';
+                btn.addEventListener('click', function(e) {
+                    const href = this.getAttribute('href');
+                    if (href === '#' || href === '' || href === null) {
+                        e.preventDefault();
+                        showToast('⚠️ This tool is coming soon!', 4000);
+                    }
+                    const rect = this.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    const ripple = document.createElement('span');
+                    ripple.style.cssText = `
+                        position: absolute;
+                        left: ${x}px;
+                        top: ${y}px;
+                        width: 8px;
+                        height: 8px;
+                        border-radius: 50%;
+                        background: rgba(255, 255, 255, 0.6);
+                        transform: scale(0);
+                        animation: rippleAnim 0.6s ease-out forwards;
+                        pointer-events: none;
+                        z-index: 10;
+                    `;
+                    this.style.position = 'relative';
+                    this.style.overflow = 'hidden';
+                    this.appendChild(ripple);
+                    setTimeout(() => ripple.remove(), 650);
+                });
+            });
+
+            if (!document.querySelector('#rippleStyle')) {
+                const style = document.createElement('style');
+                style.id = 'rippleStyle';
+                style.textContent = `@keyframes rippleAnim { to { transform: scale(8); opacity: 0; } }`;
+                document.head.appendChild(style);
+            }
+
+            console.log('🔒 Lite Pro Tools — 100% Private & Secure');
+        })();
+    </script>
+
+</body>
+</html>

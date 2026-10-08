@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Passport Photo + Signature Merge Tool</title>
+  <!-- ✅ FAVICON (placeholder, no external files) -->
+  <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✨</text></svg>">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary-purple: #7c3aed;
+      --primary-purple-dark: #6d28d9;
+      --light-purple-bg: #f3f0ff;
+      --border-purple: #d8b4fe;
+      --text-dark: #1f2937;
+      --text-light: #6b7280;
+      --success-green: #10b981;
+      --success-hover: #059669;
+      --btn-shadow: 0 4px 6px -1px rgba(124, 58, 237, 0.4);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', 'Inter', system-ui, -apple-system, Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background: linear-gradient(145deg, #f9f7ff 0%, #ede9fe 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 32px 24px;
+      color: var(--text-dark);
+    }
+
+    /* ---------- HOME BUTTON (slightly larger) ---------- */
+    .home-btn-wrapper {
+      position: fixed;
+      top: 28px;
+      right: 32px;
+      z-index: 999;
+    }
+
+    .home-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(8px);
+      color: var(--primary-purple);
+      border: 2px solid var(--border-purple);
+      padding: 14px 32px;
+      border-radius: 60px;
+      font-size: 18px;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      box-shadow: 0 8px 20px rgba(124, 58, 237, 0.15);
+      letter-spacing: 0.3px;
+    }
+
+    .home-btn:hover {
+      background: var(--primary-purple);
+      color: white;
+      border-color: var(--primary-purple);
+      transform: translateY(-3px);
+      box-shadow: 0 16px 30px rgba(124, 58, 237, 0.4);
+    }
+
+    .home-btn i {
+      font-size: 20px;
+    }
+
+    /* main wrapper - spacious */
+    .app-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      max-width: 1400px;
+      gap: 28px;
+    }
+
+    /* Header - larger, more dramatic */
+    .page-header {
+      text-align: center;
+      width: 100%;
+      margin-top: 10px;
+    }
+
+    .page-header h1 {
+      font-size: 44px;
+      background: linear-gradient(135deg, #1e1b4b 0%, #4c1d95 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 14px;
+      font-weight: 800;
+      line-height: 1.2;
+      letter-spacing: -0.5px;
+      text-shadow: 0 2px 10px rgba(124, 58, 237, 0.1);
+    }
+
+    .page-header p.subtitle {
+      color: #4b5563;
+      font-size: 18px;
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(4px);
+      padding: 10px 28px;
+      border-radius: 60px;
+      display: inline-block;
+      box-shadow: 0 6px 16px rgba(124, 58, 237, 0.08);
+      border: 1px solid rgba(216, 180, 254, 0.5);
+      font-weight: 500;
+    }
+
+    /* two columns - wider, airy */
+    .main-row {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      gap: 40px;
+      width: 100%;
+    }
+
+    /* LEFT: form card */
+    .left-col {
+      flex: 1 1 480px;
+      max-width: 560px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    /* RIGHT: result column */
+    .right-col {
+      flex: 1 1 480px;
+      max-width: 560px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      min-height: 200px;
+    }
+
+    /* Form card */
+    .main-card {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(12px);
+      width: 100%;
+      border-radius: 36px;
+      box-shadow: 0 30px 50px -20px rgba(124, 58, 237, 0.25), 0 0 0 1px rgba(124, 58, 237, 0.1);
+      padding: 32px 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      border: 1px solid rgba(255, 255, 255, 0.7);
+    }
+
+    .upload-section {
+      background-color: #ffffff;
+      border: 2px dashed var(--border-purple);
+      border-radius: 26px;
+      padding: 28px 22px;
+      text-align: center;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      box-shadow: 0 8px 18px -8px rgba(124, 58, 237, 0.15);
+    }
+
+    .upload-section:hover {
+      background-color: #faf5ff;
+      border-color: var(--primary-purple);
+      transform: scale(1.01);
+      box-shadow: 0 18px 28px -12px rgba(124, 58, 237, 0.3);
+    }
+
+    .upload-section .icon {
+      font-size: 44px;
+      color: var(--primary-purple);
+      margin-bottom: 12px;
+      display: block;
+      filter: drop-shadow(0 4px 6px rgba(124, 58, 237, 0.2));
+    }
+
+    .upload-section .upload-text {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text-dark);
+      margin-bottom: 6px;
+      letter-spacing: -0.2px;
+    }
+
+    .upload-section .upload-sub {
+      font-size: 14px;
+      color: var(--text-light);
+      margin-bottom: 18px;
+      font-weight: 400;
+    }
+
+    .btn-select {
+      background-color: white;
+      color: var(--primary-purple);
+      border: 2px solid var(--border-purple);
+      padding: 12px 32px;
+      border-radius: 60px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 4px 10px rgba(124, 58, 237, 0.1);
+    }
+
+    .btn-select:hover {
+      background-color: var(--primary-purple);
+      color: white;
+      border-color: var(--primary-purple);
+      box-shadow: 0 8px 18px rgba(124, 58, 237, 0.3);
+    }
+
+    input[type="file"] {
+      display: none;
+    }
+
+    .preview-img {
+      max-width: 100%;
+      max-height: 130px;
+      margin-top: 18px;
+      display: none;
+      border: 3px solid white;
+      border-radius: 16px;
+      box-shadow: 0 12px 22px -8px rgba(0,0,0,0.2);
+      object-fit: contain;
+      background: #f9fafb;
+      padding: 6px;
+    }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      text-align: center;
+      margin: 8px 0;
+      color: var(--text-light);
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+
+    .divider::before, .divider::after {
+      content: '';
+      flex: 1;
+      border-bottom: 2px solid #e2e8f0;
+    }
+
+    .divider span {
+      padding: 0 18px;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 30px;
+      border: 1px solid #e2e8f0;
+      padding: 6px 20px;
+      color: var(--primary-purple);
+    }
+
+    /* RIGHT column - result card */
+    #resultContainer {
+      display: none;
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(12px);
+      border-radius: 36px;
+      box-shadow: 0 30px 50px -20px rgba(124, 58, 237, 0.25), 0 0 0 1px rgba(124, 58, 237, 0.1);
+      padding: 32px 28px;
+      text-align: center;
+      width: 100%;
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      transition: all 0.3s ease;
+    }
+
+    #resultContainer h3 {
+      font-size: 22px;
+      color: var(--text-dark);
+      margin-bottom: 22px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    #resultContainer h3 i {
+      color: var(--primary-purple);
+      font-size: 28px;
+    }
+
+    #finalCanvas {
+      max-width: 100%;
+      border: 2px solid #e2e8f0;
+      border-radius: 20px;
+      box-shadow: 0 20px 35px -10px rgba(0,0,0,0.2);
+      margin-bottom: 24px;
+      background: white;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+      max-height: 440px;
+      width: auto;
+      transition: transform 0.2s;
+    }
+
+    #finalCanvas:hover {
+      transform: scale(1.01);
+    }
+
+    .download-btn {
+      background-color: var(--success-green);
+      color: white;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 16px 40px;
+      border-radius: 60px;
+      font-weight: 700;
+      font-size: 18px;
+      transition: all 0.2s;
+      box-shadow: 0 10px 20px -6px rgba(16, 185, 129, 0.4);
+      border: none;
+      cursor: pointer;
+      letter-spacing: 0.3px;
+      width: auto;
+      min-width: 260px;
+    }
+
+    .download-btn:hover {
+      background-color: var(--success-hover);
+      transform: translateY(-3px);
+      box-shadow: 0 20px 30px -8px rgba(16, 185, 129, 0.5);
+    }
+
+    /* Footer - larger */
+    .footer {
+      text-align: center;
+      color: var(--primary-purple);
+      font-size: 17px;
+      font-weight: 600;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      padding: 18px 0 8px;
+      letter-spacing: 0.3px;
+      opacity: 0.9;
+    }
+
+    .footer i {
+      color: #ec4899;
+      font-size: 18px;
+    }
+
+    /* Responsive */
+    @media (max-width: 1100px) {
+      .main-row {
+        gap: 24px;
+      }
+      .page-header h1 {
+        font-size: 36px;
+      }
+    }
+
+    @media (max-width: 900px) {
+      body { padding: 90px 20px 30px; }
+      .home-btn-wrapper { top: 18px; right: 20px; }
+      .home-btn { padding: 10px 22px; font-size: 16px; }
+      .main-row {
+        flex-direction: column;
+        align-items: center;
+        gap: 30px;
+      }
+      .left-col, .right-col {
+        max-width: 100%;
+        width: 100%;
+      }
+      .page-header h1 {
+        font-size: 32px;
+      }
+      .main-card {
+        padding: 26px 20px;
+      }
+      #finalCanvas {
+        max-height: 360px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .page-header h1 { font-size: 26px; }
+      .page-header p.subtitle { font-size: 15px; padding: 6px 18px; }
+      .upload-section .icon { font-size: 36px; }
+      .upload-section .upload-text { font-size: 18px; }
+      .btn-select { padding: 10px 22px; font-size: 15px; }
+      .download-btn { padding: 14px 24px; font-size: 16px; min-width: 200px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HOME BUTTON -->
+  <div class="home-btn-wrapper">
+    <a href="index.html" class="home-btn">
+      <i class="fas fa-home"></i> Home
+    </a>
+  </div>
+
+  <div class="app-wrapper">
+    <!-- Header -->
+    <div class="page-header">
+      <h1>Passport Photo & Signature Merge</h1>
+      <p class="subtitle">📸 Photo (3.5 x 4.5 cm) ke niche signature add karein</p>
+    </div>
+
+    <!-- Two columns -->
+    <div class="main-row">
+      <!-- LEFT: form -->
+      <div class="left-col">
+        <div class="main-card">
+          <!-- Photo Section -->
+          <div class="upload-section" onclick="document.getElementById('photoInput').click()">
+            <div class="icon"><i class="fa-solid fa-user"></i></div>
+            <div class="upload-text">Select Passport Photo</div>
+            <div class="upload-sub">Upload your recent passport size photo</div>
+            <input type="file" id="photoInput" accept="image/*">
+            <button class="btn-select"><i class="fa-solid fa-upload"></i> Choose Photo</button>
+            <br>
+            <img id="photoPreview" class="preview-img" alt="Photo Preview">
+          </div>
+
+          <!-- Divider -->
+          <div class="divider"><span>AND</span></div>
+
+          <!-- Signature Section -->
+          <div class="upload-section" onclick="document.getElementById('signInput').click()">
+            <div class="icon"><i class="fa-solid fa-pen-nib"></i></div>
+            <div class="upload-text">Select Signature</div>
+            <div class="upload-sub">Upload your signature (clear background)</div>
+            <input type="file" id="signInput" accept="image/*">
+            <button class="btn-select"><i class="fa-solid fa-upload"></i> Choose Signature</button>
+            <br>
+            <img id="signPreview" class="preview-img" alt="Signature Preview">
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: result -->
+      <div class="right-col">
+        <div id="resultContainer">
+          <h3><i class="fa-solid fa-wand-magic-sparkles"></i> Merged Passport Image</h3>
+          <canvas id="finalCanvas"></canvas>
+          <a id="downloadLink" class="download-btn" download="passport_photo_signature.png">
+            <i class="fa-solid fa-download"></i> Download Image
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <i class="fa-solid fa-heart"></i> Made with Love · Create by Sandesh <i class="fa-solid fa-heart"></i>
+    </div>
+  </div>
+
+  <!-- JavaScript Logic (unchanged, but robust) -->
+  <script>
+    (function() {
+      const photoInput = document.getElementById('photoInput');
+      const signInput = document.getElementById('signInput');
+      const photoPreview = document.getElementById('photoPreview');
+      const signPreview = document.getElementById('signPreview');
+      const canvas = document.getElementById('finalCanvas');
+      const ctx = canvas.getContext('2d');
+      const resultContainer = document.getElementById('resultContainer');
+      const downloadLink = document.getElementById('downloadLink');
+
+      let photoImg = new Image();
+      let signImg = new Image();
+
+      const CANVAS_WIDTH = 600;
+      const PHOTO_HEIGHT = 771;
+      const SIGN_AREA_HEIGHT = 250;
+      const TOTAL_HEIGHT = PHOTO_HEIGHT + SIGN_AREA_HEIGHT;
+
+      photoInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function(event) {
+            photoImg.src = event.target.result;
+            photoPreview.src = event.target.result;
+            photoPreview.style.display = 'block';
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+
+      signInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function(event) {
+            signImg.src = event.target.result;
+            signPreview.src = event.target.result;
+            signPreview.style.display = 'block';
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+
+      photoImg.onload = checkAndMerge;
+      signImg.onload = checkAndMerge;
+
+      function checkAndMerge() {
+        if (photoImg.src && signImg.src) {
+          mergeImages();
+        }
+      }
+
+      function mergeImages() {
+        canvas.width = CANVAS_WIDTH;
+        canvas.height = TOTAL_HEIGHT;
+
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        const photoAspect = photoImg.width / photoImg.height;
+        const targetAspect = CANVAS_WIDTH / PHOTO_HEIGHT;
+
+        let drawWidth, drawHeight, offsetX, offsetY;
+
+        if (photoAspect > targetAspect) {
+          drawHeight = PHOTO_HEIGHT;
+          drawWidth = photoImg.width * (PHOTO_HEIGHT / photoImg.height);
+          offsetX = (CANVAS_WIDTH - drawWidth) / 2;
+          offsetY = 0;
+        } else {
+          drawWidth = CANVAS_WIDTH;
+          drawHeight = photoImg.height * (CANVAS_WIDTH / photoImg.width);
+          offsetX = 0;
+          offsetY = (PHOTO_HEIGHT - drawHeight) / 2;
+        }
+
+        ctx.drawImage(photoImg, offsetX, offsetY, drawWidth, drawHeight);
+
+        const maxSignWidth = CANVAS_WIDTH - 80;
+        const maxSignHeight = SIGN_AREA_HEIGHT - 60;
+
+        const signAspect = signImg.width / signImg.height;
+        let signWidth, signHeight;
+
+        if (signImg.width / maxSignWidth > signImg.height / maxSignHeight) {
+          signWidth = maxSignWidth;
+          signHeight = signWidth / signAspect;
+        } else {
+          signHeight = maxSignHeight;
+          signWidth = signHeight * signAspect;
+        }
+
+        let signX = (CANVAS_WIDTH - signWidth) / 2;
+        let signY = PHOTO_HEIGHT + (SIGN_AREA_HEIGHT - signHeight) / 2;
+
+        ctx.drawImage(signImg, signX, signY, signWidth, signHeight);
+
+        resultContainer.style.display = 'block';
+        const dataURL = canvas.toDataURL('image/png');
+        downloadLink.href = dataURL;
+
+        // smooth scroll to result (optional)
+        resultContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    })();
+  </script>
+</body>
+</html>

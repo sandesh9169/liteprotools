@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
+    <title>Multiple Image to PDF</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Poppins', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(145deg, #f8f0ff 0%, #f0e6ff 100%);
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        /* ====== 💻 PC / LAPTOP — FULL WIDTH ====== */
+        .card {
+            width: 100%;
+            max-width: 100%;          /* poori screen */
+            background: rgba(255, 255, 255, 0.78);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border-radius: 40px;
+            padding: 2rem 2.5rem 2.4rem;
+            box-shadow: 0 30px 60px -15px rgba(90, 40, 140, 0.25),
+                        0 0 0 1px rgba(200, 170, 255, 0.25) inset;
+            border: 1px solid rgba(220, 200, 255, 0.4);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .brand i {
+            font-size: 2.4rem;
+            color: #6a3de8;
+            filter: drop-shadow(0 4px 8px rgba(106, 61, 232, 0.2));
+        }
+
+        .brand h1 {
+            font-size: 1.9rem;
+            font-weight: 700;
+            color: #2c1a4e;
+            letter-spacing: -0.3px;
+        }
+
+        .brand h1 small {
+            font-size: 0.8rem;
+            font-weight: 400;
+            background: #ede4ff;
+            padding: 0.2rem 1rem;
+            border-radius: 60px;
+            color: #5b3b9e;
+            margin-left: 0.3rem;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+        }
+
+        .home-btn {
+            background: #6a3de8;
+            color: white;
+            border: none;
+            padding: 0.55rem 1.2rem;
+            border-radius: 60px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            box-shadow: 0 6px 16px rgba(106, 61, 232, 0.35);
+            transition: 0.2s;
+            border: 1px solid #7b4cff;
+            text-decoration: none;
+        }
+
+        .home-btn:hover {
+            background: #4a27b0;
+            transform: scale(0.96);
+        }
+
+        .home-btn i { font-size: 1rem; }
+
+        .header-badge {
+            background: white;
+            border: 1px solid #d9c8ff;
+            padding: 0.4rem 1.2rem;
+            border-radius: 80px;
+            font-weight: 600;
+            color: #3b1f7a;
+            box-shadow: 0 6px 16px rgba(106, 61, 232, 0.08);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+        }
+
+        .header-badge i { color: #6a3de8; }
+
+        .drop-zone {
+            background: rgba(245, 238, 255, 0.6);
+            border: 2px dashed #c9b0ff;
+            border-radius: 30px;
+            padding: 1.5rem 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: background 0.25s, border 0.25s, transform 0.15s;
+            margin-bottom: 1.2rem;
+        }
+
+        .drop-zone:hover {
+            background: #f3ecff;
+            border-color: #a884ff;
+        }
+
+        .drop-zone:active { transform: scale(0.99); }
+        .drop-zone input { display: none; }
+
+        .drop-icon { font-size: 2.6rem; line-height: 1; }
+
+        .drop-text {
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: #2c1a4e;
+            margin: 0.3rem 0 0.2rem;
+        }
+
+        .drop-hint {
+            color: #6a4f9e;
+            font-size: 0.9rem;
+            background: #ede4ff;
+            display: inline-block;
+            padding: 0.2rem 1.6rem;
+            border-radius: 30px;
+            font-weight: 500;
+        }
+
+        .image-count {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.6rem 1.2rem;
+            background: #f8f2ff;
+            border-radius: 60px;
+            border: 1px solid #e0d0ff;
+            margin-bottom: 1rem;
+            color: #3b1f7a;
+            font-weight: 500;
+            font-size: 0.95rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .image-count i { color: #6a3de8; font-size: 1.2rem; }
+
+        .image-count .count-badge {
+            background: #ede4ff;
+            padding: 0.1rem 1.2rem;
+            border-radius: 30px;
+            font-weight: 600;
+        }
+
+        /* ====== GRID — PC pe bahut columns ====== */
+        .preview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0 1.2rem;
+            min-height: 80px;
+            max-height: 55vh;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 6px 10px 12px 4px;
+            scroll-behavior: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #c9b0ff #f8f2ff;
+            overscroll-behavior: contain;
+        }
+
+        .preview-grid::-webkit-scrollbar { width: 10px; }
+        .preview-grid::-webkit-scrollbar-track {
+            background: #f8f2ff;
+            border-radius: 10px;
+        }
+        .preview-grid::-webkit-scrollbar-thumb {
+            background: #c9b0ff;
+            border-radius: 10px;
+        }
+        .preview-grid::-webkit-scrollbar-thumb:hover { background: #a884ff; }
+
+        .preview-item {
+            position: relative;
+            background: #f8f2ff;
+            border-radius: 24px;
+            overflow: hidden;
+            border: 2px solid #e0d0ff;
+            transition: transform 0.15s ease, box-shadow 0.15s, border-color 0.15s, opacity 0.15s;
+            aspect-ratio: 1 / 1;
+            cursor: grab;
+            user-select: none;
+            touch-action: none;
+            -webkit-user-drag: none;
+        }
+
+        .preview-item:hover {
+            border-color: #a884ff;
+            box-shadow: 0 8px 20px rgba(106, 61, 232, 0.15);
+        }
+
+        .preview-item.dragging {
+            opacity: 0.35;
+            transform: scale(0.9);
+            border-color: #6a3de8;
+            box-shadow: 0 0 0 2px #6a3de8;
+        }
+
+        .preview-item.drag-over {
+            border-color: #10b981;
+            box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.35);
+            transform: scale(1.04);
+            background: #ecfdf5;
+        }
+
+        .preview-item.drop-left { border-left: 5px solid #10b981; }
+        .preview-item.drop-right { border-right: 5px solid #10b981; }
+
+        .preview-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            pointer-events: none;
+            -webkit-user-drag: none;
+        }
+
+        .preview-item .remove-btn {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            background: rgba(106, 61, 232, 0.85);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 26px;
+            height: 26px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(4px);
+            z-index: 5;
+            transition: 0.2s;
+        }
+
+        .preview-item .remove-btn:hover {
+            background: #e74c3c;
+            transform: scale(1.1);
+        }
+
+        .preview-item .page-num {
+            position: absolute;
+            bottom: 6px;
+            left: 6px;
+            background: rgba(0, 0, 0, 0.65);
+            color: white;
+            padding: 0.15rem 0.7rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            backdrop-filter: blur(4px);
+            z-index: 5;
+        }
+
+        .preview-item .grab-hint {
+            position: absolute;
+            top: 6px;
+            left: 6px;
+            background: rgba(106, 61, 232, 0.75);
+            color: white;
+            border-radius: 8px;
+            width: 26px;
+            height: 26px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            z-index: 4;
+            backdrop-filter: blur(4px);
+            opacity: 0.85;
+            transition: 0.2s;
+            pointer-events: none;
+        }
+
+        .preview-item:hover .grab-hint {
+            opacity: 1;
+            background: #4a27b0;
+        }
+
+        .empty-preview {
+            color: #9a82bf;
+            text-align: center;
+            padding: 2rem 0;
+            font-size: 0.95rem;
+            grid-column: 1 / -1;
+        }
+
+        .empty-preview i {
+            font-size: 2.5rem;
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #c9b0ff;
+        }
+
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            margin-top: 0.6rem;
+            justify-content: center;
+        }
+
+        .btn {
+            border: none;
+            padding: 0.8rem 1.8rem;
+            border-radius: 60px;
+            font-weight: 600;
+            font-size: 1rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.6rem;
+            cursor: pointer;
+            transition: 0.2s;
+            flex: 1 1 auto;
+            min-width: 130px;
+            box-shadow: 0 6px 14px rgba(106, 61, 232, 0.1);
+            border: 1px solid #d9c8ff;
+        }
+
+        .btn-primary {
+            background: #6a3de8;
+            color: white;
+            border-color: #7b4cff;
+            box-shadow: 0 8px 20px rgba(106, 61, 232, 0.3);
+        }
+
+        .btn-primary:hover { background: #4a27b0; transform: scale(0.97); }
+        .btn-primary:disabled { opacity: 0.5; pointer-events: none; }
+
+        .btn-secondary { background: #f5f0ff; border-color: #d9c8ff; }
+        .btn-secondary:hover { background: #ede4ff; }
+
+        .status-msg {
+            text-align: center;
+            margin-top: 1rem;
+            font-weight: 500;
+            color: #3b1f7a;
+            background: #f3ecff;
+            padding: 0.6rem 1rem;
+            border-radius: 60px;
+            font-size: 0.95rem;
+            border: 1px solid #e0d0ff;
+            transition: 0.2s;
+        }
+
+        .status-msg.success { background: #d8ebd2; border-color: #9fc7a0; color: #1c4827; }
+        .status-msg.error { background: #ffe1d6; border-color: #e7b6a4; color: #7d3f2b; }
+        .status-msg.info { background: #dbeafe; border-color: #93c5fd; color: #1e40af; }
+
+        .footer-love {
+            margin-top: 1.8rem;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #7a5fa8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+        }
+
+        .footer-love i { color: #6a3de8; }
+
+        /* ====== 💻 PC ke liye special — bahut wide screens pe grid full width ====== */
+        @media (min-width: 1200px) {
+            .preview-grid {
+                grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            }
+            .card {
+                padding: 2rem 3rem 2.5rem;
+            }
+        }
+
+        @media (min-width: 1600px) {
+            .preview-grid {
+                grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            }
+        }
+
+        /* ====== 📱 MOBILE ====== */
+        @media (max-width: 600px) {
+            body { padding: 0.8rem; }
+            .card {
+                padding: 1.4rem;
+                border-radius: 30px;
+            }
+            .brand h1 { font-size: 1.3rem; }
+            .brand i { font-size: 1.8rem; }
+            .brand h1 small { display: none; }
+            .drop-zone { padding: 1.3rem 1rem; }
+            .btn { min-width: 100px; padding: 0.7rem 1.2rem; font-size: 0.9rem; }
+            .header { flex-direction: column; align-items: flex-start; }
+            .header-right { width: 100%; justify-content: space-between; }
+            .preview-grid {
+                grid-template-columns: repeat(auto-fill, minmax(105px, 1fr));
+                max-height: 50vh;
+                gap: 0.7rem;
+            }
+            .image-count { flex-direction: column; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <div class="header">
+        <div class="brand">
+            <i class="fas fa-images"></i>
+            <h1>Multiple Image to PDF <small>drag & drop</small></h1>
+        </div>
+        <div class="header-right">
+            <a href="index.html" class="home-btn" title="Go to Home">
+                <i class="fas fa-home"></i> Home
+            </a>
+            <div class="header-badge">
+                <i class="fas fa-hand-pointer"></i> uthao · drop
+            </div>
+        </div>
+    </div>
+
+    <div class="drop-zone" id="dropZone">
+        <input type="file" id="fileInput" multiple accept="image/*" />
+        <div class="drop-icon">🖼️</div>
+        <div class="drop-text">Drop images here or click</div>
+        <div class="drop-hint">PNG · JPEG · JPG · WebP · GIF · BMP</div>
+    </div>
+
+    <div class="image-count">
+        <span><i class="fas fa-heart"></i> images in queue</span>
+        <span class="count-badge" id="countBadge">0 images</span>
+    </div>
+
+    <div class="preview-grid" id="previewGrid">
+        <div class="empty-preview">
+            <i class="fas fa-heart-broken"></i>
+            no images selected yet
+        </div>
+    </div>
+
+    <div class="actions">
+        <button class="btn btn-secondary" id="clearBtn"><i class="fas fa-trash-alt"></i> Clear all</button>
+        <button class="btn btn-primary" id="convertBtn"><i class="fas fa-file-pdf"></i> Convert to PDF</button>
+    </div>
+
+    <div class="status-msg" id="statusMsg">📌 ready to convert · image ko pakad ke kahi bhi drop karo</div>
+
+    <div class="footer-love">
+        <i class="fas fa-heart"></i> Made with Love · Create by Sandesh <i class="fas fa-heart"></i>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<script>
+    (function() {
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const previewGrid = document.getElementById('previewGrid');
+        const countBadge = document.getElementById('countBadge');
+        const clearBtn = document.getElementById('clearBtn');
+        const convertBtn = document.getElementById('convertBtn');
+        const statusMsg = document.getElementById('statusMsg');
+
+        let imageDataArray = [];
+        let idCounter = 0;
+
+        let dragState = {
+            active: false,
+            id: null,
+            index: -1,
+            startX: 0,
+            startY: 0,
+            ghostEl: null,
+            currentTargetIndex: -1,
+            currentDropSide: null,
+            movedEnough: false,
+            autoScrollInterval: null
+        };
+
+        function updateStatus(text, className = '') {
+            statusMsg.textContent = text;
+            statusMsg.className = 'status-msg' + (className ? ' ' + className : '');
+        }
+
+        function resetStatus() {
+            updateStatus('📌 ready to convert · image ko pakad ke kahi bhi drop karo', '');
+        }
+
+        function updateCount() {
+            const count = imageDataArray.length;
+            countBadge.textContent = count + ' image' + (count !== 1 ? 's' : '');
+        }
+
+        function renderPreview() {
+            if (imageDataArray.length === 0) {
+                previewGrid.innerHTML = `
+                    <div class="empty-preview">
+                        <i class="fas fa-heart-broken"></i>
+                        no images selected yet
+                    </div>
+                `;
+                updateCount();
+                return;
+            }
+
+            let html = '';
+            imageDataArray.forEach((item, index) => {
+                html += `
+                    <div class="preview-item" data-id="${item.id}" data-index="${index}">
+                        <img src="${item.dataUrl}" alt="image ${index + 1}" draggable="false" />
+                        <div class="grab-hint"><i class="fas fa-grip-vertical"></i></div>
+                        <button class="remove-btn" data-id="${item.id}" title="remove">
+                            <i class="fas fa-times"></i>
+                        </button>
+                        <span class="page-num">#${index + 1}</span>
+                    </div>
+                `;
+            });
+            previewGrid.innerHTML = html;
+
+            attachRemoveEvents();
+            attachPointerDragEvents();
+            updateCount();
+        }
+
+        function attachRemoveEvents() {
+            document.querySelectorAll('.remove-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const id = parseInt(this.dataset.id, 10);
+                    removeImageById(id);
+                });
+            });
+        }
+
+        function attachPointerDragEvents() {
+            const items = document.querySelectorAll('.preview-item');
+            items.forEach(item => {
+                item.addEventListener('pointerdown', onPointerDown);
+            });
+        }
+
+        function onPointerDown(e) {
+            if (e.target.closest('.remove-btn')) return;
+
+            const item = e.currentTarget;
+            const id = parseInt(item.dataset.id, 10);
+            const index = parseInt(item.dataset.index, 10);
+
+            if (e.button !== undefined && e.button !== 0) return;
+
+            dragState.active = true;
+            dragState.id = id;
+            dragState.index = index;
+            dragState.startX = e.clientX;
+            dragState.startY = e.clientY;
+            dragState.movedEnough = false;
+            dragState.currentTargetIndex = -1;
+            dragState.currentDropSide = null;
+
+            document.addEventListener('pointermove', onPointerMove);
+            document.addEventListener('pointerup', onPointerUp);
+            document.addEventListener('pointercancel', onPointerUp);
+
+            e.preventDefault();
+        }
+
+        function onPointerMove(e) {
+            if (!dragState.active) return;
+
+            const dx = e.clientX - dragState.startX;
+            const dy = e.clientY - dragState.startY;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+
+            if (!dragState.movedEnough && dist > 6) {
+                dragState.movedEnough = true;
+                const el = document.querySelector(`.preview-item[data-id="${dragState.id}"]`);
+                if (el) {
+                    el.classList.add('dragging');
+                    createGhost(el, e.clientX, e.clientY);
+                }
+                document.body.style.cursor = 'grabbing';
+                startAutoScroll();
+            }
+
+            if (!dragState.movedEnough) return;
+
+            moveGhost(e.clientX, e.clientY);
+            updateDropTarget(e.clientX, e.clientY);
+        }
+
+        function onPointerUp(e) {
+            if (!dragState.active) return;
+
+            document.removeEventListener('pointermove', onPointerMove);
+            document.removeEventListener('pointerup', onPointerUp);
+            document.removeEventListener('pointercancel', onPointerUp);
+
+            stopAutoScroll();
+
+            if (dragState.movedEnough) {
+                performDrop();
+            }
+
+            removeGhost();
+            document.querySelectorAll('.preview-item').forEach(el => {
+                el.classList.remove('dragging', 'drag-over', 'drop-left', 'drop-right');
+            });
+            document.body.style.cursor = '';
+
+            dragState.active = false;
+            dragState.id = null;
+            dragState.index = -1;
+            dragState.movedEnough = false;
+            dragState.currentTargetIndex = -1;
+            dragState.currentDropSide = null;
+        }
+
+        function createGhost(sourceEl, x, y) {
+            const rect = sourceEl.getBoundingClientRect();
+            const ghost = sourceEl.cloneNode(true);
+            ghost.classList.remove('dragging');
+            ghost.style.position = 'fixed';
+            ghost.style.left = (x - rect.width / 2) + 'px';
+            ghost.style.top = (y - rect.height / 2) + 'px';
+            ghost.style.width = rect.width + 'px';
+            ghost.style.height = rect.height + 'px';
+            ghost.style.pointerEvents = 'none';
+            ghost.style.zIndex = '99999';
+            ghost.style.opacity = '0.9';
+            ghost.style.transform = 'rotate(3deg) scale(1.05)';
+            ghost.style.boxShadow = '0 20px 40px rgba(106, 61, 232, 0.5)';
+            ghost.style.borderRadius = '24px';
+            ghost.style.overflow = 'hidden';
+            ghost.id = 'dragGhost';
+            document.body.appendChild(ghost);
+            dragState.ghostEl = ghost;
+        }
+
+        function moveGhost(x, y) {
+            if (!dragState.ghostEl) return;
+            const rect = dragState.ghostEl.getBoundingClientRect();
+            dragState.ghostEl.style.left = (x - rect.width / 2) + 'px';
+            dragState.ghostEl.style.top = (y - rect.height / 2) + 'px';
+        }
+
+        function removeGhost() {
+            if (dragState.ghostEl) {
+                dragState.ghostEl.remove();
+                dragState.ghostEl = null;
+            }
+        }
+
+        function updateDropTarget(x, y) {
+            if (dragState.ghostEl) dragState.ghostEl.style.display = 'none';
+            const elem = document.elementFromPoint(x, y);
+            if (dragState.ghostEl) dragState.ghostEl.style.display = '';
+
+            document.querySelectorAll('.preview-item').forEach(el => {
+                el.classList.remove('drag-over', 'drop-left', 'drop-right');
+            });
+
+            if (!elem) {
+                dragState.currentTargetIndex = -1;
+                dragState.currentDropSide = null;
+                return;
+            }
+
+            const targetItem = elem.closest('.preview-item');
+            if (!targetItem) {
+                dragState.currentTargetIndex = -1;
+                dragState.currentDropSide = null;
+                return;
+            }
+
+            const targetId = parseInt(targetItem.dataset.id, 10);
+            if (targetId === dragState.id) {
+                dragState.currentTargetIndex = -1;
+                dragState.currentDropSide = null;
+                return;
+            }
+
+            const targetIndex = parseInt(targetItem.dataset.index, 10);
+            const rect = targetItem.getBoundingClientRect();
+            const midX = rect.left + rect.width / 2;
+            const side = x < midX ? 'left' : 'right';
+
+            targetItem.classList.add('drag-over');
+            targetItem.classList.add(side === 'left' ? 'drop-left' : 'drop-right');
+
+            dragState.currentTargetIndex = targetIndex;
+            dragState.currentDropSide = side;
+        }
+
+        function performDrop() {
+            const fromIndex = dragState.index;
+            let toIndex = dragState.currentTargetIndex;
+            const side = dragState.currentDropSide;
+
+            if (toIndex === -1 || toIndex === fromIndex) return;
+
+            let newIndex = toIndex;
+            if (side === 'left') {
+                if (fromIndex < toIndex) newIndex = toIndex - 1;
+                else newIndex = toIndex;
+            } else {
+                if (fromIndex < toIndex) newIndex = toIndex;
+                else newIndex = toIndex + 1;
+            }
+
+            const movedItem = imageDataArray.splice(fromIndex, 1)[0];
+            imageDataArray.splice(newIndex, 0, movedItem);
+
+            renderPreview();
+
+            updateStatus(`✨ image position #${newIndex + 1} pe move ho gayi`, 'success');
+            setTimeout(resetStatus, 1400);
+        }
+
+        function startAutoScroll() {
+            stopAutoScroll();
+
+            dragState.autoScrollInterval = setInterval(() => {
+                if (!dragState.active || !dragState.movedEnough) return;
+
+                const x = dragState.lastX || 0;
+                const y = dragState.lastY || 0;
+
+                const rect = previewGrid.getBoundingClientRect();
+                const edgeSize = 90;
+                const scrollSpeed = 25;
+
+                if (x < rect.left || x > rect.right) return;
+
+                if (y < rect.top + edgeSize && y > rect.top - 40) {
+                    previewGrid.scrollTop -= scrollSpeed;
+                } else if (y > rect.bottom - edgeSize && y < rect.bottom + 40) {
+                    previewGrid.scrollTop += scrollSpeed;
+                }
+            }, 16);
+        }
+
+        function stopAutoScroll() {
+            if (dragState.autoScrollInterval) {
+                clearInterval(dragState.autoScrollInterval);
+                dragState.autoScrollInterval = null;
+            }
+        }
+
+        document.addEventListener('pointermove', (e) => {
+            dragState.lastX = e.clientX;
+            dragState.lastY = e.clientY;
+        }, { passive: true });
+
+        function removeImageById(id) {
+            imageDataArray = imageDataArray.filter(item => item.id !== id);
+            renderPreview();
+            if (imageDataArray.length === 0) {
+                resetStatus();
+            } else {
+                updateStatus(`🗑️ image removed`, '');
+                setTimeout(resetStatus, 1000);
+            }
+        }
+
+        function addImages(files) {
+            const fileArray = Array.from(files);
+            if (fileArray.length === 0) {
+                updateStatus('⚠️ no files selected', 'error');
+                setTimeout(resetStatus, 1500);
+                return;
+            }
+
+            let loadedCount = 0;
+            const totalFiles = fileArray.filter(f => f.type.startsWith('image/')).length;
+
+            if (totalFiles === 0) {
+                updateStatus('⚠️ no valid image files found', 'error');
+                setTimeout(resetStatus, 1500);
+                return;
+            }
+
+            fileArray.forEach((file) => {
+                if (!file.type.startsWith('image/')) return;
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const newId = ++idCounter;
+                    imageDataArray.push({
+                        id: newId,
+                        dataUrl: e.target.result,
+                        file: file,
+                        name: file.name
+                    });
+                    loadedCount++;
+
+                    renderPreview();
+
+                    if (loadedCount === totalFiles) {
+                        updateStatus(`✅ added ${totalFiles} image${totalFiles > 1 ? 's' : ''}`, 'success');
+                        setTimeout(resetStatus, 1500);
+                    }
+                };
+                reader.onerror = function() {
+                    loadedCount++;
+                    if (loadedCount === totalFiles) {
+                        updateStatus('⚠️ some images failed to load', 'error');
+                        setTimeout(resetStatus, 1500);
+                    }
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function clearAll() {
+            if (imageDataArray.length === 0) {
+                updateStatus('📭 no images to clear', '');
+                setTimeout(resetStatus, 1000);
+                return;
+            }
+            imageDataArray = [];
+            renderPreview();
+            updateStatus('🗑️ all cleared', '');
+            setTimeout(resetStatus, 1000);
+            fileInput.value = '';
+        }
+
+        dropZone.addEventListener('click', () => fileInput.click());
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                addImages(e.target.files);
+            }
+            fileInput.value = '';
+        });
+
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.style.background = '#f3ecff';
+            dropZone.style.borderColor = '#a884ff';
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.style.background = 'rgba(245, 238, 255, 0.6)';
+            dropZone.style.borderColor = '#c9b0ff';
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.style.background = 'rgba(245, 238, 255, 0.6)';
+            dropZone.style.borderColor = '#c9b0ff';
+            if (e.dataTransfer.files.length > 0) {
+                addImages(e.dataTransfer.files);
+            }
+        });
+
+        clearBtn.addEventListener('click', clearAll);
+
+        convertBtn.addEventListener('click', function() {
+            if (imageDataArray.length === 0) {
+                updateStatus('❌ Please add images first', 'error');
+                setTimeout(resetStatus, 2000);
+                return;
+            }
+
+            convertBtn.disabled = true;
+            convertBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> generating PDF...';
+            updateStatus('🔄 creating PDF with ' + imageDataArray.length + ' images...', 'info');
+
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF();
+
+            let loadedCount = 0;
+            const totalImages = imageDataArray.length;
+
+            imageDataArray.forEach((item, index) => {
+                const img = new Image();
+                img.src = item.dataUrl;
+                img.onload = function() {
+                    const pdfWidth = pdf.internal.pageSize.getWidth();
+                    const pdfHeight = pdf.internal.pageSize.getHeight();
+
+                    let imgWidth = img.width;
+                    let imgHeight = img.height;
+                    const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
+
+                    const finalWidth = imgWidth * ratio;
+                    const finalHeight = imgHeight * ratio;
+                    const x = (pdfWidth - finalWidth) / 2;
+                    const y = (pdfHeight - finalHeight) / 2;
+
+                    if (index > 0) pdf.addPage();
+                    pdf.addImage(item.dataUrl, 'JPEG', x, y, finalWidth, finalHeight);
+
+                    loadedCount++;
+                    if (loadedCount === totalImages) {
+                        pdf.save('fullpage_images.pdf');
+                        updateStatus(`✅ PDF created with ${totalImages} images!`, 'success');
+                        setTimeout(resetStatus, 3000);
+                        convertBtn.disabled = false;
+                        convertBtn.innerHTML = '<i class="fas fa-file-pdf"></i> Convert to PDF';
+                    }
+                };
+                img.onerror = function() {
+                    loadedCount++;
+                    if (loadedCount === totalImages) {
+                        convertBtn.disabled = false;
+                        convertBtn.innerHTML = '<i class="fas fa-file-pdf"></i> Convert to PDF';
+                        updateStatus('⚠️ some images failed to load', 'error');
+                        setTimeout(resetStatus, 2000);
+                    }
+                };
+            });
+        });
+
+        renderPreview();
+        resetStatus();
+    })();
+</script>
+</body>
+</html>

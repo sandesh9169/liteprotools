@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Protector - Secure Your PDF</title>
+    <!-- ✅ FAVICON - Folder ke andar wali files -->
+    <link rel="icon" type="image/x-icon" href="favicon/favicon.ico">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-purple: #7c3aed;
+            --light-purple-bg: #f3f0ff;
+            --border-purple: #d8b4fe;
+            --text-dark: #1f2937;
+            --text-light: #6b7280;
+            --success-green: #6ee7b7;
+            --success-hover: #34d399;
+            --btn-shadow: 0 4px 6px -1px rgba(124, 58, 237, 0.4);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f3f4f6;
+            background-image: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 30px 15px;
+            color: var(--text-dark);
+        }
+
+        /* Main Card Container */
+        .main-card {
+            background: white;
+            width: 100%;
+            max-width: 550px;
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08), 0 0 0 1px rgba(124, 58, 237, 0.1);
+            padding: 35px 30px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        /* Header */
+        .page-header {
+            text-align: center;
+        }
+
+        .page-header h1 {
+            font-size: 26px;
+            color: var(--text-dark);
+            margin-bottom: 10px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .page-header h1 i {
+            color: var(--primary-purple);
+        }
+
+        .page-header p.subtitle {
+            color: var(--text-light);
+            font-size: 14px;
+            background: var(--light-purple-bg);
+            padding: 8px 20px;
+            border-radius: 30px;
+            display: inline-block;
+            font-weight: 600;
+            border: 1px solid var(--border-purple);
+        }
+
+        /* --- UPLOAD AREA --- */
+        .upload-area {
+            border: 2px dashed var(--border-purple);
+            background-color: #faf5ff;
+            border-radius: 20px;
+            padding: 35px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .upload-area:hover, .upload-area.dragover {
+            background-color: #f3e8ff;
+            border-color: var(--primary-purple);
+            transform: scale(1.02);
+        }
+
+        .folder-icon {
+            font-size: 42px;
+            color: var(--primary-purple);
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .upload-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 8px;
+        }
+
+        .upload-subtitle {
+            font-size: 13px;
+            color: var(--text-light);
+            background: white;
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 1px solid #e2e8f0;
+        }
+
+        #fileInput {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        /* File Info Badge */
+        .file-info {
+            background: var(--light-purple-bg);
+            border: 1px solid var(--border-purple);
+            color: var(--primary-purple);
+            padding: 12px 18px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            word-break: break-all;
+        }
+
+        .file-info i {
+            font-size: 18px;
+        }
+
+        /* --- SETTINGS BOX --- */
+        .settings-box {
+            background: #f8fafc;
+            padding: 25px 20px;
+            border-radius: 20px;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .tip {
+            font-size: 12px;
+            color: var(--primary-purple);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-align: center;
+            background: var(--light-purple-bg);
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: 1px dashed var(--border-purple);
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .input-group label {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-dark);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .input-group input[type="password"] {
+            width: 100%;
+            padding: 14px 18px;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-dark);
+            outline: none;
+            background: white;
+            transition: all 0.2s;
+        }
+
+        .input-group input[type="password"]:focus {
+            border-color: var(--primary-purple);
+            box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+        }
+
+        /* --- ACTION BUTTON --- */
+        .btn {
+            border: none;
+            padding: 16px 30px;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.2s;
+            width: 100%;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-purple);
+            color: white;
+            box-shadow: var(--btn-shadow);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background-color: #6d28d9;
+            transform: translateY(-2px);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-success {
+            background-color: var(--success-green);
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(52, 211, 153, 0.4);
+            text-decoration: none;
+        }
+
+        .btn-success:hover {
+            background-color: var(--success-hover);
+            transform: translateY(-2px);
+        }
+
+        /* --- PROGRESS BAR --- */
+        .progress-container {
+            width: 100%;
+            height: 10px;
+            background: #e2e8f0;
+            border-radius: 10px;
+            overflow: hidden;
+            display: none;
+            margin-top: 10px;
+        }
+
+        .progress-bar {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-purple), #a78bfa);
+            transition: width 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: #000;
+            border-radius: 10px;
+        }
+
+        /* Status Text */
+        .status-text {
+            margin-top: 10px;
+            font-size: 14px;
+            min-height: 24px;
+            text-align: center;
+            font-weight: 600;
+            color: var(--text-light);
+        }
+
+        .status-text.success {
+            color: #166534;
+        }
+
+        .status-text.error {
+            color: #991b1b;
+        }
+
+        /* --- DOWNLOAD LINK --- */
+        .download-link-wrapper {
+            display: none;
+            justify-content: center;
+            margin-top: 10px;
+        }
+
+        a.download-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 16px;
+            font-weight: 700;
+            color: white;
+            text-decoration: none;
+            background: var(--success-green);
+            padding: 14px 30px;
+            border-radius: 30px;
+            box-shadow: 0 4px 6px -1px rgba(52, 211, 153, 0.4);
+            transition: all 0.2s;
+        }
+
+        a.download-link:hover {
+            background: var(--success-hover);
+            transform: translateY(-2px);
+        }
+
+        /* Footer */
+        .footer {
+            margin-top: 25px;
+            text-align: center;
+            color: var(--primary-purple);
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Spinner */
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top: 3px solid white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 500px) {
+            .main-card { padding: 25px 15px; }
+            .page-header h1 { font-size: 22px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="main-card">
+        <!-- Header -->
+        <div class="page-header">
+            <h1>
+                <i class="fas fa-lock"></i>
+                PDF Protector
+            </h1>
+            <p class="subtitle">Secure your PDF with AES-256 encryption</p>
+        </div>
+
+        <!-- Upload Area -->
+        <div class="upload-area" id="uploadArea">
+            <div class="folder-icon">
+                <i class="fas fa-file-pdf"></i>
+            </div>
+            <div class="upload-title">Drop PDF here or click</div>
+            <div class="upload-subtitle">Only .pdf files allowed</div>
+            <input type="file" id="fileInput" accept="application/pdf">
+        </div>
+
+        <!-- File Info -->
+        <div id="fileInfo" class="file-info" style="display: none;"></div>
+
+        <!-- Settings Box -->
+        <div class="settings-box">
+            <p class="tip"><i class="fas fa-shield-alt"></i> Set Password Protection</p>
+
+            <div class="input-group">
+                <label>Enter Password</label>
+                <input type="password" id="passwordInput" placeholder="Enter a strong password">
+            </div>
+        </div>
+
+        <!-- Action Button -->
+        <button class="btn btn-primary" id="protectBtn" onclick="protectPDF()">
+            <i class="fas fa-shield-alt"></i> Protect & Download
+        </button>
+
+        <!-- Progress Bar -->
+        <div class="progress-container" id="progressContainer">
+            <div class="progress-bar" id="progressBar">0%</div>
+        </div>
+
+        <!-- Status Text -->
+        <div class="status-text" id="statusText"></div>
+
+        <!-- Download Link -->
+        <div class="download-link-wrapper" id="downloadLinkWrapper">
+            <a id="downloadLink" class="download-link">
+                <i class="fas fa-download"></i> Download Protected PDF
+            </a>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <i class="fa-solid fa-heart"></i> Made with Love · Create by Sandesh <i class="fa-solid fa-heart"></i>
+    </div>
+
+    <script>
+        // Global variable for the qpdf module
+        let qpdfModule = null;
+
+        // DOM Elements
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const fileInfo = document.getElementById('fileInfo');
+        const passwordInput = document.getElementById('passwordInput');
+        const protectBtn = document.getElementById('protectBtn');
+        const progressContainer = document.getElementById('progressContainer');
+        const progressBar = document.getElementById('progressBar');
+        const statusText = document.getElementById('statusText');
+        const downloadLinkWrapper = document.getElementById('downloadLinkWrapper');
+        const downloadLink = document.getElementById('downloadLink');
+
+        function updateProgress(percent, message, type = '') {
+            progressContainer.style.display = 'block';
+            progressBar.style.width = percent + '%';
+            progressBar.textContent = Math.round(percent) + '%';
+            statusText.textContent = message || '';
+            statusText.className = 'status-text ' + type;
+        }
+
+        // Show file name when selected
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                if (file.type !== 'application/pdf') {
+                    alert("Please select a valid PDF file.");
+                    fileInput.value = '';
+                    fileInfo.style.display = 'none';
+                    return;
+                }
+                fileInfo.innerHTML = `<i class="fas fa-file-pdf"></i> ${file.name} • ${(file.size / 1024).toFixed(1)} KB`;
+                fileInfo.style.display = 'flex';
+                statusText.textContent = '';
+                progressContainer.style.display = 'none';
+                downloadLinkWrapper.style.display = 'none';
+            }
+        });
+
+        // Drag & Drop
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const file = e.dataTransfer.files[0];
+            if (file && file.type === 'application/pdf') {
+                fileInput.files = e.dataTransfer.files;
+                fileInfo.innerHTML = `<i class="fas fa-file-pdf"></i> ${file.name} • ${(file.size / 1024).toFixed(1)} KB`;
+                fileInfo.style.display = 'flex';
+                statusText.textContent = '';
+                progressContainer.style.display = 'none';
+                downloadLinkWrapper.style.display = 'none';
+            } else {
+                alert('Please drop a valid PDF file.');
+            }
+        });
+
+        // Load qpdf WASM from CDN
+        async function loadQpdf() {
+            if (qpdfModule) return qpdfModule;
+
+            updateProgress(10, "Loading qpdf engine...");
+
+            return new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = "https://unpkg.com/@jspawn/qpdf-wasm@0.0.2/qpdf.js";
+                script.onload = async () => {
+                    try {
+                        qpdfModule = await Module({
+                            locateFile: (file) => `https://unpkg.com/@jspawn/qpdf-wasm@0.0.2/${file}`,
+                            noInitialRun: true
+                        });
+                        resolve(qpdfModule);
+                    } catch (err) {
+                        reject(err);
+                    }
+                };
+                script.onerror = () => reject(new Error("Failed to load qpdf.js"));
+                document.head.appendChild(script);
+            });
+        }
+
+        async function protectPDF() {
+            const file = fileInput.files[0];
+            const password = passwordInput.value;
+
+            downloadLinkWrapper.style.display = 'none';
+            progressContainer.style.display = 'none';
+            statusText.textContent = '';
+
+            if (!file) { alert("Please upload a PDF file!"); return; }
+            if (!password) { alert("Please enter a password!"); return; }
+
+            protectBtn.disabled = true;
+            protectBtn.innerHTML = '<div class="spinner"></div> Processing...';
+
+            try {
+                updateProgress(10, "Reading PDF file...");
+                const arrayBuffer = await file.arrayBuffer();
+                const inputBytes = new Uint8Array(arrayBuffer);
+
+                const qpdf = await loadQpdf();
+
+                updateProgress(40, "Encrypting with password (AES-256)...");
+
+                const inputName = "/input.pdf";
+                const outputName = "/output.pdf";
+
+                qpdf.FS.writeFile(inputName, inputBytes);
+
+                const args = [
+                    "--encrypt",
+                    password,
+                    password,
+                    "256",
+                    "--print=none",
+                    "--modify=none",
+                    "--extract=n",
+                    "--",
+                    inputName,
+                    outputName
+                ];
+
+                try {
+                    qpdf.callMain(args);
+                } catch (e) {
+                    console.warn("qpdf callMain threw:", e);
+                }
+
+                updateProgress(80, "Creating protected PDF...");
+
+                let outputBytes;
+                try {
+                    outputBytes = qpdf.FS.readFile(outputName);
+                } catch (e) {
+                    throw new Error("Encryption failed - no output file generated. Check password or PDF validity.");
+                }
+
+                const blob = new Blob([outputBytes], { type: "application/pdf" });
+                const url = URL.createObjectURL(blob);
+
+                updateProgress(100, "✅ PDF protected successfully!", "success");
+
+                downloadLink.href = url;
+                downloadLink.download = "protected_" + file.name;
+                downloadLinkWrapper.style.display = "flex";
+
+                try {
+                    qpdf.FS.unlink(inputName);
+                    qpdf.FS.unlink(outputName);
+                } catch(e) {}
+
+            } catch (error) {
+                console.error(error);
+                updateProgress(0, "❌ Error: " + error.message, "error");
+                alert("Error: " + error.message);
+            } finally {
+                protectBtn.disabled = false;
+                protectBtn.innerHTML = '<i class="fas fa-shield-alt"></i> Protect & Download';
+            }
+        }
+    </script>
+</body>
+</html>

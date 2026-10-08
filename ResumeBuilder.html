@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume Builder</title>
+
+    <!-- Libraries for PDF and Image Download -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary-purple: #7c3aed;
+            --light-purple-bg: #f3f0ff;
+            --border-purple: #d8b4fe;
+            --text-dark: #1f2937;
+            --text-light: #6b7280;
+            --success-green: #6ee7b7;
+            --success-hover: #34d399;
+            --btn-shadow: 0 4px 6px -1px rgba(124, 58, 237, 0.4);
+
+            --heading-color: #ffff00;
+            --heading-opacity: 1;
+            --photo-border-color: #333333;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f3f4f6;
+            background-image: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+            min-height: 100vh;
+            padding: 25px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 25px;
+            flex-wrap: wrap;
+            color: var(--text-dark);
+        }
+
+        /* ============= LEFT: FORM ============= */
+        .form-container {
+            width: 380px;
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08), 0 0 0 1px rgba(124, 58, 237, 0.1);
+            padding: 25px;
+            max-height: 92vh;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .form-container::-webkit-scrollbar { width: 8px; }
+        .form-container::-webkit-scrollbar-track { background: var(--light-purple-bg); border-radius: 4px; }
+        .form-container::-webkit-scrollbar-thumb { background: var(--border-purple); border-radius: 4px; }
+        .form-container::-webkit-scrollbar-thumb:hover { background: var(--primary-purple); }
+
+        .form-header {
+            text-align: center;
+            padding-bottom: 15px;
+            border-bottom: 1px dashed var(--border-purple);
+        }
+
+        .form-header h2 {
+            color: var(--text-dark);
+            font-size: 22px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 6px;
+        }
+
+        .form-header h2 i { color: var(--primary-purple); }
+
+        .form-header p {
+            color: var(--text-light);
+            font-size: 13px;
+            font-weight: 600;
+            background: var(--light-purple-bg);
+            padding: 6px 14px;
+            border-radius: 20px;
+            display: inline-block;
+            border: 1px solid var(--border-purple);
+        }
+
+        .customization-box {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            padding: 18px;
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .customization-box h3 {
+            font-size: 12px;
+            color: var(--primary-purple);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 4px;
+        }
+
+        .custom-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            background: white;
+            padding: 10px 14px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .custom-row label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--text-dark);
+            font-weight: 600;
+        }
+
+        .custom-row input[type="color"] {
+            width: 42px;
+            height: 32px;
+            border: 2px solid var(--border-purple);
+            border-radius: 8px;
+            cursor: pointer;
+            background: none;
+            padding: 2px;
+        }
+
+        .custom-row input[type="range"] {
+            width: 110px;
+            accent-color: var(--primary-purple);
+            cursor: pointer;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-group label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 700;
+            font-size: 13px;
+            color: var(--text-dark);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .form-group label i {
+            color: var(--primary-purple);
+            font-size: 12px;
+        }
+
+        .form-group input[type="text"],
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-dark);
+            font-family: inherit;
+            background: white;
+            transition: all 0.2s;
+            outline: none;
+        }
+
+        .form-group input[type="text"]:focus,
+        .form-group textarea:focus {
+            border-color: var(--primary-purple);
+            box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+        }
+
+        .form-group input::placeholder {
+            color: #94a3b8;
+            font-weight: 500;
+        }
+
+        .form-group input[type="file"] {
+            padding: 10px;
+            border: 2px dashed var(--border-purple);
+            background: #faf5ff;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 13px;
+            color: var(--primary-purple);
+            font-weight: 600;
+        }
+
+        .form-group input[type="file"]::-webkit-file-upload-button {
+            background: var(--primary-purple);
+            color: white;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-right: 10px;
+            font-size: 12px;
+        }
+
+        .edu-box {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            padding: 18px;
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .edu-box h3 {
+            font-size: 12px;
+            color: var(--primary-purple);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 4px;
+        }
+
+        .btn {
+            padding: 14px 20px;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s;
+            width: 100%;
+        }
+
+        .btn-small {
+            background-color: var(--primary-purple);
+            color: white;
+            box-shadow: var(--btn-shadow);
+            font-size: 13px;
+            padding: 12px;
+        }
+
+        .btn-small:hover {
+            background-color: #6d28d9;
+            transform: translateY(-2px);
+        }
+
+        .btn-download {
+            background-color: var(--primary-purple);
+            color: white;
+            box-shadow: var(--btn-shadow);
+        }
+
+        .btn-download:hover {
+            background-color: #6d28d9;
+            transform: translateY(-2px);
+        }
+
+        .btn-pdf {
+            background-color: var(--success-green);
+            color: #166534;
+            box-shadow: 0 4px 6px -1px rgba(52, 211, 153, 0.4);
+        }
+
+        .btn-pdf:hover {
+            background-color: var(--success-hover);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            border-top: 1px dashed var(--border-purple);
+            padding-top: 18px;
+        }
+
+        /* ============= RIGHT: RESUME PREVIEW (A4 fixed) ============= */
+        .resume-paper {
+            width: 210mm;           /* A4 width */
+            min-height: 297mm;      /* A4 height */
+            background: white;
+            padding: 20mm 18mm;     /* uniform margins inside A4 */
+            box-shadow: 0 10px 30px rgba(0,0,0,0.12), 0 0 0 1px rgba(124, 58, 237, 0.08);
+            border-radius: 20px;
+            font-size: 14px;
+            color: var(--text-dark);
+            position: relative;
+            box-sizing: border-box;
+            /* Prevent content from stretching */
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header Layout */
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            padding-bottom: 18px;
+            border-bottom: 2px solid var(--border-purple);
+        }
+
+        .profile-info {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 68%;
+        }
+
+        .info-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+        }
+
+        .info-row span:first-child {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--light-purple-bg);
+            color: var(--primary-purple);
+            border-radius: 6px;
+            font-size: 12px;
+            flex-shrink: 0;
+            border: 1px solid var(--border-purple);
+        }
+
+        /* Editable Fields */
+        .editable-field {
+            border-bottom: 1px dashed transparent;
+            padding: 2px 4px;
+            width: 100%;
+            display: inline-block;
+            border-radius: 4px;
+            transition: all 0.2s;
+            word-break: break-word;
+            font-size: inherit;
+            line-height: inherit;
+        }
+
+        .editable-field:hover {
+            border-bottom: 1px dashed var(--primary-purple);
+            background-color: var(--light-purple-bg);
+            cursor: text;
+        }
+
+        .editable-field:focus {
+            outline: none;
+            border-bottom: 1px solid var(--primary-purple);
+            background-color: #fff;
+        }
+
+        /* Profile Photo */
+        .profile-photo {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 3px solid var(--photo-border-color);
+            background-color: #f1f5f9;
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+            flex-shrink: 0;
+        }
+
+        .profile-photo:hover {
+            transform: scale(1.03);
+            box-shadow: 0 8px 20px rgba(124, 58, 237, 0.25);
+        }
+
+        .profile-photo span {
+            font-size: 11px;
+            color: var(--text-light);
+            text-align: center;
+            padding: 10px;
+            font-weight: 600;
+        }
+
+        /* Section Titles */
+        .section-title {
+            background-color: var(--heading-color);
+            opacity: var(--heading-opacity);
+            padding: 6px 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+            font-size: 13px;
+            letter-spacing: 0.5px;
+            margin-top: 16px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            color: #1a1a1a;
+        }
+
+        /* Table Styles */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+            font-size: 12px;
+        }
+
+        table th {
+            background-color: var(--primary-purple);
+            color: white;
+            padding: 8px;
+            text-align: left;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        table td {
+            border: 1px solid #e2e8f0;
+            padding: 6px 8px;
+            background: white;
+        }
+
+        table td .editable-field {
+            border-bottom: none;
+            padding: 0;
+        }
+
+        table td .editable-field:hover {
+            border-bottom: 1px dashed var(--primary-purple);
+        }
+
+        /* Personal Details Grid */
+        .personal-details-grid {
+            display: grid;
+            grid-template-columns: 140px 12px 1fr;
+            gap: 8px 0px;
+            font-size: 12px;
+            align-items: center;
+            background: #f8fafc;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .label-bold {
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .colon {
+            text-align: center;
+            font-weight: 700;
+            color: var(--primary-purple);
+        }
+
+        .data-field {
+            width: 100%;
+        }
+
+        /* Footer */
+        .footer-sign {
+            display: flex;
+            justify-content: space-between;
+            margin-top: auto;        /* push to bottom */
+            padding-top: 18px;
+            border-top: 1px dashed var(--border-purple);
+            font-size: 13px;
+        }
+
+        .declaration-text {
+            font-size: 11px;
+            font-style: italic;
+            margin-bottom: 8px;
+            color: var(--text-light);
+            background: #f8fafc;
+            padding: 10px 12px;
+            border-radius: 8px;
+            border-left: 3px solid var(--primary-purple);
+            line-height: 1.5;
+        }
+
+        /* Print Settings */
+        @media print {
+            body {
+                background: white;
+                display: block;
+                padding: 0;
+            }
+            .form-container, .controls {
+                display: none;
+            }
+            .resume-paper {
+                box-shadow: none;
+                margin: 0;
+                width: 100%;
+                border: none;
+                padding: 20mm 18mm;
+                border-radius: 0;
+                min-height: auto;
+            }
+            .editable-field:hover {
+                border-bottom: none;
+                background: none;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            body { padding: 15px; gap: 15px; }
+            .form-container { width: 100%; max-width: 500px; max-height: none; }
+            .resume-paper { width: 100%; min-height: auto; padding: 20px; }
+            .header-top { flex-direction: column; align-items: center; gap: 15px; }
+            .profile-info { width: 100%; }
+            .personal-details-grid { grid-template-columns: 120px 12px 1fr; font-size: 11px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- LEFT SIDE: INPUT FORM -->
+    <div class="form-container">
+        <div class="form-header">
+            <h2><i class="fas fa-file-alt"></i> Resume Builder</h2>
+            <p>Create your professional resume</p>
+        </div>
+
+        <div class="customization-box">
+            <h3><i class="fas fa-palette"></i> Heading Style</h3>
+            <div class="custom-row">
+                <label><i class="fas fa-fill-drip"></i> Color</label>
+                <input type="color" id="headingColorPicker" value="#ffff00" oninput="changeHeadingColor(this.value)">
+            </div>
+            <div class="custom-row">
+                <label><i class="fas fa-adjust"></i> Opacity</label>
+                <input type="range" id="headingOpacitySlider" min="0.1" max="1" step="0.1" value="1" oninput="changeHeadingOpacity(this.value)">
+            </div>
+            <h3 style="margin-top:8px;"><i class="fas fa-portrait"></i> Photo Border</h3>
+            <div class="custom-row">
+                <label><i class="fas fa-circle"></i> Color</label>
+                <input type="color" id="photoBorderColorPicker" value="#333333" oninput="changePhotoBorderColor(this.value)">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label><i class="fas fa-user"></i> Full Name</label>
+            <input type="text" oninput="syncData(this, 'outName')" placeholder="Enter Name">
+        </div>
+        <div class="form-group">
+            <label><i class="fas fa-envelope"></i> Email</label>
+            <input type="text" oninput="syncData(this, 'outEmail')" placeholder="Enter Email">
+        </div>
+        <div class="form-group">
+            <label><i class="fas fa-phone"></i> Phone</label>
+            <input type="text" oninput="syncData(this, 'outPhone')" placeholder="Enter Phone">
+        </div>
+        <div class="form-group">
+            <label><i class="fas fa-map-marker-alt"></i> Address</label>
+            <input type="text" oninput="syncData(this, 'outAddress')" placeholder="Enter Address">
+        </div>
+        <div class="form-group">
+            <label><i class="fas fa-camera"></i> Upload Photo</label>
+            <input type="file" id="photoInput" accept="image/*" onchange="previewImage(event)">
+        </div>
+
+        <div class="edu-box">
+            <h3><i class="fas fa-graduation-cap"></i> Add Education</h3>
+            <div class="form-group">
+                <input type="text" id="eduExam" placeholder="Exam Name (e.g. 10th)">
+            </div>
+            <div class="form-group">
+                <input type="text" id="eduBoard" placeholder="Board/University">
+            </div>
+            <div class="form-group">
+                <input type="text" id="eduYear" placeholder="Year">
+            </div>
+            <div class="form-group">
+                <input type="text" id="eduPerc" placeholder="% / CGPA">
+            </div>
+            <button class="btn btn-small" onclick="addEducationRow()">
+                <i class="fas fa-plus"></i> Add Education
+            </button>
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-download" onclick="downloadPNG()">
+                <i class="fas fa-image"></i> Download PNG (A4)
+            </button>
+            <button class="btn btn-download btn-pdf" onclick="downloadPDF()">
+                <i class="fas fa-file-pdf"></i> Download PDF (A4)
+            </button>
+        </div>
+    </div>
+
+    <!-- RIGHT SIDE: RESUME PREVIEW (A4 size, no stretch) -->
+    <div class="resume-paper" id="resumePreview">
+
+        <div class="header-top">
+            <div class="profile-info">
+                <div class="info-row"><span><i class="fas fa-user"></i></span><span class="editable-field" id="outName" contenteditable="true">Your Full Name</span></div>
+                <div class="info-row"><span><i class="fas fa-envelope"></i></span><span class="editable-field" id="outEmail" contenteditable="true">Your Email Address</span></div>
+                <div class="info-row"><span><i class="fas fa-phone"></i></span><span class="editable-field" id="outPhone" contenteditable="true">Your Phone Number</span></div>
+                <div class="info-row"><span><i class="fas fa-map-marker-alt"></i></span><span class="editable-field" id="outAddress" contenteditable="true">Your Address</span></div>
+            </div>
+            <div class="profile-photo" id="outPhoto" onclick="document.getElementById('photoInput').click()">
+                <span>Click to<br>Upload Photo</span>
+            </div>
+        </div>
+
+        <div class="section-title">CAREER OBJECTIVE</div>
+        <div class="editable-field" contenteditable="true" style="display:block; font-size: 12px; margin-bottom: 8px; line-height: 1.5;">
+            To obtain a challenging career in the industry and put all my efforts into the growth of the organization.
+        </div>
+
+        <div class="section-title">EDUCATION QUALIFICATION</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Exam Name</th>
+                    <th>Board/University</th>
+                    <th>Year</th>
+                    <th>% / CGPA</th>
+                </tr>
+            </thead>
+            <tbody id="educationTableBody">
+                <tr>
+                    <td><span class="editable-field" contenteditable="true">12th Exam</span></td>
+                    <td><span class="editable-field" contenteditable="true">State Board</span></td>
+                    <td><span class="editable-field" contenteditable="true">2023</span></td>
+                    <td><span class="editable-field" contenteditable="true">85%</span></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="section-title">SKILLS</div>
+        <div class="editable-field" contenteditable="true" style="display:block; font-size: 12px; margin-bottom: 8px; line-height: 1.5;">
+            • Computer Skills, MS Word, MS PowerPoint
+        </div>
+
+        <div class="section-title">WORK EXPERIENCE</div>
+        <div class="editable-field" contenteditable="true" style="display:block; font-size: 12px; margin-bottom: 8px; line-height: 1.5;">
+            • Company Name - Job Title (2018 - Present)
+        </div>
+
+        <div class="section-title">PROJECTS</div>
+        <div class="editable-field" contenteditable="true" style="display:block; font-size: 12px; margin-bottom: 8px; line-height: 1.5;">
+            • Project Title - Built an awesome tool using coding.
+        </div>
+
+        <div class="section-title">PERSONAL DETAILS</div>
+        <div class="personal-details-grid">
+            <div class="label-bold">Father's Name</div>
+            <div class="colon">:</div>
+            <div class="data-field"><span class="editable-field" contenteditable="true">Father Name</span></div>
+
+            <div class="label-bold">Date of Birth</div>
+            <div class="colon">:</div>
+            <div class="data-field"><span class="editable-field" contenteditable="true">01 Jan 2000</span></div>
+
+            <div class="label-bold">Gender</div>
+            <div class="colon">:</div>
+            <div class="data-field"><span class="editable-field" contenteditable="true">Male/Female</span></div>
+
+            <div class="label-bold">Nationality</div>
+            <div class="colon">:</div>
+            <div class="data-field"><span class="editable-field" contenteditable="true">Indian</span></div>
+
+            <div class="label-bold">Languages Known</div>
+            <div class="colon">:</div>
+            <div class="data-field"><span class="editable-field" contenteditable="true">Hindi, English</span></div>
+
+            <div class="label-bold">Hobbies</div>
+            <div class="colon">:</div>
+            <div class="data-field"><span class="editable-field" contenteditable="true">Reading, Coding</span></div>
+        </div>
+
+        <div class="section-title" style="margin-top: 16px;">DECLARATION</div>
+        <div class="declaration-text editable-field" contenteditable="true" style="display:block;">
+            I hereby declare that the information provided above is true to the best of my knowledge and belief.
+        </div>
+
+        <div class="footer-sign">
+            <div><span class="label-bold">Date:</span> <span class="editable-field" contenteditable="true" id="outDate">DD/MM/YYYY</span></div>
+            <div><span class="label-bold">Sign:</span> <span class="editable-field" contenteditable="true">Your Name</span></div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('outDate').innerText = new Date().toLocaleDateString();
+
+        function changeHeadingColor(color) {
+            document.documentElement.style.setProperty('--heading-color', color);
+        }
+
+        function changeHeadingOpacity(value) {
+            document.documentElement.style.setProperty('--heading-opacity', value);
+        }
+
+        function changePhotoBorderColor(color) {
+            document.documentElement.style.setProperty('--photo-border-color', color);
+        }
+
+        function syncData(inputElement, targetId) {
+            const targetElement = document.getElementById(targetId);
+            if (targetElement) targetElement.innerText = inputElement.value;
+        }
+
+        function previewImage(event) {
+            const reader = new FileReader();
+            reader.onload = function(){
+                const output = document.getElementById('outPhoto');
+                output.style.backgroundImage = `url(${reader.result})`;
+                output.innerHTML = '';
+            };
+            reader.readAsDataURL(event.target.files[0]);
+        }
+
+        function addEducationRow() {
+            const exam = document.getElementById('eduExam').value || 'Exam Name';
+            const board = document.getElementById('eduBoard').value || 'Board';
+            const year = document.getElementById('eduYear').value || 'Year';
+            const perc = document.getElementById('eduPerc').value || '%';
+
+            const tbody = document.getElementById('educationTableBody');
+            const newRow = document.createElement('tr');
+            newRow.innerHTML = `
+                <td><span class="editable-field" contenteditable="true">${exam}</span></td>
+                <td><span class="editable-field" contenteditable="true">${board}</span></td>
+                <td><span class="editable-field" contenteditable="true">${year}</span></td>
+                <td><span class="editable-field" contenteditable="true">${perc}</span></td>
+            `;
+            tbody.appendChild(newRow);
+
+            document.getElementById('eduExam').value = '';
+            document.getElementById('eduBoard').value = '';
+            document.getElementById('eduYear').value = '';
+            document.getElementById('eduPerc').value = '';
+        }
+
+        // ---------- A4 FIX: preserve exact aspect ratio, no text stretch ----------
+
+        function downloadPDF() {
+            const { jsPDF } = window.jspdf;
+            const element = document.getElementById('resumePreview');
+            
+            // Hide dashed borders
+            const editables = document.querySelectorAll('.editable-field');
+            editables.forEach(el => el.style.borderBottom = 'none');
+
+            // Temporarily fix the element to its A4 size (already 210mm x 297mm, but ensure)
+            const originalWidth = element.style.width;
+            const originalMinHeight = element.style.minHeight;
+            const originalPadding = element.style.padding;
+            
+            element.style.width = '210mm';
+            element.style.minHeight = '297mm';
+            element.style.padding = '20mm 18mm'; // keep same as CSS
+
+            // Use scale 3 for high resolution
+            html2canvas(element, { 
+                scale: 3,
+                useCORS: true,
+                logging: false,
+                backgroundColor: '#ffffff',
+                allowTaint: false,
+                // ensure canvas dimensions match element dimensions
+                width: element.offsetWidth,
+                height: element.offsetHeight
+            }).then(canvas => {
+                // A4 dimensions in mm
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const pdfWidth = pdf.internal.pageSize.getWidth();   // 210 mm
+                const pdfHeight = pdf.internal.pageSize.getHeight(); // 297 mm
+
+                // Calculate image dimensions to fit A4 while preserving aspect ratio
+                const canvasAspect = canvas.width / canvas.height;
+                const pdfAspect = pdfWidth / pdfHeight;
+
+                let imgWidth, imgHeight;
+                if (canvasAspect > pdfAspect) {
+                    // wider than A4: fit width, add vertical margins
+                    imgWidth = pdfWidth;
+                    imgHeight = pdfWidth / canvasAspect;
+                } else {
+                    // taller than A4: fit height, add horizontal margins
+                    imgHeight = pdfHeight;
+                    imgWidth = pdfHeight * canvasAspect;
+                }
+
+                // Center the image on the A4 page
+                const offsetX = (pdfWidth - imgWidth) / 2;
+                const offsetY = (pdfHeight - imgHeight) / 2;
+
+                const imgData = canvas.toDataURL('image/png');
+                pdf.addImage(imgData, 'PNG', offsetX, offsetY, imgWidth, imgHeight);
+                pdf.save('my-resume.pdf');
+
+                // Restore
+                element.style.width = originalWidth;
+                element.style.minHeight = originalMinHeight;
+                element.style.padding = originalPadding;
+                editables.forEach(el => el.style.borderBottom = '1px dashed transparent');
+            }).catch(err => {
+                console.error('PDF error:', err);
+                element.style.width = originalWidth;
+                element.style.minHeight = originalMinHeight;
+                element.style.padding = originalPadding;
+                editables.forEach(el => el.style.borderBottom = '1px dashed transparent');
+            });
+        }
+
+        function downloadPNG() {
+            const element = document.getElementById('resumePreview');
+            const editables = document.querySelectorAll('.editable-field');
+            editables.forEach(el => el.style.borderBottom = 'none');
+
+            const originalWidth = element.style.width;
+            const originalMinHeight = element.style.minHeight;
+            const originalPadding = element.style.padding;
+            
+            element.style.width = '210mm';
+            element.style.minHeight = '297mm';
+            element.style.padding = '20mm 18mm';
+
+            html2canvas(element, { 
+                scale: 3,
+                useCORS: true,
+                logging: false,
+                backgroundColor: '#ffffff',
+                allowTaint: false,
+                width: element.offsetWidth,
+                height: element.offsetHeight
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = 'my-resume.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+
+                element.style.width = originalWidth;
+                element.style.minHeight = originalMinHeight;
+                element.style.padding = originalPadding;
+                editables.forEach(el => el.style.borderBottom = '1px dashed transparent');
+            }).catch(err => {
+                console.error('PNG error:', err);
+                element.style.width = originalWidth;
+                element.style.minHeight = originalMinHeight;
+                element.style.padding = originalPadding;
+                editables.forEach(el => el.style.borderBottom = '1px dashed transparent');
+            });
+        }
+    </script>
+</body>
+</html>

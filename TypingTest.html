@@ -1,0 +1,1646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <title>Typing Test | Lite Pro Tools</title>
+
+  <link rel="icon" type="image/x-icon" href="favicon/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png">
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', 'Poppins', system-ui, -apple-system, sans-serif;
+      transition: background-color 0.25s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
+    }
+
+    :root {
+      --bg-gradient: linear-gradient(145deg, #f8f0ff 0%, #f0e6ff 100%);
+      --card-bg: rgba(255, 255, 255, 0.78);
+      --card-border: rgba(220, 200, 255, 0.4);
+      --card-shadow: 0 30px 60px -15px rgba(90, 40, 140, 0.25),
+                     0 0 0 1px rgba(200, 170, 255, 0.25) inset;
+      --text-primary: #2c1a4e;
+      --text-secondary: #7a5fa8;
+      --accent: #6a3de8;
+      --accent-light: #a884ff;
+      --accent-soft: #ede4ff;
+      --sentence-pending: #7a5fa8;
+      --sentence-correct: #059669;
+      --sentence-correct-bg: rgba(16, 185, 129, 0.15);
+      --sentence-incorrect: #dc2626;
+      --sentence-incorrect-bg: rgba(239, 68, 68, 0.15);
+      --input-bg: #ffffff;
+      --input-border: #d9c8ff;
+      --input-text: #2c1a4e;
+      --input-focus: #6a3de8;
+      --stats-bg: rgba(255, 255, 255, 0.7);
+      --stat-label: #7a5fa8;
+      --stat-value: #3b1f7a;
+      --popup-correct: #059669;
+      --popup-incorrect: #dc2626;
+      --popup-lower: #2563eb;
+      --popup-upper: #d97706;
+      --popup-sentence: #7c3aed;
+      --popup-mixed: #db2777;
+      --result-bg: rgba(255, 255, 255, 0.98);
+      --result-border: #d9c8ff;
+      --result-shadow: 0 40px 80px -20px rgba(90, 40, 140, 0.5);
+    }
+
+    body.dark {
+      --bg-gradient: linear-gradient(145deg, #1a1030 0%, #0f0820 100%);
+      --card-bg: rgba(30, 20, 50, 0.7);
+      --card-border: rgba(160, 130, 255, 0.25);
+      --card-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.7),
+                     0 0 0 1px rgba(160, 130, 255, 0.2) inset;
+      --text-primary: #ede4ff;
+      --text-secondary: #b5a3d8;
+      --accent: #a884ff;
+      --accent-light: #c9b6ff;
+      --accent-soft: rgba(160, 130, 255, 0.15);
+      --sentence-pending: #b5a3d8;
+      --sentence-correct: #6ee7b7;
+      --sentence-correct-bg: rgba(16, 185, 129, 0.25);
+      --sentence-incorrect: #fca5a5;
+      --sentence-incorrect-bg: rgba(239, 68, 68, 0.25);
+      --input-bg: #1a1030;
+      --input-border: #3a2a5a;
+      --input-text: #ede4ff;
+      --input-focus: #a884ff;
+      --stats-bg: rgba(0, 0, 0, 0.3);
+      --stat-label: #b5a3d8;
+      --stat-value: #c9b6ff;
+      --popup-correct: #6ee7b7;
+      --popup-incorrect: #fca5a5;
+      --popup-lower: #60a5fa;
+      --popup-upper: #fbbf24;
+      --popup-sentence: #a78bfa;
+      --popup-mixed: #f472b6;
+      --result-bg: rgba(30, 20, 50, 0.98);
+      --result-border: #3a2a5a;
+      --result-shadow: 0 40px 80px -20px rgba(0, 0, 0, 0.9);
+    }
+
+    body {
+      min-height: 100vh;
+      background: var(--bg-gradient);
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* ---------- HEADER ---------- */
+    .header {
+      width: 100%;
+      max-width: 1000px;
+      background: rgba(255, 255, 255, 0.78);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-radius: 56px 56px 40px 40px;
+      padding: 1.8rem 2rem 1.5rem;
+      box-shadow: 0 30px 60px -15px rgba(90, 40, 140, 0.25),
+                  0 0 0 1px rgba(200, 170, 255, 0.25) inset;
+      border: 1px solid rgba(220, 200, 255, 0.4);
+      margin-bottom: 1.5rem;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+
+    body.dark .header {
+      background: rgba(30, 20, 50, 0.7);
+      border-color: rgba(160, 130, 255, 0.25);
+      box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.7),
+                  0 0 0 1px rgba(160, 130, 255, 0.2) inset;
+    }
+
+    .header:hover {
+      box-shadow: 0 35px 70px -15px rgba(90, 40, 140, 0.35);
+    }
+
+    .header .brand {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.9rem;
+      flex-wrap: wrap;
+    }
+
+    .logo-icon {
+      width: 58px;
+      height: 58px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, #6a3de8 0%, #a884ff 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      box-shadow: 0 8px 22px rgba(106, 61, 232, 0.35),
+                  0 0 0 3px rgba(255, 255, 255, 0.6) inset;
+      flex-shrink: 0;
+      overflow: hidden;
+      transition: transform 0.3s ease;
+    }
+
+    .logo-icon:hover {
+      transform: scale(1.08) rotate(-3deg);
+    }
+
+    .logo-icon::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(45deg, transparent 40%, rgba(255,255,255,0.35) 50%, transparent 60%);
+      animation: shine 3s infinite;
+    }
+
+    @keyframes shine {
+      0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+      100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+    }
+
+    .logo-icon i {
+      color: #fff;
+      font-size: 24px;
+      z-index: 2;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+    }
+
+    .logo-icon .fa-bolt {
+      position: absolute;
+      font-size: 12px !important;
+      color: #ffd700 !important;
+      top: 7px;
+      right: 7px;
+      z-index: 3;
+      filter: drop-shadow(0 0 4px rgba(255, 215, 0, 0.8)) !important;
+      animation: zap 2s infinite;
+    }
+
+    @keyframes zap {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.6; transform: scale(0.85); }
+    }
+
+    .header h1 {
+      font-size: 2.1rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #3b1f7a, #7b4cff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      letter-spacing: -0.3px;
+    }
+
+    body.dark .header h1 {
+      background: linear-gradient(135deg, #ede4ff, #c9b6ff);
+      -webkit-background-clip: text;
+      background-clip: text;
+    }
+
+    .header h1 small {
+      font-size: 0.8rem;
+      font-weight: 400;
+      background: #ede4ff;
+      padding: 0.2rem 1rem;
+      border-radius: 60px;
+      color: #5b3b9e;
+      margin-left: 0.4rem;
+      background-clip: unset;
+      -webkit-background-clip: unset;
+    }
+
+    body.dark .header h1 small {
+      background: rgba(160, 130, 255, 0.2);
+      color: #c9b6ff;
+    }
+
+    .header .subtitle {
+      color: var(--text-secondary);
+      margin-top: 0.4rem;
+      font-weight: 400;
+      font-size: 0.9rem;
+      letter-spacing: 0.5px;
+    }
+
+    .privacy-mini {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 0.8rem;
+      background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+      border-left: 4px solid #10b981;
+      border-radius: 40px;
+      padding: 0.35rem 1rem;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: #047857;
+      border: 1px solid #a7f3d0;
+    }
+
+    .privacy-mini i { color: #059669; }
+
+    /* ---------- MAIN CARD ---------- */
+    .glass-card {
+      max-width: 1000px;
+      width: 100%;
+      background: var(--card-bg);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-radius: 48px;
+      border: 1px solid var(--card-border);
+      box-shadow: var(--card-shadow);
+      padding: 2rem 2.2rem;
+      transition: all 0.3s ease;
+    }
+
+    .glass-card:hover {
+      box-shadow: 0 40px 80px -20px rgba(90, 40, 140, 0.35),
+                  0 0 0 1px rgba(200, 170, 255, 0.3) inset;
+    }
+
+    /* ---------- TOP PANEL ---------- */
+    .top-panel {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.2rem;
+      gap: 1rem;
+    }
+
+    .timer-setter {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.6rem 0.8rem;
+      background: rgba(255, 255, 255, 0.7);
+      padding: 0.5rem 1rem;
+      border-radius: 60px;
+      border: 1.5px solid var(--input-border);
+      box-shadow: 0 6px 14px -8px rgba(106, 61, 232, 0.2);
+    }
+
+    body.dark .timer-setter {
+      background: rgba(0, 0, 0, 0.25);
+    }
+
+    .timer-setter label {
+      color: var(--text-secondary);
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+
+    .timer-setter input {
+      width: 70px;
+      background: var(--input-bg);
+      border: 1.5px solid var(--input-border);
+      border-radius: 40px;
+      padding: 0.5rem 0.6rem;
+      color: var(--input-text);
+      font-weight: 700;
+      font-size: 1rem;
+      text-align: center;
+      outline: none;
+      transition: 0.2s;
+      font-family: inherit;
+    }
+
+    .timer-setter input:focus {
+      border-color: var(--input-focus);
+      box-shadow: 0 0 0 3px rgba(160, 120, 255, 0.2);
+    }
+
+    .unit-toggle {
+      display: flex;
+      background: var(--input-bg);
+      border-radius: 40px;
+      border: 1.5px solid var(--input-border);
+      overflow: hidden;
+    }
+
+    .unit-toggle button {
+      background: transparent;
+      border: none;
+      padding: 0.5rem 0.9rem;
+      font-weight: 700;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: 0.2s;
+      font-family: inherit;
+    }
+
+    .unit-toggle button.active {
+      background: linear-gradient(135deg, #6a3de8, #a884ff);
+      color: white;
+    }
+
+    /* ===== CASE SELECTOR ===== */
+    .case-setter {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.6rem 0.8rem;
+      background: rgba(255, 255, 255, 0.7);
+      padding: 0.5rem 1rem;
+      border-radius: 60px;
+      border: 1.5px solid var(--input-border);
+      box-shadow: 0 6px 14px -8px rgba(106, 61, 232, 0.2);
+    }
+
+    body.dark .case-setter {
+      background: rgba(0, 0, 0, 0.25);
+    }
+
+    .case-setter label {
+      color: var(--text-secondary);
+      font-weight: 700;
+      font-size: 0.95rem;
+      white-space: nowrap;
+    }
+
+    .case-toggle {
+      display: flex;
+      background: var(--input-bg);
+      border-radius: 40px;
+      border: 1.5px solid var(--input-border);
+      overflow: hidden;
+      flex-wrap: wrap;
+    }
+
+    .case-toggle button {
+      background: transparent;
+      border: none;
+      padding: 0.45rem 0.8rem;
+      font-weight: 700;
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: 0.2s;
+      font-family: inherit;
+      white-space: nowrap;
+    }
+
+    .case-toggle button.active {
+      color: white;
+    }
+
+    .case-toggle button[data-case="lower"].active {
+      background: linear-gradient(135deg, #2563eb, #60a5fa);
+    }
+    .case-toggle button[data-case="upper"].active {
+      background: linear-gradient(135deg, #d97706, #fbbf24);
+    }
+    .case-toggle button[data-case="sentence"].active {
+      background: linear-gradient(135deg, #7c3aed, #a78bfa);
+    }
+    .case-toggle button[data-case="mixed"].active {
+      background: linear-gradient(135deg, #db2777, #f472b6);
+    }
+
+    .apply-btn {
+      background: linear-gradient(135deg, #6a3de8, #a884ff);
+      border: none;
+      border-radius: 40px;
+      padding: 0.5rem 1.3rem;
+      color: white;
+      font-weight: 700;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: 0.2s;
+      font-family: inherit;
+      box-shadow: 0 6px 16px -6px rgba(106, 61, 232, 0.5);
+    }
+
+    .apply-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 22px -8px rgba(106, 61, 232, 0.6);
+    }
+
+    .theme-toggle {
+      background: rgba(255, 255, 255, 0.7);
+      border: 1.5px solid var(--input-border);
+      border-radius: 50%;
+      width: 42px;
+      height: 42px;
+      color: var(--text-primary);
+      font-weight: 700;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+    }
+
+    body.dark .theme-toggle {
+      background: rgba(0, 0, 0, 0.25);
+    }
+
+    .theme-toggle:hover {
+      background: linear-gradient(135deg, #6a3de8, #a884ff);
+      color: white;
+      transform: scale(1.08) rotate(15deg);
+      border-color: transparent;
+    }
+
+    .live-timer {
+      background: linear-gradient(135deg, #ede4ff, #f5eeff);
+      border-radius: 60px;
+      padding: 0.4rem 1.6rem;
+      border: 1.5px solid #d9c8ff;
+      box-shadow: 0 8px 20px -10px rgba(106, 61, 232, 0.3);
+      display: flex;
+      align-items: baseline;
+      gap: 0.3rem;
+    }
+
+    body.dark .live-timer {
+      background: linear-gradient(135deg, #2a1a4a, #1a1030);
+      border-color: #3a2a5a;
+    }
+
+    .live-timer span {
+      font-size: 2rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #3b1f7a, #7b4cff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      letter-spacing: 1px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    body.dark .live-timer span {
+      background: linear-gradient(135deg, #ede4ff, #c9b6ff);
+      -webkit-background-clip: text;
+      background-clip: text;
+    }
+
+    .live-timer .unit-label {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--text-secondary);
+    }
+
+    /* ---------- SENTENCE DISPLAY ---------- */
+    .text-display {
+      background: linear-gradient(145deg, #faf6ff, #f2e9ff);
+      border-radius: 32px;
+      padding: 1.5rem 1.7rem;
+      margin-bottom: 1.3rem;
+      border: 1.5px solid rgba(200, 170, 255, 0.35);
+      box-shadow: 0 12px 28px -14px rgba(106, 61, 232, 0.25),
+                  0 0 0 1px rgba(255, 255, 255, 0.6) inset;
+      max-height: 220px;
+      overflow-y: auto;
+      scrollbar-width: thin;
+    }
+
+    body.dark .text-display {
+      background: linear-gradient(145deg, #1a1030, #0f0820);
+      box-shadow: 0 12px 28px -14px rgba(0, 0, 0, 0.6),
+                  0 0 0 1px rgba(160, 130, 255, 0.1) inset;
+    }
+
+    .text-display::-webkit-scrollbar {
+      width: 6px;
+    }
+    .text-display::-webkit-scrollbar-thumb {
+      background: var(--input-border);
+      border-radius: 10px;
+    }
+
+    .sentence {
+      font-size: 1.45rem;
+      line-height: 1.8;
+      font-weight: 500;
+      color: var(--sentence-pending);
+      word-break: break-word;
+      letter-spacing: 0.3px;
+      min-height: 90px;
+    }
+
+    .sentence span {
+      display: inline-block;
+      transition: color 0.15s, background 0.15s, transform 0.1s;
+      border-radius: 6px;
+      padding: 0 1px;
+    }
+
+    .sentence span.correct {
+      color: var(--sentence-correct);
+      background: var(--sentence-correct-bg);
+      font-weight: 600;
+    }
+
+    .sentence span.incorrect {
+      color: var(--sentence-incorrect);
+      background: var(--sentence-incorrect-bg);
+      text-decoration: underline wavy var(--sentence-incorrect);
+      font-weight: 600;
+    }
+
+    .sentence span.pending {
+      color: var(--sentence-pending);
+    }
+
+    /* ===== POPUP CHAR ===== */
+    .popup-char {
+      position: fixed;
+      pointer-events: none;
+      font-size: 1.6rem;
+      font-weight: 800;
+      z-index: 9999;
+      animation: popUpFade 0.45s ease-out forwards;
+      text-shadow: 0 0 8px currentColor;
+    }
+
+    .popup-char.correct-pop { color: var(--popup-correct); }
+    .popup-char.incorrect-pop { color: var(--popup-incorrect); }
+
+    .popup-char.case-lower { color: var(--popup-lower); }
+    .popup-char.case-upper { color: var(--popup-upper); }
+    .popup-char.case-sentence { color: var(--popup-sentence); }
+    .popup-char.case-mixed { color: var(--popup-mixed); }
+
+    @keyframes popUpFade {
+      0% { opacity: 1; transform: translateY(0) scale(1); }
+      100% { opacity: 0; transform: translateY(-40px) scale(0.8); }
+    }
+
+    /* ---------- INPUT ---------- */
+    .input-area {
+      margin-bottom: 1.2rem;
+    }
+
+    textarea {
+      width: 100%;
+      background: var(--input-bg);
+      border: 2px solid var(--input-border);
+      border-radius: 28px;
+      padding: 1.1rem 1.4rem;
+      font-size: 1.2rem;
+      color: var(--input-text);
+      resize: none;
+      outline: none;
+      font-family: 'Segoe UI', 'Poppins', system-ui, sans-serif;
+      font-weight: 500;
+      letter-spacing: 0.3px;
+      line-height: 1.5;
+      transition: 0.15s;
+      box-shadow: 0 8px 20px -12px rgba(106, 61, 232, 0.2);
+      max-height: 140px;
+    }
+
+    textarea:focus {
+      border-color: var(--input-focus);
+      box-shadow: 0 0 0 4px rgba(160, 120, 255, 0.2),
+                  0 8px 20px -10px rgba(106, 61, 232, 0.3);
+    }
+
+    textarea:disabled {
+      opacity: 0.6;
+    }
+
+    /* ---------- BOTTOM BAR ---------- */
+    .bottom-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.8rem;
+    }
+
+    .stats {
+      display: flex;
+      gap: 1.5rem;
+      background: var(--stats-bg);
+      padding: 0.6rem 1.6rem;
+      border-radius: 60px;
+      border: 1.5px solid var(--input-border);
+      box-shadow: 0 6px 14px -8px rgba(106, 61, 232, 0.15);
+    }
+
+    .stat-item {
+      display: flex;
+      align-items: baseline;
+      gap: 0.5rem;
+    }
+
+    .stat-label {
+      color: var(--stat-label);
+      font-weight: 700;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    .stat-value {
+      background: linear-gradient(135deg, #3b1f7a, #7b4cff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      font-weight: 800;
+      font-size: 1.5rem;
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+    }
+
+    body.dark .stat-value {
+      background: linear-gradient(135deg, #ede4ff, #c9b6ff);
+      -webkit-background-clip: text;
+      background-clip: text;
+    }
+
+    .reset-btn {
+      background: linear-gradient(135deg, #6a3de8, #a884ff);
+      border: none;
+      border-radius: 60px;
+      padding: 0.75rem 1.8rem;
+      color: white;
+      font-weight: 700;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: inherit;
+      box-shadow: 0 8px 20px -8px rgba(106, 61, 232, 0.5);
+    }
+
+    .reset-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 14px 28px -10px rgba(106, 61, 232, 0.6);
+    }
+
+    .reset-btn:active {
+      transform: translateY(1px) scale(0.98);
+    }
+
+    /* ---------- RESULT OVERLAY ---------- */
+    .result-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(44, 26, 78, 0.5);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 10000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s ease;
+      padding: 1.5rem;
+    }
+
+    .result-overlay.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .result-card {
+      background: var(--result-bg);
+      border: 1.5px solid var(--result-border);
+      border-radius: 48px;
+      padding: 2.5rem 3rem;
+      max-width: 560px;
+      width: 100%;
+      box-shadow: var(--result-shadow);
+      text-align: center;
+      transform: scale(0.9) translateY(20px);
+      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .result-overlay.show .result-card {
+      transform: scale(1) translateY(0);
+    }
+
+    .result-emoji {
+      font-size: 3.5rem;
+      margin-bottom: 0.5rem;
+      display: block;
+      animation: bounce 1s ease infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .result-title {
+      font-size: 2rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #3b1f7a, #7b4cff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      margin-bottom: 0.3rem;
+    }
+
+    body.dark .result-title {
+      background: linear-gradient(135deg, #ede4ff, #c9b6ff);
+      -webkit-background-clip: text;
+      background-clip: text;
+    }
+
+    .result-subtitle {
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      margin-bottom: 1.8rem;
+      font-weight: 500;
+    }
+
+    .result-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .result-item {
+      background: linear-gradient(145deg, #faf6ff, #f2e9ff);
+      border-radius: 24px;
+      padding: 1rem 0.8rem;
+      border: 1.5px solid rgba(200, 170, 255, 0.35);
+      transition: transform 0.2s;
+    }
+
+    body.dark .result-item {
+      background: linear-gradient(145deg, #1a1030, #0f0820);
+    }
+
+    .result-item:hover {
+      transform: translateY(-4px);
+    }
+
+    .result-item .result-label {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--stat-label);
+      font-weight: 700;
+      margin-bottom: 0.4rem;
+      display: block;
+    }
+
+    .result-item .result-value {
+      font-size: 2rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #3b1f7a, #7b4cff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      line-height: 1;
+      display: block;
+      font-variant-numeric: tabular-nums;
+    }
+
+    body.dark .result-item .result-value {
+      background: linear-gradient(135deg, #ede4ff, #c9b6ff);
+      -webkit-background-clip: text;
+      background-clip: text;
+    }
+
+    .result-item .result-unit {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      font-weight: 600;
+    }
+
+    .result-message {
+      font-size: 1rem;
+      color: #059669;
+      font-weight: 700;
+      margin-bottom: 1.6rem;
+      padding: 0.8rem 1.2rem;
+      background: rgba(16, 185, 129, 0.1);
+      border: 1.5px solid rgba(16, 185, 129, 0.25);
+      border-radius: 60px;
+      display: inline-block;
+    }
+
+    .result-actions {
+      display: flex;
+      gap: 0.9rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .result-btn {
+      border: none;
+      border-radius: 60px;
+      padding: 0.85rem 2rem;
+      font-weight: 700;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: 0.2s;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: inherit;
+    }
+
+    .result-btn.primary {
+      background: linear-gradient(135deg, #6a3de8, #a884ff);
+      color: white;
+      box-shadow: 0 10px 24px -8px rgba(106, 61, 232, 0.5);
+    }
+
+    .result-btn.primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 16px 32px -10px rgba(106, 61, 232, 0.6);
+    }
+
+    .result-btn.secondary {
+      background: transparent;
+      color: var(--text-secondary);
+      border: 1.5px solid var(--input-border);
+    }
+
+    .result-btn.secondary:hover {
+      background: var(--accent-soft);
+      color: var(--accent);
+      transform: translateY(-3px);
+      border-color: var(--accent-light);
+    }
+
+    /* ---------- FOOTER ---------- */
+    .footer {
+      width: 100%;
+      max-width: 1000px;
+      text-align: center;
+      padding: 1.4rem 1.5rem;
+      background: rgba(255, 255, 255, 0.78);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-radius: 40px;
+      border: 1px solid rgba(220, 200, 255, 0.4);
+      box-shadow: 0 12px 28px -10px rgba(80, 40, 160, 0.08);
+      margin-top: 1.5rem;
+      color: #7a5fa8;
+      font-weight: 400;
+      font-size: 0.88rem;
+      transition: 0.3s ease;
+    }
+
+    body.dark .footer {
+      background: rgba(30, 20, 50, 0.7);
+      border-color: rgba(160, 130, 255, 0.25);
+      color: #b5a3d8;
+    }
+
+    .footer:hover {
+      border-color: #a884ff;
+      box-shadow: 0 16px 36px -12px rgba(106, 61, 232, 0.15);
+    }
+
+    .footer i { color: #6a3de8; }
+    body.dark .footer i { color: #a884ff; }
+
+    .footer .heart {
+      display: inline-block;
+      animation: pulse 1.8s infinite;
+      color: #ef4444;
+    }
+
+    .footer .privacy-note {
+      font-size: 0.75rem;
+      margin-top: 0.4rem;
+      color: #059669;
+      font-weight: 600;
+    }
+
+    .footer .privacy-note i { color: #059669; }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.15); }
+    }
+
+    /* ---------- RESPONSIVE ---------- */
+    @media (max-width: 700px) {
+      body { padding: 1rem; }
+      .header { padding: 1.4rem 1.2rem 1.2rem; border-radius: 40px 40px 30px 30px; }
+      .header h1 { font-size: 1.5rem; }
+      .header h1 small { font-size: 0.65rem; padding: 0.1rem 0.7rem; }
+      .header .subtitle { font-size: 0.78rem; }
+      .logo-icon { width: 48px; height: 48px; border-radius: 14px; }
+      .logo-icon i { font-size: 20px; }
+      .logo-icon .fa-bolt { font-size: 11px !important; top: 5px; right: 5px; }
+
+      .glass-card { padding: 1.5rem 1.2rem; border-radius: 36px; }
+      .sentence { font-size: 1.15rem; line-height: 1.6; }
+      textarea { font-size: 1rem; padding: 1rem; border-radius: 22px; }
+      .live-timer span { font-size: 1.5rem; }
+      .live-timer { padding: 0.3rem 1.2rem; }
+      .stats { gap: 0.8rem; padding: 0.5rem 1.1rem; }
+      .stat-value { font-size: 1.2rem; }
+      .top-panel { flex-direction: column; align-items: stretch; }
+      .timer-setter { justify-content: center; }
+      .case-setter { justify-content: center; }
+      .bottom-bar { flex-direction: column; align-items: stretch; }
+      .stats { justify-content: center; }
+      .reset-btn { justify-content: center; }
+      .result-card { padding: 1.8rem 1.4rem; border-radius: 36px; }
+      .result-grid { grid-template-columns: 1fr 1fr; gap: 0.7rem; }
+      .result-item .result-value { font-size: 1.6rem; }
+      .result-title { font-size: 1.5rem; }
+      .footer { padding: 1rem; font-size: 0.78rem; border-radius: 30px; }
+    }
+
+    @media (max-width: 400px) {
+      .header h1 { font-size: 1.25rem; }
+      .header h1 small { display: none; }
+      .result-grid { grid-template-columns: 1fr; }
+      .unit-toggle button { padding: 0.4rem 0.7rem; font-size: 0.78rem; }
+      .timer-setter input { width: 55px; font-size: 0.9rem; }
+      .sentence { font-size: 1rem; }
+      .case-toggle button { padding: 0.35rem 0.55rem; font-size: 0.7rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ========== HEADER ========== -->
+  <header class="header">
+    <div class="brand">
+      <div class="logo-icon">
+        <i class="fas fa-keyboard"></i>
+        <i class="fas fa-bolt fa-bolt"></i>
+      </div>
+      <h1>
+        Typing Test
+        <small>Typing Speed Test</small>
+      </h1>
+    </div>
+    <p class="subtitle"><i class="fas fa-star" style="color:#ffa200;"></i> Type · Measure · Improve</p>
+    
+  </header>
+
+  <!-- ========== MAIN CARD ========== -->
+  <div class="glass-card">
+
+    <!-- TOP PANEL : TIMER -->
+    <div class="top-panel">
+      <div class="timer-setter">
+        <label for="timerInput"><i class="fas fa-clock"></i></label>
+        <input type="number" id="timerInput" min="1" max="60" value="1" step="1">
+        <div class="unit-toggle">
+          <button id="unitSec" class="active">sec</button>
+          <button id="unitMin">min</button>
+        </div>
+        <button id="applyTimerBtn" class="apply-btn"><i class="fas fa-check"></i> Set</button>
+        <button id="themeToggle" class="theme-toggle" title="Toggle theme"><i class="fas fa-moon"></i></button>
+      </div>
+      <div class="live-timer">
+        <span id="timerDisplay">60</span><span class="unit-label" id="timerUnitLabel">s</span>
+      </div>
+    </div>
+
+    <!-- CASE SELECTOR -->
+    <div class="top-panel" style="margin-bottom:1rem;">
+      <div class="case-setter">
+        <label><i class="fas fa-font"></i> Letter Case</label>
+        <div class="case-toggle" id="caseToggle">
+          <button data-case="lower" class="active">lower</button>
+          <button data-case="upper">UPPER</button>
+          <button data-case="sentence">Sentence</button>
+          <button data-case="mixed">MiXeD</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SENTENCE DISPLAY (badge hata diya) -->
+    <div class="text-display">
+      <div id="sentenceContainer" class="sentence"></div>
+    </div>
+
+    <!-- INPUT AREA -->
+    <div class="input-area">
+      <textarea id="userInput" rows="3" placeholder="Start typing here..." spellcheck="false" autocomplete="off"></textarea>
+    </div>
+
+    <!-- BOTTOM BAR -->
+    <div class="bottom-bar">
+      <div class="stats">
+        <div class="stat-item">
+          <span class="stat-label">WPM</span>
+          <span id="wpmValue" class="stat-value">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">ACC</span>
+          <span id="accuracyValue" class="stat-value">100%</span>
+        </div>
+      </div>
+      <button class="reset-btn" id="resetButton">
+        <i class="fas fa-redo-alt"></i> New / Reset
+      </button>
+    </div>
+  </div>
+
+  <!-- RESULT OVERLAY -->
+  <div class="result-overlay" id="resultOverlay">
+    <div class="result-card">
+      <span class="result-emoji" id="resultEmoji">🎉</span>
+      <div class="result-title">Test Complete!</div>
+      <div class="result-subtitle" id="resultSubtitle">Here is your typing performance</div>
+
+      <div class="result-grid">
+        <div class="result-item">
+          <span class="result-label">Words / Min</span>
+          <span class="result-value" id="finalWpm">0</span>
+          <span class="result-unit">WPM</span>
+        </div>
+        <div class="result-item">
+          <span class="result-label">Accuracy</span>
+          <span class="result-value" id="finalAccuracy">0%</span>
+          <span class="result-unit">correct</span>
+        </div>
+        <div class="result-item">
+          <span class="result-label">Characters</span>
+          <span class="result-value" id="finalChars">0</span>
+          <span class="result-unit">typed</span>
+        </div>
+        <div class="result-item">
+          <span class="result-label">Correct</span>
+          <span class="result-value" id="finalCorrect">0</span>
+          <span class="result-unit">chars</span>
+        </div>
+      </div>
+
+      <div class="result-message" id="resultMessage">Great job! Keep practicing ✨</div>
+
+      <div class="result-actions">
+        <button class="result-btn primary" id="tryAgainBtn">
+          <i class="fas fa-redo-alt"></i> Try Again
+        </button>
+        <button class="result-btn secondary" id="closeResultBtn">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== FOOTER ========== -->
+  <footer class="footer">
+    <p>© <span id="year"></span> Lite Pro Tools · Made with Love <span class="heart">❤️</spam></p>
+   
+  </footer>
+
+  <script>
+    (function() {
+      const SENTENCE_POOL = [
+        "The quick brown fox jumps over the lazy dog near the riverbank",
+        "A journey of a thousand miles begins with a single step forward",
+        "In the middle of difficulty lies opportunity waiting to be found",
+        "The only way to do great work is to love what you do every day",
+        "Life is what happens when you're busy making other plans for tomorrow",
+        "The future belongs to those who believe in the beauty of their dreams",
+        "Not all those who wander are lost some are just exploring the world",
+        "The best time to plant a tree was twenty years ago the second best is now",
+        "Success is not final failure is not fatal it is the courage to continue",
+        "You miss one hundred percent of the shots you don't take in life",
+        "Happiness is not something ready made it comes from your own actions",
+        "The mind is everything what you think you become eventually",
+        "It does not matter how slowly you go as long as you do not stop",
+        "The only limit to our realization of tomorrow is our doubts of today",
+        "Everything you can imagine is real if you believe it strongly enough",
+        "Simplicity is the ultimate sophistication in design and in life",
+        "To live is the rarest thing in the world most people exist that is all",
+        "The truth is rarely pure and never simple but it is always worth seeking",
+        "We are what we repeatedly do excellence is not an act but a habit",
+        "The journey of a lifetime starts with a single confident step",
+        "A room without books is like a body without a soul empty and dark",
+        "You must be the change you wish to see in the world around you",
+        "The purpose of our lives is to be happy and to help others smile",
+        "Two roads diverged in a wood and I took the one less traveled by",
+        "The best and most beautiful things in the world cannot be seen or touched",
+        "In three words I can sum up everything I've learned about life it goes on",
+        "If you want to lift yourself up lift up someone else first",
+        "The only thing we have to fear is fear itself nothing more",
+        "It always seems impossible until it's done so keep pushing forward",
+        "The harder I work the luckier I seem to get in every situation",
+        "You can never cross the ocean until you have courage to lose sight of shore",
+        "The secret of getting ahead is getting started right now",
+        "Believe you can and you're halfway there the rest is action",
+        "The man who does not read good books has no advantage over the man who can't read",
+        "Knowledge speaks but wisdom listens so be quiet and learn",
+        "The greatest glory in living lies not in never falling but in rising every time",
+        "You only live once but if you do it right once is enough",
+        "The way to get started is to quit talking and begin doing",
+        "Your time is limited don't waste it living someone else's life",
+        "If life were predictable it would cease to be life and be without flavor",
+        "The most common way people give up their power is by thinking they don't have any",
+        "The future depends on what you do today not tomorrow",
+        "Do not go where the path may lead go instead where there is no path",
+        "The only person you are destined to become is the person you decide to be",
+        "You become what you believe so choose your beliefs carefully",
+        "The two most important days in your life are the day you are born and the day you find out why",
+        "The best revenge is massive success so focus on your own growth",
+        "When you reach the end of your rope tie a knot in it and hang on",
+        "The difference between ordinary and extraordinary is that little extra",
+        "Don't watch the clock do what it does keep going steadily",
+        "The only place where success comes before work is in the dictionary",
+        "The man who has confidence in himself gains the confidence of others",
+        "You are never too old to set another goal or to dream a new dream",
+        "The best way to predict the future is to create it yourself",
+        "The only thing standing between you and your goal is the story you keep telling yourself",
+        "It's not whether you get knocked down it's whether you get up again",
+        "The pain you feel today will be the strength you feel tomorrow",
+        "Don't let yesterday take up too much of today's precious energy",
+        "The secret to getting ahead is starting and the secret to starting is breaking tasks into small steps",
+        "A goal without a plan is just a wish floating in the wind",
+        "The only limit to our realization of tomorrow is our doubts of today",
+        "You don't have to be great to start but you have to start to be great",
+        "The successful warrior is the average man with laser-like focus",
+        "The best preparation for tomorrow is doing your best today",
+        "The only way to do great work is to love what you do every single day",
+        "If you can dream it you can achieve it with enough determination",
+        "The future belongs to those who prepare for it today",
+        "The only thing we have to fear is fear itself and fear is a liar",
+        "The best time to plant a tree was twenty years ago the second best time is now",
+        "The only person you should try to be better than is the person you were yesterday",
+        "The journey of a thousand miles begins with a single step so take it",
+        "The only way to fail is to give up before you succeed",
+        "The best way to find yourself is to lose yourself in the service of others",
+        "The only thing that overcomes hard luck is hard work",
+        "The only place where your dream becomes impossible is in your own thinking",
+        "The only thing that stands between you and your dream is the will to try"
+      ];
+
+      const extraSentences = [
+        "The sun rises in the east and sets in the west every single day",
+        "A river cuts through rock not because of its power but its persistence",
+        "The early bird catches the worm but the second mouse gets the cheese",
+        "You cannot shake hands with a clenched fist so open your heart",
+        "The best mirror is an old friend who tells you the truth always",
+        "A smooth sea never made a skilled sailor so embrace the storm",
+        "The flower that blooms in adversity is the rarest and most beautiful",
+        "What you do today can improve all your tomorrows in ways unknown",
+        "The only source of knowledge is experience so keep exploring life",
+        "A ship in harbor is safe but that is not what ships are built for",
+        "The greatest pleasure in life is doing what people say you cannot do",
+        "You must do the things you think you cannot do to grow stronger",
+        "The best way out is always through so keep moving forward boldly",
+        "A diamond is just a piece of charcoal that handled stress well",
+        "The two hardest things to say in life are hello for the first time and goodbye for the last",
+        "What we achieve inwardly will change outer reality in time best",
+        "The only journey is the one within so travel deep inside yourself",
+        "A word after a word after a word is power so choose them wisely",
+        "The best time for new beginnings is now not someday or later",
+        "You are never too small to make a difference in this world",
+        "The only way to have a friend is to be one first and foremost",
+        "A person who never made a mistake never tried anything new",
+        "The future has several names for the weak it is impossible",
+        "What lies behind us and what lies before us are tiny matters",
+        "The only true wisdom is in knowing you know nothing at all",
+        "A kind word is like a spring day that warms the coldest heart",
+        "The best and most beautiful things cannot be seen or touched",
+        "You must be the change you wish to see in the world today",
+        "The only thing that overcomes hard luck is hard work always",
+        "A goal without a plan is just a wish floating in the wind",
+        "The journey of a thousand miles begins with a single step",
+        "The only person you should try to be better than is yourself",
+        "The best way to predict the future is to create it yourself",
+        "The only limit to our realization of tomorrow is our doubts today",
+        "You don't have to be great to start but you have to start",
+        "The successful warrior is the average man with laser focus",
+        "The best preparation for tomorrow is doing your best today",
+        "If you can dream it you can achieve it with determination",
+        "The future belongs to those who prepare for it today",
+        "The only thing we have to fear is fear itself and fear lies",
+        "The best time to plant a tree was twenty years ago indeed",
+        "The only person you are destined to become is your choice",
+        "The only thing standing between you and your goal is fear",
+        "It's not whether you get knocked down it's whether you get up",
+        "The pain you feel today will be the strength you feel tomorrow",
+        "Don't let yesterday take up too much of today's energy",
+        "The secret to getting ahead is starting and breaking tasks down",
+        "A goal without a plan is just a wish floating in the wind",
+        "The only limit to our realization of tomorrow is our doubts",
+        "You don't have to be great to start but you have to start"
+      ];
+
+      while (SENTENCE_POOL.length < 500) {
+        const idx = SENTENCE_POOL.length % extraSentences.length;
+        SENTENCE_POOL.push(extraSentences[idx]);
+      }
+      SENTENCE_POOL.length = 500;
+
+      const sentenceContainer = document.getElementById('sentenceContainer');
+      const userInput = document.getElementById('userInput');
+      const timerDisplay = document.getElementById('timerDisplay');
+      const timerUnitLabel = document.getElementById('timerUnitLabel');
+      const timerInput = document.getElementById('timerInput');
+      const applyTimerBtn = document.getElementById('applyTimerBtn');
+      const resetButton = document.getElementById('resetButton');
+      const wpmValue = document.getElementById('wpmValue');
+      const accuracyValue = document.getElementById('accuracyValue');
+      const unitSec = document.getElementById('unitSec');
+      const unitMin = document.getElementById('unitMin');
+      const themeToggle = document.getElementById('themeToggle');
+      const caseToggle = document.getElementById('caseToggle');
+      const yearSpan = document.getElementById('year');
+
+      const resultOverlay = document.getElementById('resultOverlay');
+      const resultEmoji = document.getElementById('resultEmoji');
+      const resultSubtitle = document.getElementById('resultSubtitle');
+      const finalWpm = document.getElementById('finalWpm');
+      const finalAccuracy = document.getElementById('finalAccuracy');
+      const finalChars = document.getElementById('finalChars');
+      const finalCorrect = document.getElementById('finalCorrect');
+      const resultMessage = document.getElementById('resultMessage');
+      const tryAgainBtn = document.getElementById('tryAgainBtn');
+      const closeResultBtn = document.getElementById('closeResultBtn');
+
+      let currentSentence = '';
+      let baseSentence = '';
+      let currentCase = 'lower';
+      let timerInterval = null;
+      let timeLeftSeconds = 60;
+      let initialTimeSeconds = 60;
+      let currentUnit = 'sec';
+      let testActive = false;
+      let testFinished = false;
+      let startTime = null;
+      let lastTypedLength = 0;
+      let totalTyped = 0;
+      let totalCorrect = 0;
+      let totalErrors = 0;
+
+      /* ===== CASE TRANSFORMATION ===== */
+      function applyCase(text, caseType) {
+        switch(caseType) {
+          case 'lower':
+            return text.toLowerCase();
+          case 'upper':
+            return text.toUpperCase();
+          case 'sentence':
+            return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
+          case 'mixed':
+            return text.split('').map(ch => {
+              if (ch === ' ') return ch;
+              return Math.random() < 0.5 ? ch.toLowerCase() : ch.toUpperCase();
+            }).join('');
+          default:
+            return text;
+        }
+      }
+
+      function getCasePopupClass(caseType) {
+        return 'case-' + caseType;
+      }
+
+      /* ===== SENTENCE ===== */
+      function getRandomBaseSentence() {
+        return SENTENCE_POOL[Math.floor(Math.random() * SENTENCE_POOL.length)];
+      }
+
+      function generateSentence() {
+        baseSentence = getRandomBaseSentence();
+        currentSentence = applyCase(baseSentence, currentCase);
+      }
+
+      function renderSentenceWithFeedback(typedText) {
+        const sentence = currentSentence;
+        const typedLen = typedText.length;
+        let html = '';
+        for (let i = 0; i < sentence.length; i++) {
+          const char = sentence[i];
+          let className = 'pending';
+          if (i < typedLen) {
+            className = (typedText[i] === char) ? 'correct' : 'incorrect';
+          }
+          let displayChar = char;
+          if (char === ' ') displayChar = '&nbsp;';
+          else if (char === '<') displayChar = '&lt;';
+          else if (char === '>') displayChar = '&gt;';
+          else if (char === '&') displayChar = '&amp;';
+          html += `<span class="${className}">${displayChar}</span>`;
+        }
+        sentenceContainer.innerHTML = html;
+      }
+
+      /* ===== POPUP ===== */
+      function showPopupChar(char, isCorrect) {
+        const rect = userInput.getBoundingClientRect();
+        const popup = document.createElement('div');
+        let baseClass = isCorrect ? 'correct-pop' : 'incorrect-pop';
+        let caseClass = getCasePopupClass(currentCase);
+        popup.className = `popup-char ${baseClass} ${caseClass}`;
+        popup.textContent = char === ' ' ? '␣' : char;
+        const x = rect.left + Math.min(rect.width - 40, 100 + Math.random() * 200);
+        const y = rect.top + 20 + Math.random() * 40;
+        popup.style.left = x + 'px';
+        popup.style.top = y + 'px';
+        document.body.appendChild(popup);
+        setTimeout(() => { if (popup.parentNode) popup.remove(); }, 450);
+      }
+
+      /* ===== STATS ===== */
+      function updateStats() {
+        if (totalTyped > 0) {
+          const accuracy = Math.round((totalCorrect / totalTyped) * 100);
+          accuracyValue.textContent = `${accuracy}%`;
+          if (startTime) {
+            const elapsedMinutes = (Date.now() - startTime) / 60000;
+            if (elapsedMinutes > 0.01) {
+              const wpm = Math.round((totalTyped / 5) / elapsedMinutes);
+              wpmValue.textContent = wpm > 0 ? wpm : 0;
+            } else {
+              wpmValue.textContent = '0';
+            }
+          }
+        } else {
+          accuracyValue.textContent = '100%';
+          wpmValue.textContent = '0';
+        }
+      }
+
+      function updateTimerDisplay() {
+        if (currentUnit === 'sec') {
+          timerDisplay.textContent = Math.max(0, timeLeftSeconds);
+          timerUnitLabel.textContent = 's';
+        } else {
+          const minutes = Math.floor(timeLeftSeconds / 60);
+          const seconds = timeLeftSeconds % 60;
+          timerDisplay.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+          timerUnitLabel.textContent = '';
+        }
+      }
+
+      function resetStats() {
+        totalTyped = 0;
+        totalCorrect = 0;
+        totalErrors = 0;
+        wpmValue.textContent = '0';
+        accuracyValue.textContent = '100%';
+      }
+
+      /* ===== RESULTS ===== */
+      function showResults() {
+        let finalWpmVal = 0;
+        let finalAccuracyVal = 0;
+        if (totalTyped > 0) {
+          finalAccuracyVal = Math.round((totalCorrect / totalTyped) * 100);
+          if (startTime) {
+            const elapsedSeconds = initialTimeSeconds - Math.max(0, timeLeftSeconds);
+            const elapsedMinutes = elapsedSeconds / 60;
+            if (elapsedMinutes > 0.01) {
+              finalWpmVal = Math.round((totalTyped / 5) / elapsedMinutes);
+            }
+          }
+        }
+        finalWpm.textContent = finalWpmVal;
+        finalAccuracy.textContent = `${finalAccuracyVal}%`;
+        finalChars.textContent = totalTyped;
+        finalCorrect.textContent = totalCorrect;
+
+        if (finalWpmVal >= 60 && finalAccuracyVal >= 95) {
+          resultEmoji.textContent = '🏆';
+          resultSubtitle.textContent = 'Outstanding performance!';
+          resultMessage.textContent = 'You are a typing legend! 🔥';
+        } else if (finalWpmVal >= 40 && finalAccuracyVal >= 90) {
+          resultEmoji.textContent = '🌟';
+          resultSubtitle.textContent = 'Excellent work!';
+          resultMessage.textContent = 'Great speed and accuracy! Keep it up ✨';
+        } else if (finalWpmVal >= 25 && finalAccuracyVal >= 80) {
+          resultEmoji.textContent = '👍';
+          resultSubtitle.textContent = 'Good job!';
+          resultMessage.textContent = 'Solid typing! Practice makes perfect 💪';
+        } else if (finalWpmVal >= 15) {
+          resultEmoji.textContent = '💪';
+          resultSubtitle.textContent = 'Nice effort!';
+          resultMessage.textContent = 'You are getting there. Keep practicing! 🌱';
+        } else {
+          resultEmoji.textContent = '🌱';
+          resultSubtitle.textContent = 'Just getting started';
+          resultMessage.textContent = 'Every expert was once a beginner. Try again!';
+        }
+        resultOverlay.classList.add('show');
+      }
+
+      function hideResults() {
+        resultOverlay.classList.remove('show');
+      }
+
+      /* ===== RESET ===== */
+      function resetTest(newSentence = true) {
+        if (timerInterval) {
+          clearInterval(timerInterval);
+          timerInterval = null;
+        }
+        testActive = false;
+        testFinished = false;
+        startTime = null;
+        lastTypedLength = 0;
+        resetStats();
+        hideResults();
+        userInput.disabled = false;
+        userInput.value = '';
+        userInput.focus();
+        if (newSentence) {
+          generateSentence();
+        }
+        renderSentenceWithFeedback('');
+        let inputVal = parseFloat(timerInput.value) || 1;
+        if (currentUnit === 'sec') {
+          initialTimeSeconds = Math.min(300, Math.max(5, Math.round(inputVal)));
+        } else {
+          initialTimeSeconds = Math.min(600, Math.max(1, Math.round(inputVal * 60)));
+        }
+        timeLeftSeconds = initialTimeSeconds;
+        updateTimerDisplay();
+      }
+
+      /* ===== START ===== */
+      function startTest() {
+        if (testActive || testFinished) return;
+        let inputVal = parseFloat(timerInput.value) || 1;
+        if (currentUnit === 'sec') {
+          initialTimeSeconds = Math.min(300, Math.max(5, Math.round(inputVal)));
+        } else {
+          initialTimeSeconds = Math.min(600, Math.max(1, Math.round(inputVal * 60)));
+        }
+        timeLeftSeconds = initialTimeSeconds;
+        updateTimerDisplay();
+        testActive = true;
+        startTime = Date.now();
+        timerInterval = setInterval(() => {
+          if (!testActive) return;
+          timeLeftSeconds -= 1;
+          updateTimerDisplay();
+          if (timeLeftSeconds <= 0) {
+            clearInterval(timerInterval);
+            timerInterval = null;
+            testActive = false;
+            testFinished = true;
+            userInput.disabled = true;
+            updateStats();
+            showResults();
+          }
+        }, 1000);
+      }
+
+      /* ===== INPUT ===== */
+      function handleInput() {
+        const typed = userInput.value;
+        const typedLen = typed.length;
+        if (!testActive && !testFinished) {
+          startTest();
+        }
+        if (testFinished) return;
+        if (typedLen > lastTypedLength) {
+          const newCharIndex = typedLen - 1;
+          const newChar = typed[newCharIndex];
+          const expectedChar = currentSentence[newCharIndex];
+          const isCorrect = (newChar === expectedChar);
+          showPopupChar(newChar, isCorrect);
+          totalTyped++;
+          if (isCorrect) {
+            totalCorrect++;
+          } else {
+            totalErrors++;
+          }
+        }
+        lastTypedLength = typedLen;
+        if (typed.length >= currentSentence.length) {
+          generateSentence();
+          userInput.value = '';
+          lastTypedLength = 0;
+          renderSentenceWithFeedback('');
+          updateStats();
+        } else {
+          renderSentenceWithFeedback(typed);
+          updateStats();
+        }
+      }
+
+      /* ===== TIMER ===== */
+      function applyTimer() {
+        let inputVal = parseFloat(timerInput.value) || 1;
+        if (currentUnit === 'sec') {
+          inputVal = Math.min(300, Math.max(5, Math.round(inputVal)));
+        } else {
+          inputVal = Math.min(600, Math.max(1, Math.round(inputVal * 60)));
+        }
+        if (!testActive && !testFinished) {
+          initialTimeSeconds = inputVal;
+          timeLeftSeconds = inputVal;
+          updateTimerDisplay();
+        } else {
+          initialTimeSeconds = inputVal;
+        }
+      }
+
+      function toggleTheme() {
+        document.body.classList.toggle('dark');
+        const isDark = document.body.classList.contains('dark');
+        themeToggle.innerHTML = isDark ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+      }
+
+      function setUnit(unit) {
+        currentUnit = unit;
+        if (unit === 'sec') {
+          unitSec.classList.add('active');
+          unitMin.classList.remove('active');
+          timerInput.min = 5;
+          timerInput.max = 300;
+          timerInput.value = Math.min(300, Math.max(5, parseInt(timerInput.value) || 30));
+        } else {
+          unitMin.classList.add('active');
+          unitSec.classList.remove('active');
+          timerInput.min = 1;
+          timerInput.max = 10;
+          timerInput.value = Math.min(10, Math.max(1, Math.round((parseInt(timerInput.value) || 60) / 60)));
+        }
+        if (!testActive && !testFinished) {
+          applyTimer();
+        }
+      }
+
+      /* ===== CASE ===== */
+      function setCase(caseType) {
+        if (caseType === currentCase) return;
+        currentCase = caseType;
+        caseToggle.querySelectorAll('button').forEach(btn => {
+          btn.classList.toggle('active', btn.dataset.case === caseType);
+        });
+        resetTest(true);
+      }
+
+      /* ===== INIT ===== */
+      function init() {
+        yearSpan.textContent = new Date().getFullYear();
+        generateSentence();
+        renderSentenceWithFeedback('');
+        initialTimeSeconds = 60;
+        timeLeftSeconds = 60;
+        updateTimerDisplay();
+        timerInput.value = 60;
+        userInput.disabled = false;
+        userInput.focus();
+        document.body.classList.remove('dark');
+        themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+        resetStats();
+      }
+
+      /* ===== EVENTS ===== */
+      userInput.addEventListener('input', handleInput);
+      resetButton.addEventListener('click', () => resetTest(true));
+      applyTimerBtn.addEventListener('click', applyTimer);
+      timerInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') applyTimer();
+      });
+      themeToggle.addEventListener('click', toggleTheme);
+      unitSec.addEventListener('click', () => setUnit('sec'));
+      unitMin.addEventListener('click', () => setUnit('min'));
+
+      caseToggle.addEventListener('click', (e) => {
+        const btn = e.target.closest('button');
+        if (btn && btn.dataset.case) {
+          setCase(btn.dataset.case);
+        }
+      });
+
+      tryAgainBtn.addEventListener('click', () => {
+        hideResults();
+        resetTest(true);
+      });
+
+      closeResultBtn.addEventListener('click', () => {
+        hideResults();
+      });
+
+      resultOverlay.addEventListener('click', (e) => {
+        if (e.target === resultOverlay) {
+          hideResults();
+        }
+      });
+
+      init();
+    })();
+  </script>
+</body>
+</html>

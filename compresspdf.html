@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PDF Compressor</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box;
+            font-family:'Segoe UI','Poppins',system-ui,sans-serif; }
+        body { min-height:100vh;
+            background:linear-gradient(145deg,#f8f0ff 0%,#f0e6ff 100%);
+            display:flex; align-items:center; justify-content:center; padding:2rem 1.5rem; }
+
+        /* ---------- HOME BUTTON ---------- */
+        .home-btn-wrapper {
+            position: fixed;
+            top: 28px;
+            right: 32px;
+            z-index: 999;
+        }
+        .home-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(8px);
+            color: #6a3de8;
+            border: 2px solid #c9b0ff;
+            padding: 12px 28px;
+            border-radius: 60px;
+            font-size: 1rem;
+            font-weight: 700;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            box-shadow: 0 8px 20px rgba(106, 61, 232, 0.15);
+            letter-spacing: 0.3px;
+        }
+        .home-btn:hover {
+            background: #6a3de8;
+            color: white;
+            border-color: #6a3de8;
+            transform: translateY(-3px);
+            box-shadow: 0 16px 30px rgba(106, 61, 232, 0.4);
+        }
+        .home-btn i { font-size: 1.1rem; }
+
+        .card { max-width:960px; width:100%;
+            background:rgba(255,255,255,0.8);
+            backdrop-filter:blur(14px);
+            border-radius:56px; padding:2.8rem 3rem 3.2rem;
+            box-shadow:0 30px 60px -15px rgba(90,40,140,0.25),
+                       0 0 0 1px rgba(200,170,255,0.25) inset; }
+
+        .header { display:flex; justify-content:space-between; align-items:center;
+            flex-wrap:wrap; gap:1rem; margin-bottom:2rem; }
+        .brand { display:flex; align-items:center; gap:0.8rem; }
+        .brand i { font-size:2.8rem; color:#6a3de8;
+            filter: drop-shadow(0 4px 8px rgba(106,61,232,0.2)); }
+        .brand h1 { font-size:2.4rem; font-weight:700; color:#2c1a4e;
+            letter-spacing:-0.5px; }
+        .brand h1 small { font-size:0.9rem; font-weight:500; background:#ede4ff;
+            padding:0.3rem 1.2rem; border-radius:60px; color:#5b3b9e;
+            margin-left:0.4rem; }
+
+        .drop-zone { background:rgba(245,238,255,0.6); border:2.5px dashed #c9b0ff;
+            border-radius:36px; padding:2.4rem 2rem; text-align:center;
+            cursor:pointer; transition:0.25s; margin-bottom:1.6rem; }
+        .drop-zone:hover { background:#f3ecff; border-color:#a884ff; }
+        .drop-zone:active { transform:scale(0.98); }
+        .drop-zone input { display:none; }
+        .drop-icon { font-size:3.6rem; line-height:1; }
+        .drop-text { font-size:1.35rem; font-weight:600; color:#2c1a4e;
+            margin:0.5rem 0 0.3rem; }
+        .drop-hint { color:#6a4f9e; font-size:1rem; background:#ede4ff;
+            display:inline-block; padding:0.3rem 1.8rem; border-radius:30px; }
+
+        .file-info { display:flex; align-items:center; justify-content:space-between;
+            background:#f8f2ff; border-radius:28px; padding:1rem 1.6rem;
+            border:1px solid #e0d0ff; margin:1.2rem 0; min-height:65px;
+            flex-wrap:wrap; gap:0.8rem; font-size:1rem; }
+        .file-info .file-details { display:flex; align-items:center; gap:0.9rem; }
+        .file-info .file-details i { font-size:1.9rem; color:#6a3de8; }
+        .file-info .name { font-weight:600; color:#2c1a4e; max-width:280px;
+            overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+        .file-info .size { background:#ede4ff; padding:0.25rem 1.1rem;
+            border-radius:30px; font-weight:600; color:#3b1f7a; font-size:0.9rem; }
+        .empty-file-info { color:#9a82bf; text-align:center; padding:0.4rem 0; width:100%; }
+
+        .mode-section { background:#f8f2ff; border-radius:28px;
+            padding:1.4rem 1.6rem; margin:1.2rem 0;
+            border:1px solid #e0d0ff; }
+        .mode-title { font-weight:600; color:#3b1f7a; margin-bottom:0.9rem;
+            display:flex; align-items:center; gap:0.6rem; font-size:1.05rem; }
+        .mode-title i { color:#6a3de8; }
+        .mode-options { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+        @media(max-width:520px){ .mode-options { grid-template-columns:1fr; } }
+        .mode-option { background:white; border:2px solid #e0d0ff;
+            border-radius:22px; padding:1.2rem 1.2rem; cursor:pointer;
+            transition:0.2s; display:flex; gap:1rem; align-items:flex-start; }
+        .mode-option:hover { border-color:#c9b0ff; background:#faf7ff; }
+        .mode-option.active { border-color:#6a3de8; background:#f3ecff;
+            box-shadow:0 6px 16px rgba(106,61,232,0.15); }
+        .mode-option input { display:none; }
+        .mode-option .mode-icon { font-size:1.9rem; line-height:1; margin-top:2px; }
+        .mode-option .mode-info .mode-name { font-weight:700; color:#2c1a4e;
+            font-size:1.05rem; margin-bottom:0.25rem; }
+        .mode-option .mode-info .mode-desc { color:#6a4f9e; font-size:0.85rem;
+            line-height:1.4; }
+
+        .target-section { background:#f8f2ff; border-radius:28px;
+            padding:1.4rem 1.6rem; margin:1.2rem 0;
+            border:1px solid #e0d0ff; display:flex; flex-wrap:wrap;
+            align-items:center; gap:1rem 1.4rem; }
+        .target-section label { color:#3b1f7a; font-weight:500;
+            display:flex; align-items:center; gap:8px; font-size:1rem; }
+        .target-input-group { display:flex; align-items:center; background:white;
+            border-radius:60px; padding:0.2rem 0.2rem 0.2rem 1.2rem;
+            border:2px solid #d9c8ff; flex:1 1 200px; }
+        .target-input-group:focus-within { border-color:#6a3de8;
+            box-shadow:0 0 0 4px rgba(106,61,232,0.1); }
+        .target-input-group input { background:transparent; border:none;
+            padding:0.6rem 0.2rem; font-size:1.1rem; width:110px;
+            color:#2c1a4e; font-weight:600; outline:none; }
+        .target-input-group span { background:#ede4ff; padding:0.35rem 1.2rem;
+            border-radius:60px; color:#3b1f7a; font-weight:600; font-size:0.95rem; }
+        .target-section.disabled { opacity:0.45; pointer-events:none; }
+        .min-warn { color:#b45309; font-size:0.85rem; margin-top:0.5rem;
+            display:flex; align-items:center; gap:0.5rem; }
+
+        .actions { display:flex; flex-wrap:wrap; gap:1rem; margin-top:1.6rem; }
+        .btn { border:none; padding:1rem 2rem; border-radius:60px;
+            font-weight:600; font-size:1.05rem; display:inline-flex;
+            align-items:center; justify-content:center; gap:0.6rem;
+            cursor:pointer; transition:0.2s; flex:1 1 auto; min-width:140px;
+            box-shadow:0 6px 14px rgba(106,61,232,0.1); border:1px solid #d9c8ff; }
+        .btn-primary { background:#6a3de8; color:white; border-color:#7b4cff;
+            box-shadow:0 8px 20px rgba(106,61,232,0.3); }
+        .btn-primary:hover { background:#4a27b0; transform:scale(0.97); }
+        .btn-primary:disabled { opacity:0.5; pointer-events:none; }
+        .btn-success { background:#10b981; color:white; border-color:#34d399;
+            box-shadow:0 8px 20px rgba(16,185,129,0.3); }
+        .btn-success:hover { background:#059669; transform:scale(0.97); }
+        .btn-success:disabled { opacity:0.5; pointer-events:none; }
+        .btn-secondary { background:#f5f0ff; border-color:#d9c8ff; color:#3b1f7a; }
+        .btn-secondary:hover { background:#ede4ff; }
+
+        .status-msg { text-align:center; margin-top:1.4rem; font-weight:500;
+            color:#3b1f7a; background:#f3ecff; padding:0.8rem 1.2rem;
+            border-radius:60px; font-size:0.95rem; border:1px solid #e0d0ff;
+            display:flex; align-items:center; justify-content:center; gap:0.6rem; }
+        .status-msg.success { background:#d8ebd2; border-color:#9fc7a0; color:#1c4827; }
+        .status-msg.error { background:#ffe1d6; border-color:#e7b6a4; color:#7d3f2b; }
+        .status-msg.info { background:#dbeafe; border-color:#93c5fd; color:#1e40af; }
+
+        .footer-love { margin-top:2.2rem; text-align:center; font-size:1rem;
+            color:#7a5fa8; display:flex; justify-content:center;
+            align-items:center; gap:0.7rem; flex-wrap:wrap; }
+        .footer-love i { color:#6a3de8; font-size:1.1rem; }
+
+        @media (max-width: 600px) {
+            .home-btn-wrapper { top: 16px; right: 16px; }
+            .home-btn { padding: 8px 18px; font-size: 0.9rem; }
+            .card { padding: 1.8rem; }
+            .brand h1 { font-size: 1.8rem; }
+            .brand i { font-size: 2.2rem; }
+            .file-info .name { max-width: 140px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- HOME BUTTON -->
+<div class="home-btn-wrapper">
+    <a href="index.html" class="home-btn">
+        <i class="fas fa-home"></i> Home
+    </a>
+</div>
+
+<div class="card">
+    <div class="header">
+        <div class="brand">
+            <i class="fas fa-compress-alt"></i>
+            <h1>PDF Compressor <small>accurate</small></h1>
+        </div>
+    </div>
+
+    <div class="drop-zone" id="dropZone">
+        <input type="file" id="fileInput" accept=".pdf" />
+        <div class="drop-icon">📄</div>
+        <div class="drop-text">Drop PDF here or click</div>
+        <div class="drop-hint">.pdf only</div>
+    </div>
+
+    <div class="file-info" id="fileInfo">
+        <div class="empty-file-info">
+            <i class="fas fa-heart" style="margin-right:6px;"></i> no PDF selected yet
+        </div>
+    </div>
+
+    <div class="mode-section">
+        <div class="mode-title"><i class="fas fa-sliders"></i> Compression mode</div>
+        <div class="mode-options">
+            <label class="mode-option active" id="modeLossless">
+                <input type="radio" name="mode" value="lossless" checked />
+                <span class="mode-icon">🔒</span>
+                <span class="mode-info">
+                    <div class="mode-name">Lossless</div>
+                    <div class="mode-desc">Quality 100% same. Max possible size reduction.</div>
+                </span>
+            </label>
+            <label class="mode-option" id="modeLossy">
+                <input type="radio" name="mode" value="lossy" />
+                <span class="mode-icon">🎯</span>
+                <span class="mode-info">
+                    <div class="mode-name">Target Size</div>
+                    <div class="mode-desc">Exact KB hit. Text sharp rehta hai.</div>
+                </span>
+            </label>
+        </div>
+    </div>
+
+    <div class="target-section disabled" id="targetSection">
+        <label for="targetKbInput"><i class="fas fa-bullseye"></i> target size</label>
+        <div class="target-input-group">
+            <input type="number" id="targetKbInput" min="5" max="100000" value="100" step="1" />
+            <span>KB</span>
+        </div>
+        <div class="min-warn" id="minWarn" style="display:none;">
+            <i class="fas fa-triangle-exclamation"></i>
+            <span>Target bahut chhota — minimum ~15 KB possible hai PDF structure ke liye</span>
+        </div>
+    </div>
+
+    <div class="actions">
+        <button class="btn btn-secondary" id="resetBtn"><i class="fas fa-undo-alt"></i> Reset</button>
+        <button class="btn btn-primary" id="compressBtn" disabled><i class="fas fa-compress-arrows-alt"></i> Compress</button>
+        <button class="btn btn-success" id="downloadBtn" disabled><i class="fas fa-download"></i> Download</button>
+    </div>
+
+    <div class="status-msg" id="statusMsg">
+        <i class="fas fa-circle-info"></i>
+        <span>Ready · select a PDF</span>
+    </div>
+
+    <div class="footer-love">
+        <i class="fas fa-heart"></i> Made with Love · Create by Sandesh <i class="fas fa-heart"></i>
+    </div>
+</div>
+
+<script>
+(function () {
+    if (window.pdfjsLib) {
+        pdfjsLib.GlobalWorkerOptions.workerSrc =
+            'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
+    }
+
+    const fileInput     = document.getElementById('fileInput');
+    const dropZone      = document.getElementById('dropZone');
+    const fileInfo      = document.getElementById('fileInfo');
+    const targetKbInput = document.getElementById('targetKbInput');
+    const targetSection = document.getElementById('targetSection');
+    const minWarn       = document.getElementById('minWarn');
+    const compressBtn   = document.getElementById('compressBtn');
+    const downloadBtn   = document.getElementById('downloadBtn');
+    const resetBtn      = document.getElementById('resetBtn');
+    const statusMsg     = document.getElementById('statusMsg');
+    const modeLossless  = document.getElementById('modeLossless');
+    const modeLossy     = document.getElementById('modeLossy');
+
+    let currentFile = null;
+    let compressedBlob = null;
+    let originalSizeBytes = 0;
+    let compressedSizeBytes = 0;
+    let currentMode = 'lossless';
+
+    const MIN_PDF_OVERHEAD_KB = 15;
+
+    const formatSize = (b) => b < 1024 ? b + ' B' : (b / 1024).toFixed(1) + ' KB';
+
+    function updateStatus(html, cls = '') {
+        statusMsg.innerHTML = html;
+        statusMsg.className = 'status-msg' + (cls ? ' ' + cls : '');
+    }
+    function resetStatus() {
+        if (currentFile) {
+            updateStatus(`<i class="fas fa-file-pdf" style="color:#6a3de8;"></i> ${currentFile.name} · ${currentMode} mode`);
+        } else {
+            updateStatus('<i class="fas fa-circle-info"></i> Ready · select a PDF');
+        }
+    }
+    function resetCompression() {
+        compressedBlob = null; compressedSizeBytes = 0;
+        downloadBtn.disabled = true;
+        downloadBtn.innerHTML = '<i class="fas fa-download"></i> Download';
+        resetStatus();
+    }
+    function renderFileInfo(file) {
+        if (!file) {
+            fileInfo.innerHTML = `<div class="empty-file-info">
+                <i class="fas fa-heart" style="margin-right:6px;"></i> no PDF selected yet
+            </div>`;
+            return;
+        }
+        fileInfo.innerHTML = `
+            <div class="file-details">
+                <i class="fas fa-file-pdf"></i>
+                <span class="name">${file.name.length > 30 ? file.name.slice(0,26) + '…' : file.name}</span>
+                <span class="size">${formatSize(file.size)}</span>
+            </div>`;
+    }
+    function loadFile(file) {
+        if (!file) return;
+        if (!(file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf'))) {
+            updateStatus('<i class="fas fa-exclamation-triangle"></i> please select a PDF', 'error');
+            setTimeout(resetStatus, 2000); return;
+        }
+        currentFile = file;
+        originalSizeBytes = file.size;
+        renderFileInfo(file);
+        resetCompression();
+        compressBtn.disabled = false;
+        updateStatus(`<i class="fas fa-check-circle" style="color:#10b981;"></i> loaded: ${file.name} (${formatSize(file.size)})`, 'success');
+        setTimeout(resetStatus, 2000);
+    }
+
+    function setMode(mode) {
+        currentMode = mode;
+        modeLossless.classList.toggle('active', mode === 'lossless');
+        modeLossy.classList.toggle('active', mode === 'lossy');
+        targetSection.classList.toggle('disabled', mode !== 'lossy');
+        resetCompression();
+    }
+    modeLossless.addEventListener('click', () => setMode('lossless'));
+    modeLossy.addEventListener('click', () => setMode('lossy'));
+
+    targetKbInput.addEventListener('input', () => {
+        const v = parseInt(targetKbInput.value, 10);
+        minWarn.style.display = (v > 0 && v < MIN_PDF_OVERHEAD_KB) ? 'flex' : 'none';
+    });
+
+    dropZone.addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', (e) => {
+        if (e.target.files.length) loadFile(e.target.files[0]);
+        fileInput.value = '';
+    });
+    ['dragenter','dragover'].forEach(ev => dropZone.addEventListener(ev, e => {
+        e.preventDefault();
+        dropZone.style.background = '#f3ecff';
+        dropZone.style.borderColor = '#a884ff';
+    }));
+    ['dragleave','drop'].forEach(ev => dropZone.addEventListener(ev, e => {
+        e.preventDefault();
+        dropZone.style.background = 'rgba(245,238,255,0.6)';
+        dropZone.style.borderColor = '#c9b0ff';
+    }));
+    dropZone.addEventListener('drop', e => {
+        if (e.dataTransfer.files.length) loadFile(e.dataTransfer.files[0]);
+    });
+
+    resetBtn.addEventListener('click', () => {
+        fileInput.value = ''; currentFile = null;
+        compressedBlob = null; compressedSizeBytes = 0;
+        renderFileInfo(null);
+        downloadBtn.disabled = true; compressBtn.disabled = true;
+        downloadBtn.innerHTML = '<i class="fas fa-download"></i> Download';
+        targetKbInput.value = 100;
+        minWarn.style.display = 'none';
+        setMode('lossless');
+        updateStatus('<i class="fas fa-circle-info"></i> Ready · select a PDF');
+    });
+
+    async function losslessCompress(arrayBuffer) {
+        const { PDFDocument } = PDFLib;
+        const candidates = [];
+
+        try {
+            const doc = await PDFDocument.load(arrayBuffer.slice(0), { ignoreEncryption: true });
+            const bytes = await doc.save({ useObjectStreams: true, addDefaultPage: false });
+            candidates.push(bytes);
+        } catch (e) {}
+
+        try {
+            const doc = await PDFDocument.load(arrayBuffer.slice(0), { ignoreEncryption: true });
+            try {
+                doc.setTitle('');
+                doc.setAuthor('');
+                doc.setSubject('');
+                doc.setKeywords([]);
+                doc.setProducer('');
+                doc.setCreator('');
+            } catch (e) {}
+            const bytes = await doc.save({ useObjectStreams: true, addDefaultPage: false });
+            candidates.push(bytes);
+        } catch (e) {}
+
+        try {
+            const doc = await PDFDocument.load(arrayBuffer.slice(0), { ignoreEncryption: true });
+            const bytes = await doc.save({ useObjectStreams: false, addDefaultPage: false });
+            candidates.push(bytes);
+        } catch (e) {}
+
+        try {
+            const src = await PDFDocument.load(arrayBuffer.slice(0), { ignoreEncryption: true });
+            const dst = await PDFDocument.create();
+            const pageIndices = src.getPageIndices();
+            const copiedPages = await dst.copyPages(src, pageIndices);
+            copiedPages.forEach(p => dst.addPage(p));
+            const bytes = await dst.save({ useObjectStreams: true, addDefaultPage: false });
+            candidates.push(bytes);
+        } catch (e) {}
+
+        candidates.sort((a, b) => a.length - b.length);
+        return candidates[0];
+    }
+
+    async function rasterizeAtSettings(pdfjsDoc, scale, jpegQuality, onProgress) {
+        const { PDFDocument, StandardFonts, rgb } = PDFLib;
+        const outPdf = await PDFDocument.create();
+        const font = await outPdf.embedFont(StandardFonts.Helvetica);
+
+        for (let i = 1; i <= pdfjsDoc.numPages; i++) {
+            const page = await pdfjsDoc.getPage(i);
+            const viewport = page.getViewport({ scale: 1 });
+            const renderViewport = page.getViewport({ scale });
+
+            const canvas = document.createElement('canvas');
+            canvas.width  = Math.floor(renderViewport.width);
+            canvas.height = Math.floor(renderViewport.height);
+            const ctx = canvas.getContext('2d', { alpha: false });
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            await page.render({ canvasContext: ctx, viewport: renderViewport }).promise;
+
+            const dataUrl = canvas.toDataURL('image/jpeg', jpegQuality);
+            const binStr = atob(dataUrl.split(',')[1]);
+            const jpegBytes = new Uint8Array(binStr.length);
+            for (let k = 0; k < binStr.length; k++) jpegBytes[k] = binStr.charCodeAt(k);
+
+            const img = await outPdf.embedJpg(jpegBytes);
+            const newPage = outPdf.addPage([viewport.width, viewport.height]);
+            newPage.drawImage(img, { x: 0, y: 0, width: viewport.width, height: viewport.height });
+
+            try {
+                const tc = await page.getTextContent();
+                for (const item of tc.items) {
+                    if (!item.str || !item.str.trim()) continue;
+                    const [, , , d, e, f] = item.transform;
+                    const fontSize = Math.abs(d) || 10;
+                    newPage.drawText(item.str, {
+                        x: e, y: f, size: fontSize, font,
+                        color: rgb(0, 0, 0), opacity: 0
+                    });
+                }
+            } catch (err) {}
+
+            if (onProgress) onProgress(i, pdfjsDoc.numPages);
+            await new Promise(r => setTimeout(r, 0));
+        }
+        return await outPdf.save({ useObjectStreams: true });
+    }
+
+    async function preciseTargetCompress(arrayBuffer, targetBytes, onProgress) {
+        const pdfjsDoc = await pdfjsLib.getDocument({ data: arrayBuffer.slice(0) }).promise;
+        const scales = [1.6, 1.3, 1.1, 0.9, 0.75, 0.6, 0.5];
+        let bestUnder = null;
+        let smallest = null;
+
+        for (const scale of scales) {
+            const probe = await rasterizeAtSettings(pdfjsDoc, scale, 0.95, onProgress);
+
+            if (probe.length <= targetBytes) {
+                let lo = 0.95, hi = 1.0, best = probe;
+                for (let i = 0; i < 2; i++) {
+                    const mid = (lo + hi) / 2;
+                    const midBytes = await rasterizeAtSettings(pdfjsDoc, scale, mid, onProgress);
+                    if (midBytes.length <= targetBytes) {
+                        best = midBytes; lo = mid;
+                    } else {
+                        hi = mid;
+                    }
+                }
+                if (!bestUnder || best.length > bestUnder.bytes.length) {
+                    bestUnder = { bytes: best, scale, quality: lo };
+                }
+                return bestUnder;
+            }
+
+            if (!smallest || probe.length < smallest.bytes.length) {
+                smallest = { bytes: probe, scale, quality: 0.95 };
+            }
+
+            let lo = 0.15, hi = 0.95;
+            let lowestBytes = await rasterizeAtSettings(pdfjsDoc, scale, lo, onProgress);
+
+            if (lowestBytes.length < smallest.bytes.length) {
+                smallest = { bytes: lowestBytes, scale, quality: lo };
+            }
+
+            if (lowestBytes.length > targetBytes) {
+                continue;
+            }
+
+            let localBest = { bytes: lowestBytes, quality: lo };
+            for (let i = 0; i < 7; i++) {
+                const mid = (lo + hi) / 2;
+                const midBytes = await rasterizeAtSettings(pdfjsDoc, scale, mid, onProgress);
+                if (midBytes.length <= targetBytes) {
+                    localBest = { bytes: midBytes, quality: mid };
+                    lo = mid;
+                } else {
+                    hi = mid;
+                }
+            }
+
+            if (!bestUnder || localBest.bytes.length > bestUnder.bytes.length) {
+                bestUnder = { bytes: localBest.bytes, scale, quality: localBest.quality };
+            }
+            return bestUnder;
+        }
+
+        return {
+            bytes: smallest.bytes,
+            scale: smallest.scale,
+            quality: smallest.quality,
+            hit: false
+        };
+    }
+
+    compressBtn.addEventListener('click', async () => {
+        if (!currentFile) {
+            updateStatus('<i class="fas fa-exclamation-circle"></i> No file selected', 'error');
+            setTimeout(resetStatus, 2000); return;
+        }
+
+        compressBtn.disabled = true;
+
+        try {
+            const arrayBuffer = await currentFile.arrayBuffer();
+            let result;
+            let actualTargetKb = null;
+
+            if (currentMode === 'lossless') {
+                updateStatus('<i class="fas fa-spinner fa-pulse"></i> lossless compressing (trying 4 strategies) …', 'info');
+                const bytes = await losslessCompress(arrayBuffer);
+                result = { bytes, method: 'lossless' };
+            } else {
+                const targetKb = parseInt(targetKbInput.value, 10);
+                if (isNaN(targetKb) || targetKb < 1) {
+                    updateStatus('<i class="fas fa-exclamation-circle"></i> Enter valid target KB', 'error');
+                    compressBtn.disabled = false; return;
+                }
+                actualTargetKb = targetKb;
+                const targetBytes = targetKb * 1024;
+
+                updateStatus('<i class="fas fa-spinner fa-pulse"></i> searching best quality for target …', 'info');
+                const r = await preciseTargetCompress(arrayBuffer, targetBytes,
+                    (page, total) => updateStatus(
+                        `<i class="fas fa-spinner fa-pulse"></i> page ${page}/${total} …`, 'info'));
+
+                result = {
+                    bytes: r.bytes,
+                    method: 'lossy',
+                    scale: r.scale,
+                    quality: r.quality,
+                    hit: r.bytes.length <= targetBytes,
+                };
+            }
+
+            compressedBlob = new Blob([result.bytes], { type: 'application/pdf' });
+            compressedSizeBytes = compressedBlob.size;
+            downloadBtn.disabled = false;
+
+            const ratio = ((1 - (compressedSizeBytes / originalSizeBytes)) * 100).toFixed(1);
+
+            if (result.method === 'lossless') {
+                const saved = originalSizeBytes - compressedSizeBytes;
+                updateStatus(
+                    `<i class="fas fa-shield-halved" style="color:#10b981;"></i> Lossless! ${formatSize(originalSizeBytes)} → ${formatSize(compressedSizeBytes)} (${ratio}% ↓, saved ${formatSize(saved)}) · quality 100% same`,
+                    'success'
+                );
+            } else {
+                const targetBytes = actualTargetKb * 1024;
+                let badge;
+                if (result.hit) {
+                    badge = `🎯 target hit (${actualTargetKb} KB)`;
+                } else {
+                    badge = `⚠ minimum possible: ${formatSize(compressedSizeBytes)}`;
+                }
+
+                updateStatus(
+                    `<i class="fas fa-check-circle" style="color:#10b981;"></i> ${formatSize(originalSizeBytes)} → ${formatSize(compressedSizeBytes)} (${ratio}% ↓) · scale ${result.scale}x · jpg ${result.quality.toFixed(2)} · ${badge}`,
+                    'success'
+                );
+            }
+            downloadBtn.innerHTML = '<i class="fas fa-download"></i> Download compressed';
+        } catch (err) {
+            console.error(err);
+            updateStatus(`<i class="fas fa-times-circle"></i> error: ${err.message || err}`, 'error');
+        } finally {
+            compressBtn.disabled = false;
+            setTimeout(resetStatus, 6000);
+        }
+    });
+
+    downloadBtn.addEventListener('click', () => {
+        if (!compressedBlob) return;
+        const url = URL.createObjectURL(compressedBlob);
+        const a = document.createElement('a');
+        a.href = url;
+        const base = currentFile ? currentFile.name.replace(/\.pdf$/i, '') : 'compressed';
+        a.download = `${base}-compressed.pdf`;
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 4000);
+        updateStatus(`<i class="fas fa-download" style="color:#10b981;"></i> downloaded (${formatSize(compressedSizeBytes)})`, 'success');
+        setTimeout(resetStatus, 2500);
+    });
+
+    renderFileInfo(null);
+    resetStatus();
+})();
+</script>
+</body>
+</html>
