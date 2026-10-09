@@ -1,0 +1,1562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Professional PDF Editor</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+<style>
+  :root {
+    --primary-purple: #7c3aed;
+    --light-purple-bg: #f3f0ff;
+    --border-purple: #d8b4fe;
+    --text-dark: #1f2937;
+    --text-light: #6b7280;
+    --success-green: #6ee7b7;
+    --success-hover: #34d399;
+    --btn-shadow: 0 4px 6px -1px rgba(124, 58, 237, 0.4);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+  body {
+    background-color: #f3f4f6;
+    background-image: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+    overflow: hidden;
+    height: 100vh;
+    color: var(--text-dark);
+  }
+  .screen { display: none; height: 100vh; }
+  .screen.active { display: flex; flex-direction: column; }
+
+  #uploadScreen { justify-content: center; align-items: center; padding: 20px; }
+  .upload-box {
+    background: white; padding: 50px 40px; border-radius: 24px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08), 0 0 0 1px rgba(124, 58, 237, 0.1);
+    text-align: center; max-width: 480px; width: 100%;
+    display: flex; flex-direction: column; gap: 18px; align-items: center;
+  }
+  .upload-box .pdf-icon-wrap {
+    width: 90px; height: 90px; background: var(--light-purple-bg);
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    border: 2px dashed var(--border-purple);
+  }
+  .upload-box i.fa-file-pdf { font-size: 44px; color: var(--primary-purple); }
+  .upload-box h1 { color: var(--text-dark); font-size: 26px; font-weight: 700; }
+  .upload-box .subtitle-pill {
+    color: var(--text-light); font-size: 14px; background: var(--light-purple-bg);
+    padding: 8px 18px; border-radius: 30px; font-weight: 600; border: 1px solid var(--border-purple);
+  }
+  .upload-btn {
+    display: inline-flex; align-items: center; gap: 10px;
+    background-color: var(--primary-purple); color: white;
+    padding: 16px 40px; border-radius: 30px; cursor: pointer;
+    font-size: 16px; font-weight: 700; transition: all 0.2s;
+    box-shadow: var(--btn-shadow); border: none;
+  }
+  .upload-btn:hover { background-color: #6d28d9; transform: translateY(-2px); }
+  .hint { font-size: 13px; color: var(--text-light); font-weight: 500; }
+
+  .app-layout {
+    display: flex; flex: 1; overflow: hidden;
+    position: relative; padding: 12px; gap: 12px; background: #f3f4f6;
+  }
+  .sidebar {
+    width: 190px; background: white; border-radius: 16px; overflow-y: auto;
+    padding: 15px 12px; border: 1px solid rgba(124, 58, 237, 0.1);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05); flex-shrink: 0;
+    transition: width 0.3s ease, padding 0.3s ease, opacity 0.25s ease;
+    overflow-x: hidden;
+  }
+  .sidebar.hidden { width: 0; padding: 15px 0; border: none; opacity: 0; pointer-events: none; }
+  .sidebar-title {
+    font-size: 11px; text-transform: uppercase; letter-spacing: 1px;
+    color: var(--primary-purple); padding: 5px 6px 12px; font-weight: 800;
+    white-space: nowrap; display: flex; align-items: center; gap: 6px;
+  }
+  .thumb {
+    margin-bottom: 12px; cursor: pointer; border-radius: 12px;
+    padding: 8px; background: #f8fafc; transition: all 0.2s;
+    border: 2px solid transparent; min-width: 160px;
+  }
+  .thumb:hover { background: var(--light-purple-bg); border-color: var(--border-purple); }
+  .thumb.active { border-color: var(--primary-purple); background: var(--light-purple-bg); box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15); }
+  .thumb canvas { width: 100%; display: block; background: white; border-radius: 6px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+  .thumb-label { text-align: center; font-size: 11px; color: var(--primary-purple); margin-top: 6px; font-weight: 700; }
+  .sidebar::-webkit-scrollbar { width: 6px; }
+  .sidebar::-webkit-scrollbar-thumb { background: var(--border-purple); border-radius: 3px; }
+
+  .sidebar-toggle-float {
+    position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+    z-index: 90; background: var(--primary-purple); color: white; border: none;
+    width: 36px; height: 60px; border-radius: 0 12px 12px 0; cursor: pointer;
+    display: none; align-items: center; justify-content: center;
+    box-shadow: 0 4px 12px rgba(124, 58, 237, 0.4); transition: all 0.2s;
+  }
+  .sidebar-toggle-float:hover { background: #6d28d9; transform: translateY(-50%) translateX(3px); }
+  .sidebar-toggle-float.visible { display: flex; }
+
+  .main-area { flex: 1; display: flex; flex-direction: column; overflow: hidden; gap: 12px; min-width: 0; }
+
+  .toolbar {
+    background: white; color: var(--text-dark); display: flex; align-items: center;
+    padding: 12px 16px; gap: 10px; border-radius: 16px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid rgba(124, 58, 237, 0.1);
+    z-index: 100; flex-wrap: wrap;
+  }
+  .toolbar-group {
+    display: flex; align-items: center; gap: 6px;
+    padding: 0 10px; border-right: 1px dashed var(--border-purple);
+  }
+  .toolbar-group:last-child { border-right: none; }
+  .toolbar-group:first-child { padding-left: 0; }
+  .toolbar button, .toolbar select, .toolbar input[type="number"] {
+    background: white; border: 1px solid var(--border-purple);
+    color: var(--primary-purple); padding: 8px 12px; border-radius: 20px;
+    cursor: pointer; transition: all 0.2s; font-size: 13px; font-weight: 700;
+    min-height: 34px; display: inline-flex; align-items: center;
+    justify-content: center; gap: 6px; font-family: inherit;
+  }
+  .toolbar button:hover, .toolbar select:hover, .toolbar input[type="number"]:hover {
+    background: var(--light-purple-bg); border-color: var(--primary-purple);
+  }
+  .toolbar input[type="number"] {
+    width: 70px; cursor: text; text-align: center; -moz-appearance: textfield;
+  }
+  .toolbar input[type="number"]::-webkit-outer-spin-button,
+  .toolbar input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  .toolbar input[type="number"]:focus {
+    background: white; color: var(--text-dark); outline: none;
+    border-color: var(--primary-purple); box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+  }
+  .toolbar button.active {
+    background: var(--primary-purple); border-color: var(--primary-purple);
+    color: white; box-shadow: var(--btn-shadow);
+  }
+  .toolbar button.icon-btn { width: 38px; padding: 8px; }
+  .toolbar select {
+    cursor: pointer; max-width: 170px; padding-right: 28px;
+    background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%237c3aed%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%2F%3E%3C%2Fsvg%3E");
+    background-repeat: no-repeat; background-position: right 8px center;
+    background-size: 14px; appearance: none; -webkit-appearance: none;
+  }
+  .toolbar select option { background: white; color: var(--text-dark); }
+  .color-wrap { position: relative; display: inline-flex; align-items: center; }
+  .color-wrap input[type="color"] {
+    width: 38px; height: 34px; padding: 3px;
+    border: 1px solid var(--border-purple); border-radius: 20px;
+    cursor: pointer; background: white; transition: all 0.2s;
+  }
+  .color-wrap input[type="color"]:hover { transform: scale(1.05); border-color: var(--primary-purple); }
+  .download-btn {
+    background: var(--primary-purple) !important; color: white !important;
+    font-weight: 700 !important; margin-left: auto; border: none !important;
+    box-shadow: var(--btn-shadow); padding: 10px 22px !important;
+  }
+  .download-btn:hover { background: #6d28d9 !important; transform: translateY(-2px); }
+  .toolbar-label {
+    font-size: 13px; color: var(--primary-purple); margin-right: 2px;
+    display: inline-flex; align-items: center;
+  }
+
+  .editor-container {
+    flex: 1; overflow: auto; padding: 20px; background: #f8fafc;
+    border-radius: 16px; border: 1px solid rgba(124, 58, 237, 0.1);
+    display: flex; justify-content: center; align-items: flex-start;
+  }
+  .editor-container::-webkit-scrollbar { width: 8px; height: 8px; }
+  .editor-container::-webkit-scrollbar-thumb { background: var(--border-purple); border-radius: 4px; }
+  .editor-container::-webkit-scrollbar-thumb:hover { background: var(--primary-purple); }
+
+  .canvas-wrapper {
+    position: relative; background: white;
+    box-shadow: 0 8px 30px rgba(124, 58, 237, 0.15), 0 0 0 1px rgba(124, 58, 237, 0.1);
+    height: fit-content; border-radius: 8px;
+  }
+  #pdfCanvas { display: block; border-radius: 8px; }
+  #pageBgOverlay {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none; z-index: 1; border-radius: 8px;
+  }
+  #textLayer {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none; z-index: 2;
+  }
+
+  .text-item {
+    position: absolute; cursor: text;
+    border: 1px dashed transparent; padding: 1px 2px;
+    white-space: pre; line-height: 1;
+    pointer-events: auto; color: transparent;
+    user-select: none; min-width: 20px; min-height: 14px;
+    background: transparent;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .text-item .text-content {
+    display: inline-block; white-space: pre; outline: none;
+  }
+  .text-item:hover {
+    background: rgba(124, 58, 237, 0.1);
+    border: 1px dashed var(--primary-purple);
+  }
+  .text-item.selected {
+    border: 2px solid var(--primary-purple) !important;
+    z-index: 20; color: var(--text-dark);
+    box-shadow: 0 0 12px rgba(124, 58, 237, 0.5);
+  }
+  .text-item.editing {
+    color: var(--text-dark) !important; background: #ffffff !important;
+    border: 2px solid #f59e0b !important; cursor: text; outline: none;
+    z-index: 30; box-shadow: 0 2px 12px rgba(0,0,0,0.35); user-select: text;
+  }
+  .text-item.modified { color: var(--text-dark) !important; background: #ffffff !important; }
+  .text-item.new-text {
+    background: rgba(253, 242, 220, 0.95) !important;
+    border: 2px dashed #f59e0b;
+  }
+  .text-item.new-text.selected { background: #ffffff !important; border: 2px solid var(--primary-purple) !important; }
+  .text-item.new-text.editing { background: #ffffff !important; border: 2px solid #f59e0b !important; }
+  .text-item.dragging {
+    cursor: grabbing !important; opacity: 0.75;
+    box-shadow: 0 15px 40px rgba(124, 58, 237, 0.5) !important;
+    z-index: 200; transform: scale(1.03); transition: none !important;
+  }
+
+  #floatingActionBar {
+    position: absolute; display: none; gap: 5px; z-index: 500;
+    pointer-events: auto; white-space: nowrap; align-items: center;
+    transform: translateY(-40px);
+  }
+  #floatingActionBar.visible { display: flex; }
+  #floatingActionBar button {
+    height: 32px; padding: 0 14px; border-radius: 20px; border: none;
+    cursor: pointer; font-size: 12px; display: inline-flex;
+    align-items: center; gap: 6px; font-weight: 700;
+    transition: all 0.15s; user-select: none; font-family: inherit;
+  }
+  #floatingActionBar button:hover { transform: translateY(-2px); }
+  #floatingActionBar .move-btn {
+    background: var(--success-green); color: #166534;
+    cursor: grab !important; box-shadow: 0 4px 10px rgba(52, 211, 153, 0.4);
+  }
+  #floatingActionBar .move-btn:hover { background: var(--success-hover); color: white; }
+  #floatingActionBar .move-btn:active { cursor: grabbing !important; }
+  #floatingActionBar .delete-btn {
+    background: #fee2e2; color: #dc2626;
+    box-shadow: 0 4px 10px rgba(239, 68, 68, 0.25);
+  }
+  #floatingActionBar .delete-btn:hover { background: #fecaca; }
+
+  #floatingResizeHandle {
+    position: absolute; display: none; width: 16px; height: 16px;
+    background: var(--primary-purple); border: 2px solid white;
+    border-radius: 50%; cursor: nwse-resize; z-index: 500;
+    box-shadow: 0 2px 6px rgba(124, 58, 237, 0.5);
+  }
+  #floatingResizeHandle.visible { display: block; }
+
+  .loader {
+    position: fixed; inset: 0; background: rgba(15, 23, 42, 0.75);
+    backdrop-filter: blur(8px); display: flex; flex-direction: column;
+    justify-content: center; align-items: center; z-index: 9999;
+    color: white; gap: 16px;
+  }
+  .loader.hidden { display: none; }
+  .spinner {
+    width: 50px; height: 50px; border: 5px solid rgba(255,255,255,0.2);
+    border-top-color: var(--primary-purple); border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loader p { font-size: 15px; font-weight: 700; color: white; }
+
+  .toast {
+    position: fixed; bottom: 30px; left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: var(--success-green); color: #166534;
+    padding: 14px 26px; border-radius: 30px;
+    box-shadow: 0 6px 25px rgba(52, 211, 153, 0.5);
+    opacity: 0; transition: all 0.3s; z-index: 10000;
+    font-size: 14px; font-weight: 700;
+    display: flex; align-items: center; gap: 8px; max-width: 90vw;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+  @media (max-width: 900px) {
+    .sidebar { width: 120px; }
+    .thumb { min-width: 100px; }
+    .toolbar { font-size: 12px; padding: 10px; gap: 6px; }
+    .toolbar button, .toolbar select, .toolbar input[type="number"] {
+      padding: 6px 9px; font-size: 11px; min-height: 30px;
+    }
+    .toolbar button.icon-btn { width: 32px; padding: 6px; }
+    .toolbar-group { padding: 0 6px; gap: 4px; }
+  }
+  @media (max-width: 600px) {
+    .app-layout { padding: 8px; gap: 8px; }
+    .editor-container { border-radius: 12px; padding: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<div id="uploadScreen" class="screen active">
+  <div class="upload-box">
+    <div class="pdf-icon-wrap"><i class="fas fa-file-pdf"></i></div>
+    <h1>Professional PDF Editor</h1>
+    <p class="subtitle-pill">Upload a PDF file to begin editing</p>
+    <label for="pdfUpload" class="upload-btn">
+      <i class="fas fa-upload"></i> Select PDF File
+    </label>
+    <input type="file" id="pdfUpload" accept="application/pdf" hidden>
+    <p class="hint">Only PDF files are supported</p>
+  </div>
+</div>
+
+<div id="editorScreen" class="screen">
+  <div class="toolbar" style="margin: 12px 12px 0; border-radius: 16px;">
+    <div class="toolbar-group">
+      <button id="backBtn" class="icon-btn" title="Exit to Home"><i class="fas fa-arrow-left"></i></button>
+      <button id="sidebarToggleBtn" class="icon-btn active" title="Toggle Page Sidebar">
+        <i class="fas fa-columns"></i>
+      </button>
+      <button id="prevPage" class="icon-btn" title="Previous Page"><i class="fas fa-chevron-left"></i></button>
+      <span style="font-size:12px; color:var(--primary-purple); font-weight:700;">
+        <span id="currentPage">1</span> / <span id="totalPages">1</span>
+      </span>
+      <button id="nextPage" class="icon-btn" title="Next Page"><i class="fas fa-chevron-right"></i></button>
+    </div>
+
+    <div class="toolbar-group">
+      <span class="toolbar-label"><i class="fas fa-font"></i></span>
+      <select id="fontFamilySel" title="Font Family">
+        <option value="Helvetica">Helvetica</option>
+        <option value="Arial">Arial</option>
+        <option value="Verdana">Verdana</option>
+        <option value="Tahoma">Tahoma</option>
+        <option value="Trebuchet">Trebuchet MS</option>
+        <option value="Calibri">Calibri</option>
+        <option value="Times">Times New Roman</option>
+        <option value="Georgia">Georgia</option>
+        <option value="Garamond">Garamond</option>
+        <option value="Palatino">Palatino</option>
+        <option value="BookAntiqua">Book Antiqua</option>
+        <option value="Courier">Courier New</option>
+        <option value="Consolas">Consolas</option>
+        <option value="Monaco">Monaco</option>
+        <option value="ComicSans">Comic Sans MS</option>
+        <option value="Impact">Impact</option>
+        <option value="Cambria">Cambria</option>
+        <option value="Bookman">Bookman</option>
+        <option value="Century">Century Gothic</option>
+        <option value="Rockwell">Rockwell</option>
+      </select>
+
+      <input type="number" id="fontSizeInput" placeholder="Size" min="4" max="300" step="0.5" title="Custom Font Size">
+      <select id="fontSizeSel" title="Common Sizes">
+        <option value="">▼</option>
+        <option value="8">8</option><option value="9">9</option>
+        <option value="10">10</option><option value="11">11</option>
+        <option value="12">12</option><option value="14">14</option>
+        <option value="16">16</option><option value="18">18</option>
+        <option value="20">20</option><option value="24">24</option>
+        <option value="28">28</option><option value="32">32</option>
+        <option value="40">40</option><option value="48">48</option>
+        <option value="56">56</option><option value="64">64</option>
+        <option value="72">72</option><option value="96">96</option>
+      </select>
+    </div>
+
+    <div class="toolbar-group">
+      <button id="boldBtn" class="icon-btn" title="Bold"><b>B</b></button>
+      <button id="italicBtn" class="icon-btn" title="Italic"><i>I</i></button>
+      <button id="underlineBtn" class="icon-btn" title="Underline"><u>U</u></button>
+      <button id="clearFmtBtn" class="icon-btn" title="Clear Formatting"><i class="fas fa-eraser"></i></button>
+    </div>
+
+    <div class="toolbar-group">
+      <span class="toolbar-label" title="Text Color"><i class="fas fa-font"></i></span>
+      <div class="color-wrap"><input type="color" id="textColorPicker" value="#000000" title="Text Color"></div>
+    </div>
+
+    <div class="toolbar-group">
+      <span class="toolbar-label" title="Highlight"><i class="fas fa-highlighter"></i></span>
+      <div class="color-wrap"><input type="color" id="highlightColorPicker" value="#ffff00" title="Highlight Color"></div>
+      <button id="removeHighlightBtn" class="icon-btn" title="Remove Highlight"><i class="fas fa-ban"></i></button>
+    </div>
+
+    <div class="toolbar-group">
+      <button id="addTextBtn" title="Insert New Text"><i class="fas fa-plus"></i> Insert Text</button>
+    </div>
+
+    <div class="toolbar-group">
+      <span class="toolbar-label" title="Page Background"><i class="fas fa-fill-drip"></i></span>
+      <div class="color-wrap"><input type="color" id="pageBgPicker" value="#ffffff" title="Page Background Color"></div>
+      <button id="resetPageBg" class="icon-btn" title="Reset Page Background"><i class="fas fa-undo"></i></button>
+    </div>
+
+    <button id="downloadBtn" class="download-btn">
+      <i class="fas fa-download"></i> Download PDF
+    </button>
+  </div>
+
+  <div class="app-layout">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-title"><i class="fas fa-file-alt"></i> Pages</div>
+      <div id="thumbnails"></div>
+    </aside>
+
+    <button class="sidebar-toggle-float" id="sidebarToggleFloat" title="Show Page Sidebar">
+      <i class="fas fa-chevron-right"></i>
+    </button>
+
+    <div class="main-area">
+      <div class="editor-container" id="editorContainer">
+        <div class="canvas-wrapper" id="canvasWrapper">
+          <canvas id="pdfCanvas"></canvas>
+          <div id="pageBgOverlay"></div>
+          <div id="textLayer"></div>
+          <div id="floatingActionBar">
+            <button class="move-btn" data-act="move" title="Hold and drag to reposition">
+              <i class="fas fa-hand-rock"></i> Move
+            </button>
+            <button class="delete-btn" data-act="delete" title="Delete this text">
+              <i class="fas fa-trash"></i> Delete
+            </button>
+          </div>
+          <div id="floatingResizeHandle" title="Drag to resize"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="loader" class="loader hidden">
+  <div class="spinner"></div>
+  <p id="loaderText">Processing...</p>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+const { PDFDocument, rgb, StandardFonts } = PDFLib;
+
+let pdfDoc = null;
+let currentPageNum = 1;
+let totalPages = 1;
+let pdfBytes = null;
+const scale = 1.5;
+
+let textEdits = [];
+let originalTextItems = [];   // MERGED LINES with duplicate detection
+let pageBackgrounds = [];
+
+let selectedEl = null;
+let newTextCounter = 0;
+let clipboard = null;
+
+const uploadScreen = document.getElementById('uploadScreen');
+const editorScreen = document.getElementById('editorScreen');
+const pdfUpload = document.getElementById('pdfUpload');
+const pdfCanvas = document.getElementById('pdfCanvas');
+const textLayer = document.getElementById('textLayer');
+const pageBgOverlay = document.getElementById('pageBgOverlay');
+const canvasWrapper = document.getElementById('canvasWrapper');
+const currentPageEl = document.getElementById('currentPage');
+const totalPagesEl = document.getElementById('totalPages');
+const thumbnailsEl = document.getElementById('thumbnails');
+const loader = document.getElementById('loader');
+const loaderText = document.getElementById('loaderText');
+const toastEl = document.getElementById('toast');
+const sidebar = document.getElementById('sidebar');
+const sidebarToggleBtn = document.getElementById('sidebarToggleBtn');
+const sidebarToggleFloat = document.getElementById('sidebarToggleFloat');
+const floatingActionBar = document.getElementById('floatingActionBar');
+const floatingResizeHandle = document.getElementById('floatingResizeHandle');
+
+const fontFamilySel = document.getElementById('fontFamilySel');
+const fontSizeSel = document.getElementById('fontSizeSel');
+const fontSizeInput = document.getElementById('fontSizeInput');
+const boldBtn = document.getElementById('boldBtn');
+const italicBtn = document.getElementById('italicBtn');
+const underlineBtn = document.getElementById('underlineBtn');
+const clearFmtBtn = document.getElementById('clearFmtBtn');
+const textColorPicker = document.getElementById('textColorPicker');
+const highlightColorPicker = document.getElementById('highlightColorPicker');
+const removeHighlightBtn = document.getElementById('removeHighlightBtn');
+const pageBgPicker = document.getElementById('pageBgPicker');
+const resetPageBg = document.getElementById('resetPageBg');
+const addTextBtn = document.getElementById('addTextBtn');
+
+const FONT_MAP = {
+  'Helvetica':    { pdf: 'Helvetica', css: 'Helvetica, Arial, sans-serif' },
+  'Arial':        { pdf: 'Helvetica', css: 'Arial, Helvetica, sans-serif' },
+  'Verdana':      { pdf: 'Helvetica', css: 'Verdana, Geneva, sans-serif' },
+  'Tahoma':       { pdf: 'Helvetica', css: 'Tahoma, Geneva, sans-serif' },
+  'Trebuchet':    { pdf: 'Helvetica', css: '"Trebuchet MS", Helvetica, sans-serif' },
+  'Calibri':      { pdf: 'Helvetica', css: 'Calibri, Candara, sans-serif' },
+  'ComicSans':    { pdf: 'Helvetica', css: '"Comic Sans MS", cursive, sans-serif' },
+  'Impact':       { pdf: 'HelveticaBold', css: 'Impact, Charcoal, sans-serif' },
+  'Century':      { pdf: 'Helvetica', css: '"Century Gothic", sans-serif' },
+  'Rockwell':     { pdf: 'Helvetica', css: 'Rockwell, "Courier New", serif' },
+  'Times':        { pdf: 'Times', css: '"Times New Roman", Times, serif' },
+  'Georgia':      { pdf: 'Times', css: 'Georgia, "Times New Roman", serif' },
+  'Garamond':     { pdf: 'Times', css: 'Garamond, "Times New Roman", serif' },
+  'Palatino':     { pdf: 'Times', css: '"Palatino Linotype", "Book Antiqua", serif' },
+  'BookAntiqua':  { pdf: 'Times', css: '"Book Antiqua", Palatino, serif' },
+  'Cambria':      { pdf: 'Times', css: 'Cambria, Georgia, serif' },
+  'Bookman':      { pdf: 'Times', css: '"Bookman Old Style", Georgia, serif' },
+  'Courier':      { pdf: 'Courier', css: '"Courier New", Courier, monospace' },
+  'Consolas':     { pdf: 'Courier', css: 'Consolas, Monaco, monospace' },
+  'Monaco':       { pdf: 'Courier', css: 'Monaco, Consolas, monospace' }
+};
+
+function getCssFont(name) { return (FONT_MAP[name] && FONT_MAP[name].css) || 'Arial, Helvetica, sans-serif'; }
+function getPdfFontFamily(name) { return (FONT_MAP[name] && FONT_MAP[name].pdf) || 'Helvetica'; }
+
+function getFontWidthRatio(family, bold, italic) {
+  const pdfFam = getPdfFontFamily(family);
+  let ratio = 0.55;
+  if (pdfFam === 'Times') ratio = 0.50;
+  if (pdfFam === 'Courier') ratio = 0.60;
+  if (bold) ratio *= 1.05;
+  if (italic) ratio *= 0.98;
+  return ratio;
+}
+
+function estimateTextWidth(text, fontSize, family, bold, italic) {
+  const ratio = getFontWidthRatio(family, bold, italic);
+  return text.length * fontSize * ratio;
+}
+
+let sidebarHidden = false;
+function toggleSidebar() {
+  sidebarHidden = !sidebarHidden;
+  if (sidebarHidden) {
+    sidebar.classList.add('hidden');
+    sidebarToggleBtn.classList.remove('active');
+    sidebarToggleFloat.classList.add('visible');
+  } else {
+    sidebar.classList.remove('hidden');
+    sidebarToggleBtn.classList.add('active');
+    sidebarToggleFloat.classList.remove('visible');
+  }
+}
+sidebarToggleBtn.onclick = (e) => { e.stopPropagation(); toggleSidebar(); };
+sidebarToggleFloat.onclick = (e) => { e.stopPropagation(); toggleSidebar(); };
+
+function toast(msg) {
+  toastEl.textContent = msg;
+  toastEl.classList.add('show');
+  setTimeout(() => toastEl.classList.remove('show'), 1800);
+}
+function showLoader(t) { loaderText.textContent = t || 'Processing...'; loader.classList.remove('hidden'); }
+function hideLoader() { loader.classList.add('hidden'); }
+function hexToRgb01(hex) {
+  const h = hex.replace('#', '');
+  return { r: parseInt(h.substring(0,2),16)/255, g: parseInt(h.substring(2,4),16)/255, b: parseInt(h.substring(4,6),16)/255 };
+}
+function detectStyle(fontName) {
+  if (!fontName) return { bold: false, italic: false };
+  const n = fontName.toLowerCase();
+  return { bold: /bold|black|heavy|semibold|demibold|extrabold/.test(n), italic: /italic|oblique|slanted/.test(n) };
+}
+function detectFamily(fontName) {
+  if (!fontName) return 'Helvetica';
+  const n = fontName.toLowerCase();
+  if (/times|serif|georgia|garamond|palatino|book|century|cambria/.test(n)) return 'Times';
+  if (/courier|mono|consol/.test(n)) return 'Courier';
+  return 'Helvetica';
+}
+
+function getTextFromElement(el) {
+  const span = el.querySelector('.text-content');
+  if (span) return (span.innerText || span.textContent || '').replace(/\n/g, '');
+  return (el.textContent || '').replace(/\n/g, '');
+}
+function setTextInElement(el, text) {
+  const span = el.querySelector('.text-content');
+  if (span) span.innerText = text;
+  else el.innerText = text;
+}
+
+function updateFloatingControls() {
+  if (!selectedEl) {
+    floatingActionBar.classList.remove('visible');
+    floatingResizeHandle.classList.remove('visible');
+    return;
+  }
+  const el = selectedEl;
+  const x = parseFloat(el.dataset.x);
+  const y = parseFloat(el.dataset.y);
+  const w = parseFloat(el.dataset.width) + 12;
+  const h = parseFloat(el.dataset.fontSize) * 1.35;
+
+  floatingActionBar.style.left = x + 'px';
+  floatingActionBar.style.top = y + 'px';
+  floatingActionBar.classList.add('visible');
+
+  floatingResizeHandle.style.left = (x + w - 8) + 'px';
+  floatingResizeHandle.style.top = (y + h - 8) + 'px';
+  floatingResizeHandle.classList.add('visible');
+}
+
+pdfUpload.addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  if (file.type !== 'application/pdf') return alert('Please select a valid PDF file.');
+  showLoader('Loading PDF...');
+  try {
+    const arrayBuffer = await file.arrayBuffer();
+    pdfBytes = new Uint8Array(arrayBuffer);
+    pdfDoc = await pdfjsLib.getDocument({ data: pdfBytes.slice() }).promise;
+    totalPages = pdfDoc.numPages;
+    totalPagesEl.textContent = totalPages;
+    currentPageNum = 1;
+
+    textEdits = Array.from({ length: totalPages }, () => ({}));
+    originalTextItems = Array.from({ length: totalPages }, () => []);
+    pageBackgrounds = Array.from({ length: totalPages }, () => null);
+
+    uploadScreen.classList.remove('active');
+    editorScreen.classList.add('active');
+
+    await buildThumbnails();
+    await renderPage(currentPageNum);
+    hideLoader();
+    toast('PDF ready. Click any text to edit.');
+  } catch (err) {
+    console.error(err);
+    alert('PDF load error: ' + err.message);
+    hideLoader();
+  }
+});
+
+async function buildThumbnails() {
+  thumbnailsEl.innerHTML = '';
+  for (let i = 1; i <= totalPages; i++) {
+    const wrap = document.createElement('div');
+    wrap.className = 'thumb' + (i === currentPageNum ? ' active' : '');
+    wrap.dataset.page = i;
+    const canvas = document.createElement('canvas');
+    wrap.appendChild(canvas);
+    const label = document.createElement('div');
+    label.className = 'thumb-label';
+    label.textContent = 'Page ' + i;
+    wrap.appendChild(label);
+    wrap.addEventListener('click', () => gotoPage(i));
+    thumbnailsEl.appendChild(wrap);
+    const page = await pdfDoc.getPage(i);
+    const vp = page.getViewport({ scale: 0.25 });
+    canvas.width = vp.width;
+    canvas.height = vp.height;
+    const ctx = canvas.getContext('2d');
+    await page.render({ canvasContext: ctx, viewport: vp }).promise;
+  }
+}
+
+function gotoPage(n) {
+  if (n === currentPageNum || n < 1 || n > totalPages) return;
+  saveCurrentEdits();
+  currentPageNum = n;
+  thumbnailsEl.querySelectorAll('.thumb').forEach((t) => {
+    t.classList.toggle('active', parseInt(t.dataset.page) === n);
+  });
+  renderPage(n);
+}
+
+document.getElementById('prevPage').onclick = () => gotoPage(currentPageNum - 1);
+document.getElementById('nextPage').onclick = () => gotoPage(currentPageNum + 1);
+document.getElementById('backBtn').onclick = () => {
+  if (confirm('Exit the editor? All unsaved changes will be lost.')) location.reload();
+};
+
+function saveCurrentEdits() {
+  const pageIndex = currentPageNum - 1;
+  textLayer.querySelectorAll('.text-item').forEach((el) => {
+    const idx = parseInt(el.dataset.idx);
+    const data = collectItemData(el);
+    if (el.dataset.isNew === '1' || data.text !== el.dataset.original || data.modified) {
+      textEdits[pageIndex][idx] = data;
+    } else {
+      delete textEdits[pageIndex][idx];
+    }
+  });
+}
+
+function collectItemData(el) {
+  return {
+    text: getTextFromElement(el),
+    x: parseFloat(el.dataset.x),
+    y: parseFloat(el.dataset.y),
+    fontSize: parseFloat(el.dataset.fontSize),
+    width: parseFloat(el.dataset.width),
+    origX: parseFloat(el.dataset.origX),
+    origY: parseFloat(el.dataset.origY),
+    origBaselineY: parseFloat(el.dataset.origBaselineY),
+    origFontSize: parseFloat(el.dataset.origFontSize),
+    origWidth: parseFloat(el.dataset.origWidth),
+    origText: el.dataset.original || '',
+    sourceIndices: (el.dataset.sourceIndices || '').split(',').filter(x => x).map(Number),
+    fontFamily: el.dataset.fontFamily || 'Helvetica',
+    bold: el.dataset.bold === '1',
+    italic: el.dataset.italic === '1',
+    underline: el.dataset.underline === '1',
+    color: el.dataset.color || '#000000',
+    highlight: el.dataset.highlight || '',
+    isNew: el.dataset.isNew === '1',
+    modified: el.dataset.modified === '1'
+  };
+}
+
+/* ============================================================
+   CRITICAL: Merge PDF.js items into visual lines AND remove duplicates
+   ============================================================ */
+function mergeTextItemsIntoLines(items, viewport) {
+  const normalized = [];
+  items.forEach((item, originalIdx) => {
+    if (!item.str || !item.str.trim()) return;
+    const tx = pdfjsLib.Util.transform(viewport.transform, item.transform);
+    const fontHeight = Math.hypot(tx[2], tx[3]);
+    if (fontHeight < 1) return;
+
+    normalized.push({
+      originalIdx,
+      text: item.str,
+      x: tx[4],
+      baselineY: tx[5],
+      fontSize: fontHeight,
+      pdfjsWidth: (item.width * viewport.scale) || 0,
+      fontName: item.fontName || '',
+      endX: tx[4] + ((item.width * viewport.scale) || 0)
+    });
+  });
+
+  // Sort by baseline (top to bottom) then x (left to right)
+  normalized.sort((a, b) => {
+    const dy = b.baselineY - a.baselineY;
+    if (Math.abs(dy) > 2) return dy;
+    return a.x - b.x;
+  });
+
+  // Group into lines
+  const lines = [];
+  const Y_TOLERANCE = 3;
+  const GAP_TOLERANCE = 60;
+
+  for (const it of normalized) {
+    let targetLine = null;
+    for (const line of lines) {
+      const sameY = Math.abs(line.baselineY - it.baselineY) < Y_TOLERANCE;
+      if (!sameY) continue;
+      const gap = it.x - line.endX;
+      if (Math.abs(gap) < GAP_TOLERANCE) {
+        targetLine = line;
+        break;
+      }
+    }
+
+    if (targetLine) {
+      targetLine.items.push(it);
+      // Only append if text is different from what's already merged at this position
+      const existingText = targetLine.text.trim();
+      const newText = it.text.trim();
+      if (!existingText.endsWith(newText) && !newText.endsWith(existingText)) {
+        targetLine.text += (existingText && newText ? ' ' : '') + it.text;
+      }
+      targetLine.endX = Math.max(targetLine.endX, it.endX);
+      targetLine.sourceIndices.push(it.originalIdx);
+    } else {
+      lines.push({
+        text: it.text,
+        x: it.x,
+        baselineY: it.baselineY,
+        fontSize: it.fontSize,
+        fontName: it.fontName,
+        startX: it.x,
+        endX: it.endX,
+        items: [it],
+        sourceIndices: [it.originalIdx]
+      });
+    }
+  }
+
+  // ============================================================
+  // CRITICAL: Remove duplicate lines (same text, same position)
+  // ============================================================
+  const uniqueLines = [];
+  for (const line of lines) {
+    const lineText = line.text.trim();
+    const isDuplicate = uniqueLines.some(existing => {
+      const sameText = existing.text.trim() === lineText;
+      const sameX = Math.abs(existing.x - line.x) < 2;
+      const sameY = Math.abs(existing.baselineY - line.baselineY) < 2;
+      return sameText && sameX && sameY;
+    });
+    if (!isDuplicate) {
+      uniqueLines.push(line);
+    }
+  }
+
+  // Compute width for each line
+  uniqueLines.forEach(line => {
+    const style = detectStyle(line.fontName);
+    const family = detectFamily(line.fontName);
+    const estWidth = estimateTextWidth(line.text, line.fontSize, family, style.bold, style.italic);
+    const actualWidth = line.endX - line.startX;
+    line.width = Math.max(estWidth, actualWidth);
+    line.fontFamily = family;
+    line.bold = style.bold;
+    line.italic = style.italic;
+    line.sourceIndices.sort((a, b) => a - b);
+  });
+
+  return uniqueLines;
+}
+
+async function renderPage(pageNum) {
+  const page = await pdfDoc.getPage(pageNum);
+  const viewport = page.getViewport({ scale });
+
+  pdfCanvas.width = viewport.width;
+  pdfCanvas.height = viewport.height;
+  const ctx = pdfCanvas.getContext('2d');
+  ctx.clearRect(0, 0, pdfCanvas.width, pdfCanvas.height);
+  await page.render({ canvasContext: ctx, viewport }).promise;
+
+  canvasWrapper.style.width = viewport.width + 'px';
+  canvasWrapper.style.height = viewport.height + 'px';
+  pageBgOverlay.style.width = viewport.width + 'px';
+  pageBgOverlay.style.height = viewport.height + 'px';
+
+  const pageIndex = pageNum - 1;
+  if (pageBackgrounds[pageIndex]) {
+    pageBgOverlay.style.background = pageBackgrounds[pageIndex];
+    pageBgOverlay.style.mixBlendMode = 'multiply';
+    pageBgOverlay.style.display = 'block';
+  } else {
+    pageBgOverlay.style.background = 'transparent';
+    pageBgOverlay.style.display = 'none';
+  }
+  pageBgPicker.value = pageBackgrounds[pageIndex] || '#ffffff';
+
+  textLayer.innerHTML = '';
+  textLayer.style.width = viewport.width + 'px';
+  textLayer.style.height = viewport.height + 'px';
+
+  const textContent = await page.getTextContent();
+
+  if (originalTextItems[pageIndex].length === 0) {
+    const mergedLines = mergeTextItemsIntoLines(textContent.items, viewport);
+    originalTextItems[pageIndex] = mergedLines.map((line, i) => ({
+      idx: i,
+      text: line.text,
+      x: line.x,
+      baselineY: line.baselineY,
+      fontSize: line.fontSize,
+      width: line.width,
+      fontFamily: line.fontFamily,
+      bold: line.bold,
+      italic: line.italic,
+      sourceIndices: line.sourceIndices
+    }));
+  }
+
+  originalTextItems[pageIndex].forEach((info) => {
+    if (textEdits[pageIndex][info.idx] && textEdits[pageIndex][info.idx].deleted) return;
+    const edited = textEdits[pageIndex][info.idx];
+    const data = edited || {
+      text: info.text,
+      x: info.x,
+      y: info.baselineY - info.fontSize,
+      fontSize: info.fontSize, width: info.width,
+      fontFamily: info.fontFamily, bold: info.bold, italic: info.italic,
+      underline: false, color: '#000000', highlight: '', isNew: false,
+      origX: info.x,
+      origY: info.baselineY - info.fontSize,
+      origBaselineY: info.baselineY,
+      origFontSize: info.fontSize,
+      origWidth: info.width, origText: info.text,
+      sourceIndices: info.sourceIndices || []
+    };
+    if (data.origBaselineY === undefined) data.origBaselineY = info.baselineY;
+    if (data.origX === undefined) data.origX = info.x;
+    if (data.origY === undefined) data.origY = (info.baselineY - info.fontSize);
+    if (data.origFontSize === undefined) data.origFontSize = info.fontSize;
+    if (data.origWidth === undefined) data.origWidth = info.width;
+    if (data.origText === undefined) data.origText = info.text;
+    if (!data.sourceIndices) data.sourceIndices = info.sourceIndices || [];
+    createTextElement(data, info.idx, false);
+  });
+
+  Object.keys(textEdits[pageIndex]).forEach((k) => {
+    const idx = parseInt(k);
+    if (idx >= 900000 && !textEdits[pageIndex][idx].deleted) {
+      createTextElement(textEdits[pageIndex][idx], idx, true);
+    }
+  });
+
+  currentPageEl.textContent = pageNum;
+  updateFloatingControls();
+}
+
+function createTextElement(data, idx, isNew) {
+  const el = document.createElement('div');
+  el.className = 'text-item';
+  el.dataset.idx = idx;
+  el.dataset.original = isNew ? '' : (data.origText !== undefined ? data.origText : (originalTextItems[currentPageNum - 1].find(i => i.idx === idx)?.text || ''));
+  el.dataset.x = data.x;
+  el.dataset.y = data.y;
+  el.dataset.fontSize = data.fontSize;
+  el.dataset.width = data.width;
+  el.dataset.origX = (data.origX !== undefined) ? data.origX : data.x;
+  el.dataset.origY = (data.origY !== undefined) ? data.origY : data.y;
+  el.dataset.origBaselineY = (data.origBaselineY !== undefined) ? data.origBaselineY : (data.y + data.fontSize);
+  el.dataset.origFontSize = (data.origFontSize !== undefined) ? data.origFontSize : data.fontSize;
+  el.dataset.origWidth = (data.origWidth !== undefined) ? data.origWidth : data.width;
+  el.dataset.sourceIndices = (data.sourceIndices || []).join(',');
+  el.dataset.fontFamily = data.fontFamily || 'Helvetica';
+  el.dataset.bold = data.bold ? '1' : '0';
+  el.dataset.italic = data.italic ? '1' : '0';
+  el.dataset.underline = data.underline ? '1' : '0';
+  el.dataset.color = data.color || '#000000';
+  el.dataset.highlight = data.highlight || '';
+  el.dataset.isNew = isNew ? '1' : '0';
+  el.dataset.modified = (isNew || (data.modified === true)) ? '1' : '0';
+
+  const span = document.createElement('span');
+  span.className = 'text-content';
+  span.innerText = data.text;
+  el.appendChild(span);
+
+  applyVisualStyle(el);
+
+  if (el.dataset.modified === '1' || el.dataset.isNew === '1') {
+    el.classList.add('modified');
+  }
+  if (isNew) el.classList.add('new-text');
+
+  el.addEventListener('mousedown', (ev) => {
+    if (el.classList.contains('editing')) return;
+    ev.stopPropagation();
+  });
+  el.addEventListener('click', (ev) => {
+    if (el.classList.contains('editing')) return;
+    ev.stopPropagation();
+    selectElement(el);
+    startEditing(el);
+  });
+
+  textLayer.appendChild(el);
+  return el;
+}
+
+function startSmoothDrag(el, ev) {
+  const startX = ev.clientX;
+  const startY = ev.clientY;
+  const origX = parseFloat(el.dataset.x);
+  const origY = parseFloat(el.dataset.y);
+
+  el.classList.add('dragging');
+  document.body.style.userSelect = 'none';
+  document.body.style.cursor = 'grabbing';
+
+  function onMove(e) {
+    e.preventDefault();
+    const dx = e.clientX - startX;
+    const dy = e.clientY - startY;
+    const nx = Math.max(0, origX + dx);
+    const ny = Math.max(0, origY + dy);
+    el.dataset.x = nx;
+    el.dataset.y = ny;
+    el.style.left = nx + 'px';
+    el.style.top = ny + 'px';
+    if (selectedEl === el) updateFloatingControls();
+  }
+  function onUp() {
+    document.removeEventListener('mousemove', onMove);
+    document.removeEventListener('mouseup', onUp);
+    el.classList.remove('dragging');
+    document.body.style.userSelect = '';
+    document.body.style.cursor = '';
+    const idx = parseInt(el.dataset.idx);
+    const pageIndex = currentPageNum - 1;
+    textEdits[pageIndex][idx] = collectItemData(el);
+  }
+  document.addEventListener('mousemove', onMove);
+  document.addEventListener('mouseup', onUp);
+}
+
+function applyVisualStyle(el) {
+  el.style.left = parseFloat(el.dataset.x) + 'px';
+  el.style.top = parseFloat(el.dataset.y) + 'px';
+  el.style.fontSize = parseFloat(el.dataset.fontSize) + 'px';
+
+  const text = getTextFromElement(el);
+  const isModified = el.dataset.modified === '1' || el.dataset.isNew === '1' || text !== el.dataset.original;
+  const isActive = el.classList.contains('selected') || el.classList.contains('editing');
+
+  let displayWidth;
+  if (!isModified) {
+    displayWidth = parseFloat(el.dataset.width);
+  } else {
+    const fontSize = parseFloat(el.dataset.fontSize);
+    const family = el.dataset.fontFamily;
+    const bold = el.dataset.bold === '1';
+    const italic = el.dataset.italic === '1';
+    const estWidth = estimateTextWidth(text, fontSize, family, bold, italic);
+    const origWidth = parseFloat(el.dataset.origWidth) || 0;
+    displayWidth = Math.max(estWidth, origWidth);
+    el.dataset.width = displayWidth;
+  }
+
+  el.style.width = (displayWidth + 12) + 'px';
+  el.style.minHeight = (parseFloat(el.dataset.fontSize) * 1.35) + 'px';
+  el.style.fontFamily = getCssFont(el.dataset.fontFamily);
+  el.style.fontWeight = el.dataset.bold === '1' ? '700' : '400';
+  el.style.fontStyle = el.dataset.italic === '1' ? 'italic' : 'normal';
+  el.style.textDecoration = el.dataset.underline === '1' ? 'underline' : 'none';
+
+  if (isModified || isActive) {
+    el.style.color = el.dataset.color || '#000000';
+  } else {
+    el.style.color = 'transparent';
+  }
+
+  if (el.dataset.highlight && el.dataset.highlight !== '') {
+    el.style.background = el.dataset.highlight;
+  } else if (isModified) {
+    el.style.background = '#ffffff';
+  } else if (el.classList.contains('editing')) {
+    el.style.background = '#ffffff';
+  } else {
+    el.style.background = 'transparent';
+  }
+}
+
+function selectElement(el) {
+  document.querySelectorAll('.text-item.selected').forEach((o) => {
+    if (o !== el) o.classList.remove('selected');
+  });
+  el.classList.add('selected');
+  selectedEl = el;
+
+  fontFamilySel.value = el.dataset.fontFamily || 'Helvetica';
+  const sz = Math.round(parseFloat(el.dataset.fontSize) * 10) / 10;
+  fontSizeInput.value = sz;
+  fontSizeSel.value = '';
+  boldBtn.classList.toggle('active', el.dataset.bold === '1');
+  italicBtn.classList.toggle('active', el.dataset.italic === '1');
+  underlineBtn.classList.toggle('active', el.dataset.underline === '1');
+  textColorPicker.value = el.dataset.color || '#000000';
+  if (el.dataset.highlight) highlightColorPicker.value = el.dataset.highlight;
+
+  updateFloatingControls();
+}
+
+function clearSelection() {
+  document.querySelectorAll('.text-item.selected').forEach((o) => o.classList.remove('selected'));
+  selectedEl = null;
+  updateFloatingControls();
+}
+
+function startEditing(el) {
+  document.querySelectorAll('.text-item.editing').forEach((o) => { if (o !== el) finalizeEdit(o); });
+  if (el.classList.contains('editing')) return;
+
+  selectElement(el);
+
+  const span = el.querySelector('.text-content');
+  el.dataset.beforeEdit = getTextFromElement(el);
+  el.dataset.modified = '1';
+  el.classList.add('modified');
+  el.classList.add('editing');
+
+  span.contentEditable = 'true';
+  span.focus();
+
+  const range = document.createRange();
+  range.selectNodeContents(span);
+  range.collapse(false);
+  const sel = window.getSelection();
+  sel.removeAllRanges();
+  sel.addRange(range);
+
+  floatingActionBar.classList.remove('visible');
+  floatingResizeHandle.classList.remove('visible');
+
+  span.onblur = () => finalizeEdit(el);
+  span.onkeydown = (e) => {
+    e.stopPropagation();
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); span.blur(); }
+    if (e.key === 'Escape') {
+      setTextInElement(el, el.dataset.beforeEdit);
+      el.classList.remove('editing');
+      applyVisualStyle(el);
+      span.contentEditable = 'false';
+      span.blur();
+    }
+  };
+}
+
+function finalizeEdit(el) {
+  if (!el.classList.contains('editing')) return;
+  const span = el.querySelector('.text-content');
+  span.contentEditable = 'false';
+  el.classList.remove('editing');
+
+  const idx = parseInt(el.dataset.idx);
+  const pageIndex = currentPageNum - 1;
+  const newText = getTextFromElement(el);
+
+  setTextInElement(el, newText);
+  applyVisualStyle(el);
+  span.onblur = null;
+  span.onkeydown = null;
+
+  const data = collectItemData(el);
+  data.text = newText;
+  textEdits[pageIndex][idx] = data;
+
+  if (el.dataset.isNew === '1') {
+    selectElement(el);
+  } else {
+    updateFloatingControls();
+  }
+}
+
+function deleteElement(el) {
+  const idx = parseInt(el.dataset.idx);
+  const pageIndex = currentPageNum - 1;
+  textEdits[pageIndex][idx] = { ...collectItemData(el), deleted: true };
+  el.remove();
+  if (selectedEl === el) {
+    selectedEl = null;
+    updateFloatingControls();
+  }
+  toast('Text deleted');
+}
+
+function pasteClipboard() {
+  if (!clipboard) return toast('Clipboard is empty');
+  const pageIndex = currentPageNum - 1;
+  const idx = 900000 + (newTextCounter++);
+  const data = { ...clipboard, x: (clipboard.x || 100) + 30, y: (clipboard.y || 100) + 30, isNew: true, modified: true };
+  textEdits[pageIndex][idx] = data;
+  const el = createTextElement(data, idx, true);
+  selectElement(el);
+  toast('Text pasted');
+}
+
+function startResize(el, ev) {
+  selectElement(el);
+  const startX = ev.clientX;
+  const startY = ev.clientY;
+  const origSize = parseFloat(el.dataset.fontSize);
+
+  function onMove(e) {
+    const dx = e.clientX - startX;
+    const dy = e.clientY - startY;
+    const delta = Math.max(dx, dy) + (Math.min(dx, dy) * 0.3);
+    let newSize = origSize + delta * 0.35;
+    newSize = Math.max(4, Math.min(300, newSize));
+    newSize = Math.round(newSize * 10) / 10;
+    el.dataset.fontSize = newSize;
+    el.dataset.modified = '1';
+    el.classList.add('modified');
+    applyVisualStyle(el);
+    const sz = Math.round(newSize * 10) / 10;
+    fontSizeInput.value = sz;
+    updateFloatingControls();
+  }
+  function onUp() {
+    document.removeEventListener('mousemove', onMove);
+    document.removeEventListener('mouseup', onUp);
+    const idx = parseInt(el.dataset.idx);
+    const pageIndex = currentPageNum - 1;
+    textEdits[pageIndex][idx] = collectItemData(el);
+  }
+  document.addEventListener('mousemove', onMove);
+  document.addEventListener('mouseup', onUp);
+}
+
+floatingActionBar.querySelector('[data-act="move"]').addEventListener('mousedown', (ev) => {
+  ev.preventDefault();
+  ev.stopPropagation();
+  if (!selectedEl) return;
+  if (selectedEl.classList.contains('editing')) finalizeEdit(selectedEl);
+  startSmoothDrag(selectedEl, ev);
+});
+floatingActionBar.querySelector('[data-act="move"]').addEventListener('click', (ev) => { ev.preventDefault(); ev.stopPropagation(); });
+floatingActionBar.querySelector('[data-act="delete"]').addEventListener('click', (ev) => {
+  ev.preventDefault();
+  ev.stopPropagation();
+  if (selectedEl) deleteElement(selectedEl);
+});
+floatingResizeHandle.addEventListener('mousedown', (ev) => {
+  ev.stopPropagation();
+  ev.preventDefault();
+  if (selectedEl) startResize(selectedEl, ev);
+});
+
+addTextBtn.onclick = () => {
+  const pageIndex = currentPageNum - 1;
+  const idx = 900000 + (newTextCounter++);
+  const count = Object.keys(textEdits[pageIndex]).filter(k => parseInt(k) >= 900000).length;
+  const offset = count * 30;
+  const data = {
+    text: 'New Text',
+    x: 80 + offset,
+    y: 80 + offset,
+    fontSize: 16,
+    width: 90,
+    origX: 80 + offset,
+    origY: 80 + offset,
+    origBaselineY: 80 + offset + 16,
+    origFontSize: 16,
+    origWidth: 90,
+    origText: '',
+    sourceIndices: [],
+    fontFamily: fontFamilySel.value || 'Helvetica',
+    bold: boldBtn.classList.contains('active'),
+    italic: italicBtn.classList.contains('active'),
+    underline: underlineBtn.classList.contains('active'),
+    color: textColorPicker.value || '#000000',
+    highlight: '',
+    isNew: true,
+    modified: true
+  };
+  textEdits[pageIndex][idx] = data;
+  const el = createTextElement(data, idx, true);
+  selectElement(el);
+  toast('Use Move to reposition, click text to edit');
+};
+
+function applyToSelected(fn) {
+  if (!selectedEl) return toast('Please select a text element first');
+  fn(selectedEl);
+  applyVisualStyle(selectedEl);
+  const idx = parseInt(selectedEl.dataset.idx);
+  const pageIndex = currentPageNum - 1;
+  textEdits[pageIndex][idx] = collectItemData(selectedEl);
+  updateFloatingControls();
+}
+
+boldBtn.onclick = () => { applyToSelected((el) => { el.dataset.bold = el.dataset.bold === '1' ? '0' : '1'; }); boldBtn.classList.toggle('active', selectedEl && selectedEl.dataset.bold === '1'); };
+italicBtn.onclick = () => { applyToSelected((el) => { el.dataset.italic = el.dataset.italic === '1' ? '0' : '1'; }); italicBtn.classList.toggle('active', selectedEl && selectedEl.dataset.italic === '1'); };
+underlineBtn.onclick = () => { applyToSelected((el) => { el.dataset.underline = el.dataset.underline === '1' ? '0' : '1'; }); underlineBtn.classList.toggle('active', selectedEl && selectedEl.dataset.underline === '1'); };
+clearFmtBtn.onclick = () => {
+  applyToSelected((el) => {
+    el.dataset.bold = '0'; el.dataset.italic = '0'; el.dataset.underline = '0';
+    el.dataset.color = '#000000'; el.dataset.highlight = '';
+  });
+  boldBtn.classList.remove('active'); italicBtn.classList.remove('active');
+  underlineBtn.classList.remove('active');
+  textColorPicker.value = '#000000'; highlightColorPicker.value = '#ffff00';
+};
+fontFamilySel.onchange = () => applyToSelected((el) => { el.dataset.fontFamily = fontFamilySel.value; });
+
+fontSizeInput.addEventListener('input', () => {
+  const v = parseFloat(fontSizeInput.value);
+  if (!v || isNaN(v)) return;
+  if (!selectedEl) return;
+  selectedEl.dataset.fontSize = v;
+  selectedEl.dataset.modified = '1';
+  selectedEl.classList.add('modified');
+  applyVisualStyle(selectedEl);
+  const idx = parseInt(selectedEl.dataset.idx);
+  const pageIndex = currentPageNum - 1;
+  textEdits[pageIndex][idx] = collectItemData(selectedEl);
+  updateFloatingControls();
+});
+fontSizeInput.addEventListener('change', () => {
+  const v = parseFloat(fontSizeInput.value);
+  if (!v || isNaN(v)) return;
+  if (!selectedEl) return;
+  selectedEl.dataset.fontSize = v;
+  selectedEl.dataset.modified = '1';
+  selectedEl.classList.add('modified');
+  applyVisualStyle(selectedEl);
+  const idx = parseInt(selectedEl.dataset.idx);
+  const pageIndex = currentPageNum - 1;
+  textEdits[pageIndex][idx] = collectItemData(selectedEl);
+  updateFloatingControls();
+});
+
+fontSizeSel.onchange = () => {
+  const v = parseFloat(fontSizeSel.value);
+  if (!v) return;
+  fontSizeInput.value = v;
+  applyToSelected((el) => {
+    el.dataset.fontSize = v;
+    el.dataset.modified = '1';
+    el.classList.add('modified');
+  });
+};
+
+textColorPicker.oninput = () => {
+  applyToSelected((el) => {
+    el.dataset.color = textColorPicker.value;
+    el.dataset.modified = '1';
+    el.classList.add('modified');
+  });
+};
+highlightColorPicker.oninput = () => {
+  applyToSelected((el) => {
+    el.dataset.highlight = highlightColorPicker.value;
+    el.dataset.modified = '1';
+    el.classList.add('modified');
+  });
+};
+removeHighlightBtn.onclick = () => applyToSelected((el) => { el.dataset.highlight = ''; });
+
+pageBgPicker.oninput = () => {
+  const pageIndex = currentPageNum - 1;
+  const v = pageBgPicker.value;
+  if (v.toLowerCase() === '#ffffff') {
+    pageBackgrounds[pageIndex] = null;
+    pageBgOverlay.style.display = 'none';
+  } else {
+    pageBackgrounds[pageIndex] = v;
+    pageBgOverlay.style.background = v;
+    pageBgOverlay.style.mixBlendMode = 'multiply';
+    pageBgOverlay.style.display = 'block';
+  }
+};
+resetPageBg.onclick = () => {
+  const pageIndex = currentPageNum - 1;
+  pageBackgrounds[pageIndex] = null;
+  pageBgOverlay.style.display = 'none';
+  pageBgPicker.value = '#ffffff';
+};
+
+document.addEventListener('click', (e) => {
+  if (e.target.closest('.toolbar')) return;
+  if (e.target.closest('.sidebar')) return;
+  if (e.target.closest('#floatingActionBar')) return;
+  if (e.target.closest('#floatingResizeHandle')) return;
+  if (!e.target.closest('.text-item')) {
+    document.querySelectorAll('.text-item.editing').forEach(finalizeEdit);
+    clearSelection();
+  }
+});
+
+document.addEventListener('keydown', (e) => {
+  const editingEl = document.querySelector('.text-item.editing');
+  const targetInsideEditing = e.target && e.target.closest && e.target.closest('.text-item.editing');
+
+  if (editingEl || targetInsideEditing) {
+    if ((e.ctrlKey || e.metaKey) && targetInsideEditing) {
+      if (e.key.toLowerCase() === 'b') { e.preventDefault(); boldBtn.click(); return; }
+      if (e.key.toLowerCase() === 'i') { e.preventDefault(); italicBtn.click(); return; }
+      if (e.key.toLowerCase() === 'u') { e.preventDefault(); underlineBtn.click(); return; }
+    }
+    return;
+  }
+
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'b') {
+    e.preventDefault();
+    toggleSidebar();
+    return;
+  }
+
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'c') {
+    if (selectedEl && window.getSelection().toString() === '') {
+      e.preventDefault();
+      clipboard = collectItemData(selectedEl);
+      toast('Text copied');
+    }
+  }
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'v') {
+    if (!selectedEl) {
+      e.preventDefault();
+      pasteClipboard();
+    }
+  }
+  if (e.key === 'Delete' && selectedEl) {
+    e.preventDefault();
+    deleteElement(selectedEl);
+  }
+  if ((e.ctrlKey || e.metaKey) && selectedEl) {
+    if (e.key.toLowerCase() === 'b') { e.preventDefault(); boldBtn.click(); }
+    if (e.key.toLowerCase() === 'i') { e.preventDefault(); italicBtn.click(); }
+    if (e.key.toLowerCase() === 'u') { e.preventDefault(); underlineBtn.click(); }
+  }
+});
+
+/* ============================================================
+   DOWNLOAD — Table-safe white-out
+   ============================================================ */
+document.getElementById('downloadBtn').onclick = async () => {
+  document.querySelectorAll('.text-item.editing').forEach(finalizeEdit);
+  saveCurrentEdits();
+  showLoader('Generating your edited PDF...');
+
+  try {
+    const pdfDocLib = await PDFDocument.load(pdfBytes.slice());
+    const F = {
+      h: { r: await pdfDocLib.embedFont(StandardFonts.Helvetica), b: await pdfDocLib.embedFont(StandardFonts.HelveticaBold), i: await pdfDocLib.embedFont(StandardFonts.HelveticaOblique), bi: await pdfDocLib.embedFont(StandardFonts.HelveticaBoldOblique) },
+      t: { r: await pdfDocLib.embedFont(StandardFonts.TimesRoman), b: await pdfDocLib.embedFont(StandardFonts.TimesRomanBold), i: await pdfDocLib.embedFont(StandardFonts.TimesRomanItalic), bi: await pdfDocLib.embedFont(StandardFonts.TimesRomanBoldItalic) },
+      c: { r: await pdfDocLib.embedFont(StandardFonts.Courier), b: await pdfDocLib.embedFont(StandardFonts.CourierBold), i: await pdfDocLib.embedFont(StandardFonts.CourierOblique), bi: await pdfDocLib.embedFont(StandardFonts.CourierBoldOblique) }
+    };
+    const pickFont = (family, bold, italic) => {
+      const pdfFam = getPdfFontFamily(family);
+      const fam = pdfFam === 'Times' ? F.t : pdfFam === 'Courier' ? F.c : F.h;
+      if (bold && italic) return fam.bi;
+      if (bold) return fam.b;
+      if (italic) return fam.i;
+      return fam.r;
+    };
+
+    const pdfPages = pdfDocLib.getPages();
+
+    for (let p = 0; p < totalPages; p++) {
+      const pdfPage = pdfPages[p];
+      const { width: pageW, height: pageH } = pdfPage.getSize();
+
+      if (pageBackgrounds[p]) {
+        const c = hexToRgb01(pageBackgrounds[p]);
+        pdfPage.drawRectangle({ x: 0, y: 0, width: pageW, height: pageH, color: rgb(c.r, c.g, c.b), opacity: 0.35 });
+      }
+
+      const edits = textEdits[p];
+      if (!edits || Object.keys(edits).length === 0) continue;
+
+      const keys = Object.keys(edits).map(k => parseInt(k)).sort((a, b) => a - b);
+      for (const idx of keys) {
+        const d = edits[idx];
+        if (!d) continue;
+
+        if (d.deleted) {
+          if (idx < 900000) {
+            const info = originalTextItems[p].find(i => i.idx === idx);
+            if (info) {
+              // TABLE-SAFE white-out: tight around the text only
+              const pdfX = info.x / scale;
+              const pdfBaseline = pageH - (info.baselineY / scale);
+              const pdfFontSize = info.fontSize / scale;
+              const widthPdf = Math.max(
+                info.width / scale,
+                estimateTextWidth(info.text, info.fontSize, info.fontFamily, info.bold, info.italic) / scale
+              );
+              if (!pageBackgrounds[p]) {
+                // Small padding only — do NOT overlap table borders
+                pdfPage.drawRectangle({
+                  x: pdfX - 2,
+                  y: pdfBaseline - pdfFontSize * 0.25,
+                  width: widthPdf + 4,
+                  height: pdfFontSize * 1.2,
+                  color: rgb(1, 1, 1)
+                });
+              }
+            }
+          }
+          continue;
+        }
+
+        const newText = d.text || '';
+        const isModified = d.modified || d.isNew;
+
+        // TABLE-SAFE white-out: tight around the ORIGINAL text
+        if (isModified && !pageBackgrounds[p] && !d.isNew) {
+          const origX = (d.origX !== undefined) ? d.origX : d.x;
+          const origFontSize = (d.origFontSize !== undefined) ? d.origFontSize : d.fontSize;
+          const origText = (d.origText !== undefined) ? d.origText : '';
+
+          let origBaselineCanvas = d.origBaselineY;
+          if (origBaselineCanvas === undefined) {
+            origBaselineCanvas = (d.origY !== undefined ? d.origY : d.y) + origFontSize;
+          }
+
+          const pdfX0 = origX / scale;
+          const pdfBaseline0 = pageH - (origBaselineCanvas / scale);
+          const pdfFontSize0 = origFontSize / scale;
+
+          let origWidth = (d.origWidth !== undefined) ? d.origWidth : 0;
+          if (origText) {
+            const est = estimateTextWidth(origText, origFontSize, d.fontFamily, d.bold, d.italic);
+            origWidth = Math.max(origWidth, est);
+          }
+          const pdfWidth0 = origWidth / scale;
+
+          // TIGHT white-out — only around the text, 2px padding
+          // This prevents table borders from being erased
+          pdfPage.drawRectangle({
+            x: pdfX0 - 2,
+            y: pdfBaseline0 - pdfFontSize0 * 0.25,
+            width: pdfWidth0 + 4,
+            height: pdfFontSize0 * 1.2,
+            color: rgb(1, 1, 1)
+          });
+        }
+
+        if (d.highlight && d.highlight !== '') {
+          const c = hexToRgb01(d.highlight);
+          const pdfX = d.x / scale;
+          const pdfFontSize = d.fontSize / scale;
+          const canvasBaseline = d.y + d.fontSize;
+          const pdfBaseline = pageH - (canvasBaseline / scale);
+          const newWidth = Math.max(
+            estimateTextWidth(newText, d.fontSize, d.fontFamily, d.bold, d.italic),
+            (d.width || 0)
+          ) / scale;
+          pdfPage.drawRectangle({
+            x: pdfX - 2,
+            y: pdfBaseline - pdfFontSize * 0.25,
+            width: newWidth + 4,
+            height: pdfFontSize * 1.2,
+            color: rgb(c.r, c.g, c.b), opacity: 0.9
+          });
+        }
+
+        if (newText && newText.trim() !== '') {
+          const pdfX = d.x / scale;
+          const pdfFontSize = d.fontSize / scale;
+          const canvasBaseline = d.y + d.fontSize;
+          const pdfBaseline = pageH - (canvasBaseline / scale);
+          const fontToUse = pickFont(d.fontFamily, d.bold, d.italic);
+          const tc = hexToRgb01(d.color || '#000000');
+          try {
+            pdfPage.drawText(newText, {
+              x: pdfX,
+              y: pdfBaseline + pdfFontSize * 0.1,
+              size: pdfFontSize, font: fontToUse,
+              color: rgb(tc.r, tc.g, tc.b)
+            });
+            if (d.underline) {
+              const w = estimateTextWidth(newText, d.fontSize, d.fontFamily, d.bold, d.italic) / scale;
+              pdfPage.drawLine({
+                start: { x: pdfX, y: pdfBaseline - pdfFontSize * 0.1 },
+                end: { x: pdfX + w, y: pdfBaseline - pdfFontSize * 0.1 },
+                thickness: Math.max(0.5, pdfFontSize * 0.05),
+                color: rgb(tc.r, tc.g, tc.b)
+              });
+            }
+          } catch (err) { console.warn('drawText error:', err); }
+        }
+      }
+    }
+
+    const newBytes = await pdfDocLib.save();
+    const blob = new Blob([newBytes], { type: 'application/pdf' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'edited-document.pdf';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+    hideLoader();
+    toast('PDF downloaded successfully');
+  } catch (err) {
+    console.error(err);
+    alert('Save error: ' + err.message);
+    hideLoader();
+  }
+};
+</script>
+
+</body>
+</html>
