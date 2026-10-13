@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>हिंदी Calligraphy PNG Generator - 30+ Fonts Live Preview</title>
+<link href="https://fonts.googleapis.com/css2?family=Kalam:wght@300;400;700&family=Rozha+One&family=Yatra+One&family=Baloo+2:wght@400;700;800&family=Tiro+Devanagari+Hindi:ital@0;1&family=Hind:wght@300;400;600;700&family=Mukta:wght@300;400;700&family=Modak&family=Sahitya:wght@400;700&family=Khand:wght@300;400;700&family=Rajdhani:wght@300;400;600;700&family=Gotu&family=Khula:wght@300;400;700&family=Karma:wght@300;400;700&family=Halant:wght@300;400;700&family=Ranga&family=Sura:wght@400;700&family=Vesper+Libre:wght@400;700&family=Martel:wght@300;400;700;900&family=Kadwa:wght@400;700&family=Amiko:wght@400;600;700&family=Charm:wght@400;700&family=Bahiana&family=Kavivanar&family=Atma:wght@300;400;700&family=Kurale&family=Glegoo:wght@400;700&family=Palanquin:wght@300;400;700&family=Gajraj+One&family=Sirin+Stencil&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+:root {
+  --primary-purple: #7c3aed;
+  --light-purple-bg: #f3f0ff;
+  --border-purple: #d8b4fe;
+  --text-dark: #1f2937;
+  --text-light: #6b7280;
+  --success-green: #6ee7b7;
+  --success-hover: #34d399;
+  --btn-shadow: 0 4px 6px -1px rgba(124, 58, 237, 0.4);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Hind', 'Segoe UI', Tahoma, sans-serif;
+  background-color: #f3f4f6;
+  background-image: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+  min-height: 100vh;
+  padding: 25px 15px;
+  color: var(--text-dark);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.container {
+  max-width: 1400px;
+  width: 100%;
+  background: white;
+  border-radius: 24px;
+  padding: 30px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08), 0 0 0 1px rgba(124, 58, 237, 0.1);
+}
+
+header {
+  text-align: center;
+  margin-bottom: 25px;
+  padding-bottom: 20px;
+  border-bottom: 1px dashed var(--border-purple);
+}
+
+header h1 {
+  font-family: 'Rozha One', serif;
+  font-size: 26px;
+  color: var(--text-dark);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  font-weight: 700;
+}
+
+header h1 i { color: var(--primary-purple); font-size: 24px; }
+
+header p {
+  color: var(--text-light);
+  font-size: 14px;
+  background: var(--light-purple-bg);
+  padding: 8px 20px;
+  border-radius: 30px;
+  display: inline-block;
+  font-weight: 600;
+  border: 1px solid var(--border-purple);
+}
+
+main {
+  display: grid;
+  grid-template-columns: 420px 1fr;
+  gap: 25px;
+}
+
+@media (max-width: 950px) {
+  main { grid-template-columns: 1fr; }
+  .container { padding: 18px; border-radius: 20px; }
+  header h1 { font-size: 20px; }
+}
+
+/* Controls */
+.controls {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 88vh;
+  overflow-y: auto;
+  padding-right: 10px;
+}
+
+.controls::-webkit-scrollbar { width: 6px; }
+.controls::-webkit-scrollbar-thumb { background: var(--border-purple); border-radius: 3px; }
+
+.section-title {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--primary-purple);
+  margin-top: 16px;
+  margin-bottom: 4px;
+  padding-bottom: 8px;
+  border-bottom: 1px dashed var(--border-purple);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.controls label {
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--text-dark);
+  margin-top: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Textarea */
+textarea#textInput {
+  width: 100%;
+  min-height: 180px;
+  padding: 16px 18px;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  font-family: 'Hind', sans-serif;
+  font-size: 1.15rem;
+  line-height: 1.6;
+  transition: all 0.3s;
+  resize: vertical;
+  background: white;
+  color: var(--text-dark);
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  outline: none;
+}
+
+textarea#textInput::placeholder {
+  color: #94a3b8;
+  font-style: italic;
+}
+
+textarea#textInput:focus {
+  border-color: var(--primary-purple);
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+}
+
+select, input[type="number"] {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  font-family: 'Hind', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-dark);
+  transition: all 0.2s;
+  outline: none;
+  background: white;
+  cursor: pointer;
+}
+
+select:focus {
+  border-color: var(--primary-purple);
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+}
+
+select {
+  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%237c3aed%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%2F%3E%3C%2Fsvg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 14px;
+  appearance: none;
+  -webkit-appearance: none;
+  padding-right: 34px;
+}
+
+select option { background: white; color: var(--text-dark); }
+select optgroup { font-weight: 800; color: var(--primary-purple); }
+
+input[type="range"] {
+  width: 100%;
+  accent-color: var(--primary-purple);
+  cursor: pointer;
+  height: 6px;
+}
+
+input[type="color"] {
+  width: 100%;
+  height: 42px;
+  border: 1px solid var(--border-purple);
+  border-radius: 12px;
+  cursor: pointer;
+  background: white;
+  padding: 4px;
+  transition: all 0.2s;
+}
+
+input[type="color"]:hover { transform: scale(1.02); }
+
+/* Character counter */
+.char-info {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--primary-purple);
+  font-weight: 700;
+  margin-top: -4px;
+  padding: 6px 12px;
+  background: var(--light-purple-bg);
+  border-radius: 10px;
+  border: 1px solid var(--border-purple);
+}
+
+.color-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.color-row > div { display: flex; flex-direction: column; gap: 6px; }
+.color-row label { margin: 0; font-size: 12px; color: var(--text-light); }
+
+.bg-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.bg-btn {
+  padding: 10px;
+  border: 1px solid var(--border-purple);
+  border-radius: 20px;
+  background: white;
+  cursor: pointer;
+  font-size: 12px;
+  font-family: 'Hind', sans-serif;
+  font-weight: 700;
+  color: var(--primary-purple);
+  transition: all 0.2s;
+}
+
+.bg-btn:hover { 
+  background: var(--light-purple-bg);
+  border-color: var(--primary-purple);
+  transform: translateY(-1px);
+}
+
+.bg-btn.active {
+  background: var(--primary-purple);
+  color: white;
+  border-color: var(--primary-purple);
+  box-shadow: var(--btn-shadow);
+}
+
+.effects {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.effects label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  cursor: pointer;
+  padding: 9px 12px;
+  background: white;
+  border-radius: 10px;
+  transition: all 0.2s;
+  margin: 0;
+  border: 1px solid #e2e8f0;
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+.effects label:hover {
+  background: var(--light-purple-bg);
+  border-color: var(--border-purple);
+}
+
+.effects input {
+  accent-color: var(--primary-purple);
+  cursor: pointer;
+  width: 16px;
+  height: 16px;
+}
+
+/* Font Chips */
+.font-chips {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  padding: 4px 0;
+}
+
+.font-chip {
+  padding: 8px 14px;
+  background: white;
+  border: 1px solid var(--border-purple);
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: var(--primary-purple);
+}
+
+.font-chip:hover {
+  background: var(--light-purple-bg);
+  border-color: var(--primary-purple);
+  transform: translateY(-2px);
+}
+
+.font-chip.active {
+  background: var(--primary-purple);
+  color: white;
+  border-color: var(--primary-purple);
+  box-shadow: var(--btn-shadow);
+}
+
+/* Preview */
+.preview-area {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.font-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px 20px;
+  background: var(--light-purple-bg);
+  border-radius: 16px;
+  border: 1px solid var(--border-purple);
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.font-info .info-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--primary-purple);
+  font-weight: 800;
+}
+
+.font-info .info-name {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--text-dark);
+  margin-top: 2px;
+}
+
+.font-info .info-category {
+  font-size: 12px;
+  padding: 6px 14px;
+  background: var(--primary-purple);
+  color: white;
+  border-radius: 20px;
+  font-weight: 700;
+  box-shadow: var(--btn-shadow);
+}
+
+#canvasWrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 420px;
+  border-radius: 16px;
+  border: 2px dashed var(--border-purple);
+  padding: 15px;
+  overflow: auto;
+  transition: background 0.3s;
+}
+
+.checker {
+  background-image:
+    linear-gradient(45deg, #e2e8f0 25%, transparent 25%),
+    linear-gradient(-45deg, #e2e8f0 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #e2e8f0 75%),
+    linear-gradient(-45deg, transparent 75%, #e2e8f0 75%);
+  background-size: 20px 20px;
+  background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+  background-color: #fafafa;
+}
+
+#canvas {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+.actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.actions button {
+  flex: 1;
+  min-width: 160px;
+  padding: 15px 20px;
+  border: none;
+  border-radius: 30px;
+  font-family: 'Hind', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.25s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.primary {
+  background-color: var(--primary-purple);
+  color: white;
+  box-shadow: var(--btn-shadow);
+}
+
+.primary:hover {
+  background-color: #6d28d9;
+  transform: translateY(-2px);
+}
+
+#resetBtn {
+  background: white;
+  color: var(--primary-purple);
+  border: 1px solid var(--border-purple);
+  flex: 0 0 130px;
+  min-width: 130px;
+}
+
+#resetBtn:hover { 
+  background: var(--light-purple-bg);
+  border-color: var(--primary-purple);
+  transform: translateY(-2px);
+}
+
+footer {
+  text-align: center;
+  margin-top: 25px;
+  padding-top: 20px;
+  border-top: 1px dashed var(--border-purple);
+  color: var(--primary-purple);
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+}
+
+.toast {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  background: var(--success-green);
+  color: #166534;
+  padding: 14px 26px;
+  border-radius: 30px;
+  font-weight: 700;
+  box-shadow: 0 6px 25px rgba(52, 211, 153, 0.5);
+  opacity: 0;
+  transition: all 0.4s;
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 90vw;
+}
+
+.toast.show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <h1><i class="fas fa-paint-brush"></i> हिंदी Calligraphy Studio</h1>
+    <p>30+ Fonts • Color • Border • Transparent PNG</p>
+  </header>
+
+  <main>
+    <section class="controls">
+
+      <div class="section-title"><i class="fas fa-pen-fancy"></i> Text (Bada Area)</div>
+      <label><i class="fas fa-i-cursor"></i> अपना Text लिखें</label>
+      <textarea id="textInput" rows="8" placeholder="यहाँ हिंदी में लिखें...&#10;&#10;उदाहरण:&#10;स्वागत है&#10;शुभ दीपावली&#10;मेरे प्यारे भारत">स्वागत है</textarea>
+      <div class="char-info">
+        <span id="charCount">9 characters</span>
+        <span id="lineCount">1 line</span>
+      </div>
+
+      <div class="section-title"><i class="fas fa-bolt"></i> Quick Font Picks</div>
+      <div class="font-chips" id="fontChips">
+        <div class="font-chip active" data-font="'Kalam', cursive">Kalam</div>
+        <div class="font-chip" data-font="'Rozha One', serif">Rozha</div>
+        <div class="font-chip" data-font="'Yatra One', cursive">Yatra</div>
+        <div class="font-chip" data-font="'Baloo 2', cursive">Baloo</div>
+        <div class="font-chip" data-font="'Charm', cursive">Charm</div>
+        
+      </div>
+
+      <div class="section-title"><i class="fas fa-font"></i> All Fonts (30+)</div>
+      <label><i class="fas fa-list"></i> Choose Font</label>
+      <select id="fontSelect">
+        <optgroup label="── Calligraphy / Handwritten ──">
+          <option value="'Kalam', cursive" data-name="Kalam" data-cat="Handwritten" selected>Kalam — Handwritten</option>
+          <option value="'Charm', cursive" data-name="Charm" data-cat="Script">Charm — Elegant Script</option>
+          <option value="'Kavivanar', cursive" data-name="Kavivanar" data-cat="Brush">Kavivanar — Playful Brush</option>
+          <option value="'Kurale', serif" data-name="Kurale" data-cat="Italic">Kurale — Soft Italic</option>
+          <option value="'Atma', cursive" data-name="Atma" data-cat="Playful">Atma — Playful</option>
+          <option value="'Bahiana', cursive" data-name="Bahiana" data-cat="Brush">Bahiana — Bold Brush</option>
+        </optgroup>
+        <optgroup label="── Traditional / Classic ──">
+          <option value="'Rozha One', serif" data-name="Rozha One" data-cat="Traditional">Rozha One — Traditional</option>
+          <option value="'Yatra One', cursive" data-name="Yatra One" data-cat="Brush">Yatra One — Devanagari Brush</option>
+          <option value="'Tiro Devanagari Hindi', serif" data-name="Tiro Devanagari" data-cat="Elegant">Tiro Devanagari — Elegant</option>
+          <option value="'Sahitya', serif" data-name="Sahitya" data-cat="Book">Sahitya — Classic Book</option>
+          <option value="'Karma', serif" data-name="Karma" data-cat="Balanced">Karma — Balanced Serif</option>
+          <option value="'Halant', serif" data-name="Halant" data-cat="Thin Serif">Halant — Thin Serif</option>
+          <option value="'Martel', serif" data-name="Martel" data-cat="Heavy Serif">Martel — Heavy Serif</option>
+          <option value="'Vesper Libre', serif" data-name="Vesper Libre" data-cat="Old Style">Vesper Libre — Old Style</option>
+        </optgroup>
+        <optgroup label="── Modern / Clean ──">
+          <option value="'Hind', sans-serif" data-name="Hind" data-cat="Modern">Hind — Modern Sans</option>
+          <option value="'Mukta', sans-serif" data-name="Mukta" data-cat="Clean">Mukta — Clean Sans</option>
+          <option value="'Khula', sans-serif" data-name="Khula" data-cat="Geometric">Khula — Geometric</option>
+          <option value="'Rajdhani', sans-serif" data-name="Rajdhani" data-cat="Techy">Rajdhani — Techy</option>
+          <option value="'Khand', sans-serif" data-name="Khand" data-cat="Condensed">Khand — Condensed</option>
+          <option value="'Palanquin', sans-serif" data-name="Palanquin" data-cat="Smooth">Palanquin — Smooth</option>
+          <option value="'Gotu', sans-serif" data-name="Gotu" data-cat="Minimal">Gotu — Minimal</option>
+          <option value="'Amiko', sans-serif" data-name="Amiko" data-cat="Rounded">Amiko — Rounded</option>
+        </optgroup>
+        <optgroup label="── Decorative / Bold ──">
+          <option value="'Baloo 2', cursive" data-name="Baloo 2" data-cat="Rounded Bold">Baloo 2 — Rounded Bold</option>
+          <option value="'Modak', cursive" data-name="Modak" data-cat="Fun">Modak — Puffy Fun</option>
+          <option value="'Gajraj One', cursive" data-name="Gajraj One" data-cat="Display">Gajraj One — Display Bold</option>
+          <option value="'Sirin Stencil', cursive" data-name="Sirin Stencil" data-cat="Stencil">Sirin Stencil — Stencil</option>
+          <option value="'Ranga', cursive" data-name="Ranga" data-cat="Artistic">Ranga — Artistic</option>
+          <option value="'Sura', serif" data-name="Sura" data-cat="Storybook">Sura — Storybook</option>
+          <option value="'Kadwa', serif" data-name="Kadwa" data-cat="Heavy">Kadwa — Heavy Display</option>
+          <option value="'Glegoo', serif" data-name="Glegoo" data-cat="Slab">Glegoo — Slab Serif</option>
+        </optgroup>
+      </select>
+
+      <label><i class="fas fa-text-height"></i> Font Size: <span id="sizeVal" style="color:var(--primary-purple);background:var(--light-purple-bg);padding:2px 10px;border-radius:20px;font-weight:800;">80</span>px</label>
+      <input type="range" id="fontSize" min="20" max="250" value="80">
+
+      <label><i class="fas fa-arrows-alt-h"></i> Letter Spacing: <span id="spacingVal" style="color:var(--primary-purple);background:var(--light-purple-bg);padding:2px 10px;border-radius:20px;font-weight:800;">0</span>px</label>
+      <input type="range" id="letterSpacing" min="-10" max="30" value="0">
+
+      <div class="section-title"><i class="fas fa-palette"></i> Text Color</div>
+      <div class="color-row">
+        <div>
+          <label>Fill Color</label>
+          <input type="color" id="textColor" value="#1a1a1a">
+        </div>
+        <div>
+          <label>Gradient 2nd</label>
+          <input type="color" id="gradientColor" value="#764ba2">
+        </div>
+      </div>
+      <div class="effects">
+        <label><input type="checkbox" id="gradientChk"> <i class="fas fa-fill-drip" style="color:var(--primary-purple);"></i> Gradient</label>
+        <label><input type="checkbox" id="shadowChk"> <i class="fas fa-clone" style="color:var(--primary-purple);"></i> Shadow</label>
+        <label><input type="checkbox" id="glowChk"> <i class="fas fa-sun" style="color:var(--primary-purple);"></i> Neon Glow</label>
+        <label><input type="checkbox" id="italicChk"> <i class="fas fa-italic" style="color:var(--primary-purple);"></i> Italic</label>
+      </div>
+
+      <div class="section-title"><i class="fas fa-circle-notch"></i> Border / Outline</div>
+      <div class="effects">
+        <label><input type="checkbox" id="outlineChk" checked> <i class="fas fa-border-all" style="color:var(--primary-purple);"></i> Border On</label>
+        <label><input type="checkbox" id="doubleBorderChk"> <i class="fas fa-layer-group" style="color:var(--primary-purple);"></i> Double Border</label>
+      </div>
+
+      <label><i class="fas fa-weight-hanging"></i> Border Thickness: <span id="strokeVal" style="color:var(--primary-purple);background:var(--light-purple-bg);padding:2px 10px;border-radius:20px;font-weight:800;">3</span>px</label>
+      <input type="range" id="strokeWidth" min="0" max="20" value="3">
+
+      <div class="color-row">
+        <div>
+          <label>Border Color</label>
+          <input type="color" id="strokeColor" value="#ffffff">
+        </div>
+        <div>
+          <label>Outer Border</label>
+          <input type="color" id="outerStrokeColor" value="#667eea">
+        </div>
+      </div>
+
+      <div class="section-title"><i class="fas fa-eye"></i> Preview Background</div>
+      <div class="bg-options">
+        <button class="bg-btn active" data-bg="checker">Transparent</button>
+        <button class="bg-btn" data-bg="#ffffff">White</button>
+        <button class="bg-btn" data-bg="#111111">Black</button>
+        <button class="bg-btn" data-bg="#fce4ec">Pink</button>
+        <button class="bg-btn" data-bg="#e3f2fd">Blue</button>
+        <button class="bg-btn" data-bg="#fff8e1">Cream</button>
+      </div>
+
+    </section>
+
+    <section class="preview-area">
+
+      <div class="font-info">
+        <div>
+          <div class="info-label">Currently Selected Font</div>
+          <div class="info-name" id="fontNameDisplay">Kalam</div>
+        </div>
+        <div class="info-category" id="fontCatDisplay">Handwritten</div>
+      </div>
+
+      <div id="canvasWrap" class="checker">
+        <canvas id="canvas" width="800" height="400"></canvas>
+      </div>
+      <div class="actions">
+        <button id="downloadBtn" class="primary"><i class="fas fa-download"></i> Download PNG (Transparent)</button>
+        <button id="resetBtn"><i class="fas fa-redo"></i> Reset</button>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <i class="fa-solid fa-heart"></i> Made with Love · Create by Sandesh <i class="fa-solid fa-heart"></i>
+  </footer>
+</div>
+
+<div class="toast" id="toast"><i class="fas fa-check-circle"></i> Downloaded!</div>
+
+<script>
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+
+const els = {
+  text: document.getElementById('textInput'),
+  charCount: document.getElementById('charCount'),
+  lineCount: document.getElementById('lineCount'),
+  font: document.getElementById('fontSelect'),
+  fontNameDisplay: document.getElementById('fontNameDisplay'),
+  fontCatDisplay: document.getElementById('fontCatDisplay'),
+  fontChips: document.getElementById('fontChips'),
+  size: document.getElementById('fontSize'),
+  sizeVal: document.getElementById('sizeVal'),
+  spacing: document.getElementById('letterSpacing'),
+  spacingVal: document.getElementById('spacingVal'),
+  color: document.getElementById('textColor'),
+  gradientColor: document.getElementById('gradientColor'),
+  strokeWidth: document.getElementById('strokeWidth'),
+  strokeVal: document.getElementById('strokeVal'),
+  strokeColor: document.getElementById('strokeColor'),
+  outerStrokeColor: document.getElementById('outerStrokeColor'),
+  shadow: document.getElementById('shadowChk'),
+  outline: document.getElementById('outlineChk'),
+  doubleBorder: document.getElementById('doubleBorderChk'),
+  glow: document.getElementById('glowChk'),
+  gradient: document.getElementById('gradientChk'),
+  italic: document.getElementById('italicChk'),
+  canvasWrap: document.getElementById('canvasWrap'),
+  download: document.getElementById('downloadBtn'),
+  reset: document.getElementById('resetBtn'),
+  toast: document.getElementById('toast')
+};
+
+let currentBg = 'checker';
+
+// Auto-resize textarea as user types
+function autoResizeTextarea() {
+  els.text.style.height = 'auto';
+  els.text.style.height = Math.max(180, els.text.scrollHeight) + 'px';
+}
+
+// Update character / line count
+function updateCounts() {
+  const txt = els.text.value;
+  els.charCount.textContent = `${txt.length} characters`;
+  els.lineCount.textContent = `${txt.split('\n').length} line${txt.split('\n').length > 1 ? 's' : ''}`;
+}
+
+function getCurrentFontInfo() {
+  const opt = els.font.options[els.font.selectedIndex];
+  return {
+    value: els.font.value,
+    name: opt.dataset.name || opt.text.split('—')[0].trim(),
+    cat: opt.dataset.cat || 'Font'
+  };
+}
+
+function updateFontInfo() {
+  const info = getCurrentFontInfo();
+  els.fontNameDisplay.textContent = info.name;
+  els.fontCatDisplay.textContent = info.cat;
+  els.fontChips.querySelectorAll('.font-chip').forEach(chip => {
+    chip.classList.toggle('active', chip.dataset.font === info.value);
+  });
+}
+
+function drawTextWithSpacing(text, x, y, spacing) {
+  if (spacing === 0) { ctx.fillText(text, x, y); return; }
+  const chars = [...text];
+  const widths = chars.map(c => ctx.measureText(c).width);
+  const totalWidth = widths.reduce((a, b) => a + b, 0) + spacing * (chars.length - 1);
+  let curX = x - totalWidth / 2;
+  chars.forEach((c, i) => { ctx.fillText(c, curX + widths[i] / 2, y); curX += widths[i] + spacing; });
+}
+
+function strokeTextWithSpacing(text, x, y, spacing) {
+  if (spacing === 0) { ctx.strokeText(text, x, y); return; }
+  const chars = [...text];
+  const widths = chars.map(c => ctx.measureText(c).width);
+  const totalWidth = widths.reduce((a, b) => a + b, 0) + spacing * (chars.length - 1);
+  let curX = x - totalWidth / 2;
+  chars.forEach((c, i) => { ctx.strokeText(c, curX + widths[i] / 2, y); curX += widths[i] + spacing; });
+}
+
+function measureLine(line, fontSize, font, spacing) {
+  const temp = document.createElement('canvas').getContext('2d');
+  temp.font = `700 ${fontSize}px ${font}`;
+  if (spacing === 0) return temp.measureText(line).width;
+  const chars = [...line];
+  return chars.reduce((sum, c) => sum + temp.measureText(c).width, 0) + spacing * (chars.length - 1);
+}
+
+function resizeCanvas(lines, fontSize, font, spacing, strokeWidth) {
+  let maxWidth = 0;
+  lines.forEach(line => {
+    const w = measureLine(line, fontSize, font, spacing);
+    if (w > maxWidth) maxWidth = w;
+  });
+  const lineHeight = fontSize * 1.35;
+  const extra = strokeWidth * 2 + 20;
+  const padding = Math.max(50, fontSize * 0.5) + extra;
+  const width = Math.ceil(maxWidth + padding * 2);
+  const height = Math.ceil(lines.length * lineHeight + padding * 2);
+  canvas.width = Math.max(400, width);
+  canvas.height = Math.max(200, height);
+}
+
+function draw() {
+  const text = els.text.value || ' ';
+  const font = els.font.value;
+  const fontSize = parseInt(els.size.value);
+  const color = els.color.value;
+  const gradientColor = els.gradientColor.value;
+  const spacing = parseInt(els.spacing.value);
+  const strokeWidth = parseInt(els.strokeWidth.value);
+  const lines = text.split('\n');
+  const lineHeight = fontSize * 1.35;
+
+  resizeCanvas(lines, fontSize, font, spacing, strokeWidth);
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  const style = els.italic.checked ? 'italic' : 'normal';
+  ctx.font = `${style} 700 ${fontSize}px ${font}`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.lineJoin = 'round';
+  ctx.miterLimit = 2;
+
+  const totalHeight = lines.length * lineHeight;
+  const startY = (canvas.height - totalHeight) / 2 + lineHeight / 2;
+
+  lines.forEach((line, i) => {
+    const y = startY + i * lineHeight;
+    const x = canvas.width / 2;
+
+    ctx.shadowColor = 'transparent';
+    ctx.shadowBlur = 0;
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 0;
+
+    if (els.glow.checked) {
+      ctx.shadowColor = color;
+      ctx.shadowBlur = 25;
+    }
+    if (els.shadow.checked) {
+      ctx.shadowColor = 'rgba(0,0,0,0.45)';
+      ctx.shadowBlur = 12;
+      ctx.shadowOffsetX = 5;
+      ctx.shadowOffsetY = 5;
+    }
+
+    if (els.doubleBorder.checked && strokeWidth > 0) {
+      ctx.lineWidth = strokeWidth * 2 + 4;
+      ctx.strokeStyle = els.outerStrokeColor.value;
+      strokeTextWithSpacing(line, x, y, spacing);
+    }
+
+    if (els.outline.checked && strokeWidth > 0) {
+      ctx.lineWidth = strokeWidth;
+      ctx.strokeStyle = els.strokeColor.value;
+      strokeTextWithSpacing(line, x, y, spacing);
+    }
+
+    ctx.shadowColor = 'transparent';
+    ctx.shadowBlur = 0;
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 0;
+
+    if (els.gradient.checked) {
+      const grad = ctx.createLinearGradient(0, y - fontSize / 2, 0, y + fontSize / 2);
+      grad.addColorStop(0, color);
+      grad.addColorStop(1, gradientColor);
+      ctx.fillStyle = grad;
+    } else {
+      ctx.fillStyle = color;
+    }
+    drawTextWithSpacing(line, x, y, spacing);
+  });
+
+  updateCounts();
+}
+
+function setBg(bg) {
+  currentBg = bg;
+  document.querySelectorAll('.bg-btn').forEach(b => b.classList.remove('active'));
+  const btn = document.querySelector(`.bg-btn[data-bg="${bg}"]`);
+  if (btn) btn.classList.add('active');
+  if (bg === 'checker') {
+    els.canvasWrap.className = 'checker';
+    els.canvasWrap.style.background = '';
+  } else {
+    els.canvasWrap.className = '';
+    els.canvasWrap.style.background = bg;
+  }
+}
+
+function download() {
+  const info = getCurrentFontInfo();
+  const link = document.createElement('a');
+  link.download = `hindi-${info.name.toLowerCase().replace(/\s+/g,'-')}-${Date.now()}.png`;
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+  showToast(`✅ ${info.name} PNG Downloaded!`);
+}
+
+function showToast(msg) {
+  els.toast.innerHTML = `<i class="fas fa-check-circle"></i> ${msg}`;
+  els.toast.classList.add('show');
+  setTimeout(() => els.toast.classList.remove('show'), 2200);
+}
+
+function reset() {
+  els.text.value = 'स्वागत है';
+  els.font.value = "'Kalam', cursive";
+  els.size.value = 80; els.sizeVal.textContent = 80;
+  els.spacing.value = 0; els.spacingVal.textContent = 0;
+  els.color.value = '#1a1a1a';
+  els.gradientColor.value = '#764ba2';
+  els.strokeWidth.value = 3; els.strokeVal.textContent = 3;
+  els.strokeColor.value = '#ffffff';
+  els.outerStrokeColor.value = '#667eea';
+  els.shadow.checked = false;
+  els.outline.checked = true;
+  els.doubleBorder.checked = false;
+  els.glow.checked = false;
+  els.gradient.checked = false;
+  els.italic.checked = false;
+  setBg('checker');
+  updateFontInfo();
+  autoResizeTextarea();
+  draw();
+}
+
+// ===== EVENTS =====
+els.font.addEventListener('change', () => { updateFontInfo(); draw(); });
+
+els.fontChips.addEventListener('click', (e) => {
+  const chip = e.target.closest('.font-chip');
+  if (!chip) return;
+  for (let opt of els.font.options) {
+    if (opt.value === chip.dataset.font) { els.font.value = chip.dataset.font; break; }
+  }
+  updateFontInfo();
+  draw();
+});
+
+// Text events - auto resize + redraw
+els.text.addEventListener('input', () => {
+  autoResizeTextarea();
+  draw();
+});
+
+['input', 'change'].forEach(ev => {
+  els.color.addEventListener(ev, draw);
+  els.gradientColor.addEventListener(ev, draw);
+  els.strokeColor.addEventListener(ev, draw);
+  els.outerStrokeColor.addEventListener(ev, draw);
+  els.shadow.addEventListener(ev, draw);
+  els.outline.addEventListener(ev, draw);
+  els.doubleBorder.addEventListener(ev, draw);
+  els.glow.addEventListener(ev, draw);
+  els.gradient.addEventListener(ev, draw);
+  els.italic.addEventListener(ev, draw);
+});
+
+els.size.addEventListener('input', e => { els.sizeVal.textContent = e.target.value; draw(); });
+els.spacing.addEventListener('input', e => { els.spacingVal.textContent = e.target.value; draw(); });
+els.strokeWidth.addEventListener('input', e => { els.strokeVal.textContent = e.target.value; draw(); });
+
+document.querySelectorAll('.bg-btn').forEach(btn => {
+  btn.addEventListener('click', () => setBg(btn.dataset.bg));
+});
+
+els.download.addEventListener('click', download);
+els.reset.addEventListener('click', reset);
+
+// ===== INIT =====
+autoResizeTextarea();
+updateFontInfo();
+draw();
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(draw);
+setTimeout(draw, 800);
+setTimeout(draw, 2000);
+</script>
+
+</body>
+</html>
